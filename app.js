@@ -1,13 +1,10 @@
-/*WORLD1_BANK star_bloom*/
+/*WORLD1_BANK star_bloom art-hotswap*/
 (async function(){
-  var SHA="c97ad9af2dd0db917b28eae3feeef30f3ac0aab0";
-  var base="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@"+SHA+"/";
-  var names=["app.p0.js","app.p1.js","app.p2.js"];
-  for (var i=0;i<names.length;i++){
-    var t=await (await fetch(base+names[i])).text();
-    (0,eval)(t);
-  }
-  var s=(window.__MVB0||"")+(window.__MVB1||"")+(window.__MVB2||"");
-  try{delete window.__MVB0;delete window.__MVB1;delete window.__MVB2;}catch(e){}
+  var SHA="f8cc72828ace6da8a82e5294307e435c108f0db1";
+  var base=(document.currentScript&&document.currentScript.getAttribute("data-base"))||window.MEADOW_JS_BASE||("https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@"+SHA+"/");
+  if(!base.endsWith("/")) base+="/";
+  var names=[]; for(var i=0;i<12;i++) names.push("app.q"+i+".js");
+  for(var i=0;i<names.length;i++){ var t=await (await fetch(base+names[i])).text(); (0,eval)(t); }
+  var s=""; for(var i=0;i<12;i++){ s+=window["__MVBQ"+i]||""; try{delete window["__MVBQ"+i]}catch(e){} }
   (0,eval)(s);
 })();
