@@ -1,0 +1,62 @@
+/* Pixel Art Director hot-swap */
+.hero.art-sprite .cat-ear,
+.hero.art-sprite .cat-head,
+.hero.art-sprite .cat-body,
+.hero.art-sprite .cat-tail,
+.hero.art-sprite .cat-collar{display:none!important}
+.hero.art-sprite{
+  width:72px;height:72px;
+  background-image:var(--hero-sheet);
+  background-repeat:no-repeat;
+  background-position:var(--hero-sx,0) var(--hero-sy,0);
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  background-color:transparent;
+  border:none;box-shadow:none;
+}
+.hero.art-sprite .hero-label{bottom:-1.1rem}
+.bloop.art-sprite .bloop-body{opacity:0;pointer-events:none}
+.bloop.art-sprite{
+  width:96px;height:84px;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  background-color:transparent;
+}
+.bloop.art-sprite.boss-art{
+  width:140px;height:110px;
+  transform-origin:center bottom;
+}
+.bloop.art-sprite .bloop-label{bottom:-1.15rem}
+.read-panel.art-panel{
+  background-size:cover;
+  background-position:center top;
+  background-repeat:no-repeat;
+}
+.power-chip.art-chip{
+  background-size:280px 186px;
+  background-repeat:no-repeat;
+  background-position:0 center;
+  font-size:0;color:transparent;
+  border-radius:10px;
+  image-rendering:pixelated;
+}
+.power-chip.art-chip.star{background-position:2px -66px;background-size:280px 186px}
+.power-chip.art-chip.leaf{background-position:-120px -66px}
+.power-chip.art-chip.wind{background-position:-160px -66px}
+.power-pick-btn.art-power{display:inline-flex;align-items:center;gap:0.35rem}
+.art-power-icon{
+  display:inline-block;width:28px;height:28px;
+  background-size:280px 186px;background-repeat:no-repeat;
+  image-rendering:pixelated;
+}
+.art-power-icon.star{background-position:0 -66px}
+.spark.art-vfx{
+  width:48px;height:48px;border-radius:0;
+  background-color:transparent!important;
+  background-size:280px 186px;
+  background-position:-18px -28px;
+  background-repeat:no-repeat;
+  box-shadow:none;filter:none;
+  image-rendering:pixelated;
+}
+.spark.art-vfx.star-fx{background-position:-18px -28px;transform:scale(1.25)}
