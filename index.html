@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Meadow vs Bloop — Reading RPG Slice</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="top-bar">
+      <h1 class="title">Meadow vs Bloop</h1>
+      <div class="mode-toggle" role="tablist" aria-label="Success mode">
+        <button type="button" id="mode-confirm" class="mode-btn active" role="tab" aria-selected="true">
+          Parent Confirm
+        </button>
+        <button type="button" id="mode-match" class="mode-btn" role="tab" aria-selected="false">
+          Pick the word
+        </button>
+      </div>
+    </header>
+
+    <main class="stage" id="stage">
+      <div class="sky"></div>
+      <div class="hills"></div>
+      <div class="grass"></div>
+
+      <div class="hit-pips" id="hit-pips" aria-label="Hits on Bloop">
+        <span class="pip" data-hit="0"></span>
+        <span class="pip" data-hit="1"></span>
+        <span class="pip" data-hit="2"></span>
+      </div>
+
+      <div class="actors">
+        <div class="hero" id="hero" title="Hero">
+          <div class="hero-body"></div>
+          <div class="hero-face"></div>
+          <div class="hero-label">You</div>
+        </div>
+
+        <div class="chest" id="chest" title="Treasure chest">
+          <div class="chest-lid"></div>
+          <div class="chest-box"></div>
+          <div class="chest-lock"></div>
+          <div class="chest-label">Chest</div>
+        </div>
+
+        <div class="bloop" id="bloop" title="Bloop">
+          <div class="bloop-body">
+            <div class="bloop-eye left"></div>
+            <div class="bloop-eye right"></div>
+            <div class="bloop-smile"></div>
+          </div>
+          <div class="bloop-label">Bloop</div>
+        </div>
+      </div>
+
+      <div class="fx" id="fx" aria-hidden="true"></div>
+      <div class="flavor" id="flavor" aria-live="polite"></div>
+    </main>
+
+    <section class="read-panel" id="read-panel">
+      <p class="prompt" id="prompt">Sound it out!</p>
+      <div class="cvc-wrap" id="cvc-wrap">
+        <div class="cvc-word" id="cvc-word" aria-live="polite">CAT</div>
+      </div>
+
+      <div class="controls" id="controls-confirm">
+        <button type="button" class="btn-confirm" id="btn-confirm">Confirm ✓</button>
+      </div>
+
+      <div class="controls hidden" id="controls-match">
+        <button type="button" class="word-tile" id="choice-a"></button>
+        <button type="button" class="word-tile" id="choice-b"></button>
+      </div>
+
+      <p class="feedback" id="feedback" aria-live="assertive"></p>
+    </section>
+
+    <div class="win-overlay hidden" id="win-overlay">
+      <div class="win-card">
+        <p class="win-emoji">✨🏆✨</p>
+        <h2>You did it!</h2>
+        <p>The chest opens. Spark treasure for a great reader!</p>
+        <button type="button" class="btn-confirm" id="btn-replay">Play again</button>
+      </div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
