@@ -2,6 +2,12 @@
 (async function(){
   var base=(document.currentScript&&document.currentScript.getAttribute("data-base"))||window.MEADOW_JS_BASE||"https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@main/";
   if(!base.endsWith("/")) base+="/";
+  try{
+    var link=document.createElement("link");
+    link.rel="stylesheet";
+    link.href=base+"art-hotswap.css";
+    document.head.appendChild(link);
+  }catch(e){}
   window.MEADOW_ASSET_EMBED=window.MEADOW_ASSET_EMBED||{};
   async function tryLoad(url){
     try{
