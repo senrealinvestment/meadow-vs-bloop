@@ -29,14 +29,16 @@ jobs:
           }
           staging = pathlib.Path("assets/_staging")
           for prefix, (dest, exp) in mapping.items():
-            files = sorted(staging.glob(prefix + ".part*"))
+            files = sorted(staging.glob(prefix + ".p*"))
+            if not files:
+              files = sorted(staging.glob(prefix + ".part*"))
             if not files:
               raise SystemExit(f"missing parts for {prefix}")
-            data = "".join(f.read_text() for f in files)
+            data = "".join(f.read_text().strip() for f in files)
             md5 = hashlib.md5(data.encode()).hexdigest()
             print(dest, len(files), len(data), md5)
             if md5 != exp:
-              raise SystemExit(f"md5 mismatch {dest}")
+              raise SystemExit(f"md5 mismatch {dest}: got {md5} want {exp}")
             pathlib.Path(dest).parent.mkdir(parents=True, exist_ok=True)
             pathlib.Path(dest).write_text(data)
           print("OK")
