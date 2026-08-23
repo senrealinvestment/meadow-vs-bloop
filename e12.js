@@ -1,0 +1,1 @@
+window.MEADOW_ASSET_EMBED["sparkelody/walk/sheet.png"]+='ysbMsiUFeG7YRADFp4wDe1ANXye7VSRy0fDKJMcNIlj5FZ/uwCi0TAV8Hcz6DBBbN0eL/yepMGv/TS79OAmH6W+5kwUn+8zM1eJoKfHN/qmJPp0/L7RehtQTEcWzy/+HsvX+dav/I5dTpyieds9e8+esVrpdh7/+i8q9h+dd46r1D+v7/K+jNKO8+P7zlfs/qZrn7X889xFUCTz1FJOp9ec896v0ST/+SYHeJrniNJO2w2vmWxjqlkm5948L+1aWltJDM3GwAAAABJRU5ErkJggg==';
