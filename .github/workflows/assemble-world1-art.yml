@@ -1,0 +1,51 @@
+name: Assemble World 1 art b64
+on:
+  workflow_dispatch:
+  push:
+    branches: [art/world1-hotswap]
+    paths: ['assets/_staging/**']
+permissions:
+  contents: write
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: art/world1-hotswap
+      - name: Assemble and verify
+        run: |
+          python3 <<'PY'
+          import hashlib, pathlib
+          mapping = {
+            "assets__sparkelody__walk__sheet.png.b64": ("assets/sparkelody/walk/sheet.png.b64", "e58f13d4b9d6791e11c9b7026daa5012"),
+            "assets__sparkelody__cast__sheet.png.b64": ("assets/sparkelody/cast/sheet.png.b64", "a96c35fc667536bf7d7cfebc51bdacbb"),
+            "assets__powers__icons-sheet.png.b64": ("assets/powers/icons-sheet.png.b64", "f2b06f8860a82aec89666e8a2c39f097"),
+            "assets__powers__vfx-sheet.png.b64": ("assets/powers/vfx-sheet.png.b64", "bac7026820b4a8557e63b94e2ec3a424"),
+            "assets__worlds__meadow__tiles.png.b64": ("assets/worlds/meadow/tiles.png.b64", "8e9db1667187ba01d8c85410a5ce095e"),
+            "assets__foes__bloop-fluff-sheet.png.b64": ("assets/foes/bloop-fluff-sheet.png.b64", "8f13379a90f8de0fd4215da99881b780"),
+            "assets__bosses__star_bloom.png.b64": ("assets/bosses/star_bloom.png.b64", "5a1915851df4a486431acd9bbcd12769"),
+            "assets__ui__cvc-panel.png.b64": ("assets/ui/cvc-panel.png.b64", "9422fc38a2e247ac34512b1b5a2bea8c"),
+          }
+          staging = pathlib.Path("assets/_staging")
+          for prefix, (dest, exp) in mapping.items():
+            files = sorted(staging.glob(prefix + ".p*"))
+            if not files:
+              files = sorted(staging.glob(prefix + ".part*"))
+            if not files:
+              raise SystemExit(f"missing parts for {prefix}")
+            data = "".join(f.read_text().strip() for f in files)
+            md5 = hashlib.md5(data.encode()).hexdigest()
+            print(dest, len(files), len(data), md5)
+            if md5 != exp:
+              raise SystemExit(f"md5 mismatch {dest}: got {md5} want {exp}")
+            pathlib.Path(dest).parent.mkdir(parents=True, exist_ok=True)
+            pathlib.Path(dest).write_text(data)
+          print("OK")
+          PY
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/sparkelody/walk/sheet.png.b64 assets/sparkelody/cast/sheet.png.b64 assets/powers/icons-sheet.png.b64 assets/powers/vfx-sheet.png.b64 assets/worlds/meadow/tiles.png.b64 assets/foes/bloop-fluff-sheet.png.b64 assets/bosses/star_bloom.png.b64 assets/ui/cvc-panel.png.b64
+          git diff --cached --quiet || (git commit -m "art: assemble World 1 hot-swap base64 assets" && git push)
