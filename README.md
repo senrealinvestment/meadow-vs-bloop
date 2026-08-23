@@ -1,10 +1,10 @@
-# Sparkelody — Meadow vs Bloop (Phase 2)
+# Sparkelody — Meadow vs Bloop (Phase 2 / v0.2)
 
 K–1 reading RPG stub: top-down meadow walk → talk to NPCs → reading-gated CVC fights → persistent powers.
 
 ## Play
 
-Open the deployed Vercel URL, or open `index.html` locally (single-file build: CSS+JS inlined).
+Open `index.html` on GitHub Pages / raw / local (CSS inlined; loads `app.js`). Modular fallback: `index.modular.html` + `styles.css` + `app.js`.
 
 1. Walk with **arrows / WASD / on-screen D-pad**.
 2. Talk to **Meadow Elder** (south path) → unlock **Star**.
@@ -15,4 +15,4 @@ Open the deployed Vercel URL, or open `index.html` locally (single-file build: C
 
 ## Stack
 
-Static single-file `index.html` (CSS+JS inlined) + `vercel.json`. No build step.
+Static HTML/CSS/JS. No build step. Vercel optional (`vercel.json`); GitHub static hosting works.
