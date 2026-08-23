@@ -1,1 +1,1 @@
-window.__MVB1="PLACEHOLDER_WILL_REPLACE";
+@file:///workspace/FINAL_P1.js
