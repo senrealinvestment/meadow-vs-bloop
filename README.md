@@ -1,21 +1,16 @@
-# Sparkelody — Meadow vs Bloop (Phase 3 / World 1)
+# Meadow vs Bloop — Sparkelody Phase 3 World 1
 
-K–1 reading RPG: expanded Meadow overworld → 20 cute Bloop/Fluff encounters → **Star Bloom** boss (20 CVC reads) → unlock **Star** → World 2 Frost Path gate (placeholder).
+Literacy-first overworld + read-to-hit fights. CVC only.
 
-## Play
+## World 1 Meadow
+- Expanded 20×16 map with camera
+- 20 foe spots + **Star Bloom** boss (20 reads)
+- WORLD1 CVC bank (~79 words), ≤2/10 repeat picker
+- Star unlocks **only** after Star Bloom
+- World 2 Frost Path gate placeholder (locked until boss)
 
-Open the deployed Vercel URL, or open `index.html` locally.
-
-1. Walk with **arrows / WASD / D-pad**. Talk to **Meadow Elder** (teaches Star Bloom → Star → World 2).
-2. Clear **20** meadow foes (basic read-to-hit; no Star yet).
-3. Beat **Star Bloom** on the hill (**20** successful CVC reads). Miss = Almost, same word.
-4. Unlock **Star** (zap/pop/sun/bat/jam). East gate opens for Frost Path (coming soon).
-5. Modes: **Confirm** or **Pick word**. Reading is the only cast/hit.
-
-## Literacy
-
-CVC-only `WORLD1_BANK`. Word picker enforces ≤2 uses of the same word in any window of 10 foe reads or 10 boss reads.
-
-## Stack
-
-Static HTML/CSS/JS. Source: `app.readable.js` → minify `app.js`. Production: CDN-backed `index.html` (jsDelivr from GitHub) + `vercel.json`.
+## Files
+- `app.readable.js` — source
+- `app.js` — minified
+- `styles.css` — styles
+- Deploy uses small CDN-backed `index.html` on Vercel pointing jsDelivr at a commit SHA
