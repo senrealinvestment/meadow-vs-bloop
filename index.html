@@ -3,86 +3,131 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Meadow vs Bloop — Reading RPG Slice</title>
+  <title>Sparkelody — Meadow Walk (Phase 2)</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="app">
     <header class="top-bar">
-      <h1 class="title">Meadow vs Bloop</h1>
-      <div class="mode-toggle" role="tablist" aria-label="Success mode">
-        <button type="button" id="mode-confirm" class="mode-btn active" role="tab" aria-selected="true">
-          Parent Confirm
-        </button>
-        <button type="button" id="mode-match" class="mode-btn" role="tab" aria-selected="false">
-          Pick the word
-        </button>
+      <h1 class="title">Sparkelody · Meadow</h1>
+      <div class="hud-row">
+        <div class="power-hud" id="power-hud" aria-label="Powers">
+          <span class="power-chip spark locked" id="chip-spark" title="Spark">⚡</span>
+          <span class="power-chip leaf locked" id="chip-leaf" title="Leaf">🍃</span>
+          <span class="power-chip dash locked" id="chip-dash" title="Dash">💨</span>
+        </div>
+        <div class="mode-toggle" role="tablist" aria-label="Success mode">
+          <button type="button" id="mode-confirm" class="mode-btn active" role="tab" aria-selected="true">Confirm</button>
+          <button type="button" id="mode-match" class="mode-btn" role="tab" aria-selected="false">Pick word</button>
+        </div>
       </div>
     </header>
 
-    <main class="stage" id="stage">
-      <div class="sky"></div>
-      <div class="hills"></div>
-      <div class="grass"></div>
-
-      <div class="hit-pips" id="hit-pips" aria-label="Hits on Bloop">
-        <span class="pip" data-hit="0"></span>
-        <span class="pip" data-hit="1"></span>
-        <span class="pip" data-hit="2"></span>
+    <!-- OVERWORLD -->
+    <main class="view" id="view-overworld">
+      <div class="world-wrap">
+        <canvas id="world" width="480" height="360" aria-label="Meadow overworld"></canvas>
+        <div class="world-hint" id="world-hint">Arrows / WASD · bump to talk</div>
       </div>
 
-      <div class="actors">
-        <div class="hero" id="hero" title="Hero">
-          <div class="hero-body"></div>
-          <div class="hero-face"></div>
-          <div class="hero-label">You</div>
-        </div>
-
-        <div class="chest" id="chest" title="Treasure chest">
-          <div class="chest-lid"></div>
-          <div class="chest-box"></div>
-          <div class="chest-lock"></div>
-          <div class="chest-label">Chest</div>
-        </div>
-
-        <div class="bloop" id="bloop" title="Bloop">
-          <div class="bloop-body">
-            <div class="bloop-eye left"></div>
-            <div class="bloop-eye right"></div>
-            <div class="bloop-smile"></div>
-          </div>
-          <div class="bloop-label">Bloop</div>
-        </div>
+      <div class="dialogue hidden" id="dialogue" role="dialog" aria-live="polite">
+        <p class="dialogue-name" id="dialogue-name"></p>
+        <p class="dialogue-text" id="dialogue-text"></p>
+        <button type="button" class="btn-confirm btn-sm" id="btn-dialogue">OK</button>
       </div>
 
-      <div class="fx" id="fx" aria-hidden="true"></div>
-      <div class="flavor" id="flavor" aria-live="polite"></div>
+      <div class="dpad" id="dpad" aria-label="D-pad">
+        <button type="button" class="dpad-btn" data-dir="up" aria-label="Up">▲</button>
+        <div class="dpad-mid">
+          <button type="button" class="dpad-btn" data-dir="left" aria-label="Left">◀</button>
+          <button type="button" class="dpad-btn dpad-interact" id="btn-interact" aria-label="Interact">💬</button>
+          <button type="button" class="dpad-btn" data-dir="right" aria-label="Right">▶</button>
+        </div>
+        <button type="button" class="dpad-btn" data-dir="down" aria-label="Down">▼</button>
+      </div>
     </main>
 
-    <section class="read-panel" id="read-panel">
-      <p class="prompt" id="prompt">Sound it out!</p>
-      <div class="cvc-wrap" id="cvc-wrap">
-        <div class="cvc-word" id="cvc-word" aria-live="polite">CAT</div>
+    <!-- FIGHT -->
+    <main class="view hidden" id="view-fight">
+      <div class="stage" id="stage">
+        <div class="sky"></div>
+        <div class="hills"></div>
+        <div class="grass"></div>
+
+        <div class="fight-meta">
+          <div class="hit-pips" id="hit-pips" aria-label="Hits"></div>
+          <div class="sandglass hidden" id="sandglass" aria-label="Timer">
+            <div class="sand-fill" id="sand-fill"></div>
+          </div>
+        </div>
+
+        <div class="actors">
+          <div class="hero sparkelody" id="hero" title="Sparkelody">
+            <div class="cat-ear left"></div>
+            <div class="cat-ear right"></div>
+            <div class="cat-head">
+              <div class="cat-eye left"></div>
+              <div class="cat-eye right"></div>
+              <div class="cat-nose"></div>
+            </div>
+            <div class="cat-body"></div>
+            <div class="cat-tail"></div>
+            <div class="cat-collar"><span class="cat-charm"></span></div>
+            <div class="hero-label">Sparkelody</div>
+          </div>
+
+          <div class="chest hidden" id="chest" title="Treasure chest">
+            <div class="chest-lid"></div>
+            <div class="chest-box"></div>
+            <div class="chest-lock"></div>
+            <div class="chest-label">Chest</div>
+          </div>
+
+          <div class="bloop" id="bloop" title="Foe">
+            <div class="bloop-body">
+              <div class="bloop-eye left"></div>
+              <div class="bloop-eye right"></div>
+              <div class="bloop-smile"></div>
+            </div>
+            <div class="bloop-label" id="foe-label">Bloop</div>
+          </div>
+        </div>
+
+        <div class="fx" id="fx" aria-hidden="true"></div>
+        <div class="flavor" id="flavor" aria-live="polite"></div>
       </div>
 
-      <div class="controls" id="controls-confirm">
-        <button type="button" class="btn-confirm" id="btn-confirm">Confirm ✓</button>
-      </div>
+      <section class="power-picker hidden" id="power-picker" aria-label="Pick a power">
+        <p class="prompt">Pick a power</p>
+        <div class="power-choices" id="power-choices"></div>
+      </section>
 
-      <div class="controls hidden" id="controls-match">
-        <button type="button" class="word-tile" id="choice-a"></button>
-        <button type="button" class="word-tile" id="choice-b"></button>
-      </div>
+      <section class="read-panel" id="read-panel">
+        <p class="prompt" id="prompt">Sound it out!</p>
+        <div class="cvc-wrap" id="cvc-wrap">
+          <div class="cvc-word" id="cvc-word" aria-live="polite">CAT</div>
+        </div>
 
-      <p class="feedback" id="feedback" aria-live="assertive"></p>
-    </section>
+        <div class="controls" id="controls-confirm">
+          <button type="button" class="btn-confirm" id="btn-confirm">Confirm ✓</button>
+        </div>
+
+        <div class="controls hidden" id="controls-match">
+          <button type="button" class="word-tile" id="choice-a"></button>
+          <button type="button" class="word-tile" id="choice-b"></button>
+        </div>
+
+        <p class="feedback" id="feedback" aria-live="assertive"></p>
+        <button type="button" class="btn-flee" id="btn-flee">Back to meadow</button>
+      </section>
+    </main>
 
     <div class="win-overlay hidden" id="win-overlay">
       <div class="win-card">
         <p class="win-emoji">✨🏆✨</p>
-        <h2>You did it!</h2>
-        <p>The chest opens. Spark treasure for a great reader!</p>
-        <button type="button" class="btn-confirm" id="btn-replay">Play again</button>
+        <h2 id="win-title">You did it!</h2>
+        <p id="win-msg">The chest opens. Spark treasure for a great reader!</p>
+        <button type="button" class="btn-confirm" id="btn-replay">Back to meadow</button>
       </div>
     </div>
   </div>
