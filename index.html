@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- WORLD1_BANK Phase 3 star_bloom -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Sparkelody — Meadow World 1 (Phase 3)</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@4ee18a2e680e21d4734096861528155ce40c7c03/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@b64bf1d14b39422bad5aae7019cf6c65abcd7aac/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@b64bf1d14b39422bad5aae7019cf6c65abcd7aac/art-hotswap.css" />
 </head>
 <body>
   <div id="app">
@@ -93,40 +93,44 @@
         </div>
 
         <div class="fx" id="fx" aria-hidden="true"></div>
-        <p class="flavor" id="flavor" aria-live="polite"></p>
+        <div class="flavor" id="flavor" aria-live="polite"></div>
       </div>
 
-      <div class="power-picker hidden" id="power-picker">
+      <section class="power-picker hidden" id="power-picker" aria-label="Pick a power">
+        <p class="prompt">Pick a power</p>
         <div class="power-choices" id="power-choices"></div>
-      </div>
+      </section>
 
-      <div class="read-panel" id="read-panel">
+      <section class="read-panel" id="read-panel">
         <p class="prompt" id="prompt">Sound it out!</p>
         <div class="cvc-wrap" id="cvc-wrap">
-          <div class="cvc-word" id="cvc-word" aria-live="polite"></div>
+          <div class="cvc-word" id="cvc-word" aria-live="polite">CAT</div>
         </div>
+
         <div class="controls" id="controls-confirm">
-          <button type="button" class="btn-confirm" id="btn-confirm">Confirm</button>
+          <button type="button" class="btn-confirm" id="btn-confirm">Confirm ✓</button>
         </div>
+
         <div class="controls hidden" id="controls-match">
           <button type="button" class="word-tile" id="choice-a"></button>
           <button type="button" class="word-tile" id="choice-b"></button>
         </div>
-        <p class="feedback" id="feedback" aria-live="polite"></p>
+
+        <p class="feedback" id="feedback" aria-live="assertive"></p>
         <button type="button" class="btn-flee" id="btn-flee">Back to meadow</button>
-      </div>
-
-      <div class="win-overlay hidden" id="win-overlay">
-        <div class="win-card">
-          <div class="win-emoji">🌟</div>
-          <h2 id="win-title">You did it!</h2>
-          <p id="win-msg">Great reading!</p>
-          <button type="button" class="btn-confirm" id="btn-replay">Back to meadow</button>
-        </div>
-      </div>
+      </section>
     </main>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@4ee18a2e680e21d4734096861528155ce40c7c03/app.js"></script>
+    <div class="win-overlay hidden" id="win-overlay">
+      <div class="win-card">
+        <p class="win-emoji">✨🏆✨</p>
+        <h2 id="win-title">You did it!</h2>
+        <p id="win-msg">Great reading!</p>
+        <button type="button" class="btn-confirm" id="btn-replay">Back to meadow</button>
+      </div>
+    </div>
+  </div>
+  <script>window.MEADOW_ASSET_BASE="https://meadow-vs-bloop.vercel.app/assets";window.MEADOW_JS_BASE="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@f8cc72828ace6da8a82e5294307e435c108f0db1/";</script>
+  <script src="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@b64bf1d14b39422bad5aae7019cf6c65abcd7aac/app.js" data-base="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@f8cc72828ace6da8a82e5294307e435c108f0db1/"></script>
 </body>
 </html>
