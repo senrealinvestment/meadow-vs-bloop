@@ -3,56 +3,74 @@
 
 /* Pixel Art Director hot-swap */
 /* Pixel Art Director hot-swap — clip sheets to one frame; no duplicate UI art */
+/* Pixel Art Director + GE — one hero frame, no CVC panel paint */
 .hero.art-sprite .cat-ear,
 .hero.art-sprite .cat-head,
 .hero.art-sprite .cat-body,
 .hero.art-sprite .cat-tail,
 .hero.art-sprite .cat-collar{display:none!important}
+
+/* Clip sheet to one frame at 2×; NEVER background-size:auto (shows whole sheet) */
+.hero.sparkelody.art-sprite,
 .hero.art-sprite{
-  /* viewport = one frame; sheet positioned via --hero-sx/sy */
-  width:calc(var(--hero-sw, 36px) * 2);
-  height:calc(var(--hero-sh, 40px) * 2);
-  overflow:hidden;
+  width:calc(var(--hero-sw, 36px) * 2) !important;
+  height:calc(var(--hero-sh, 40px) * 2) !important;
+  max-width:calc(var(--hero-sw, 36px) * 2) !important;
+  max-height:calc(var(--hero-sh, 40px) * 2) !important;
+  overflow:hidden !important;
   background-image:var(--hero-sheet);
-  background-repeat:no-repeat;
-  /* scale sheet 2x so frame fills the box */
-  background-size:calc(var(--hero-sheet-w, 256px) * 2) calc(var(--hero-sheet-h, 200px) * 2);
-  background-position:calc(var(--hero-sx, 0px) * 2) calc(var(--hero-sy, 0px) * 2);
+  background-repeat:no-repeat !important;
+  background-size:calc(var(--hero-sheet-w, 256px) * 2) calc(var(--hero-sheet-h, 200px) * 2) !important;
+  background-position:calc(var(--hero-sx, 0px) * 2) calc(var(--hero-sy, 0px) * 2) !important;
   image-rendering:pixelated;
   image-rendering:crisp-edges;
-  background-color:transparent;
-  border:none;box-shadow:none;
+  background-color:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+  transform:none;
+  transform-origin:bottom left;
+}
+.hero.art-sprite.strike{
+  transform:translateX(28px) scale(1.05);
 }
 .hero.art-sprite .hero-label{
   position:absolute;left:50%;transform:translateX(-50%);
-  bottom:-1.15rem;margin-top:0;white-space:nowrap;
+  bottom:-1.1rem;margin-top:0;white-space:nowrap;
 }
+
 .bloop.art-sprite .bloop-body,
 .bloop.art-sprite .bloop-eye,
-.bloop.art-sprite .bloop-smile{display:none!important}
+.bloop.art-sprite .bloop-smile{opacity:0!important;pointer-events:none}
 .bloop.art-sprite{
-  width:96px;height:96px;
-  overflow:hidden;
+  /* lift above grass horizon so full cell fits */
+  bottom:22% !important;
+  width:96px !important;
+  height:96px !important;
+  overflow:hidden !important;
   image-rendering:pixelated;
   image-rendering:crisp-edges;
   background-color:transparent;
   background-repeat:no-repeat;
 }
 .bloop.art-sprite.boss-art{
-  width:128px;height:110px;
-  background-size:contain!important;
-  background-position:center bottom!important;
+  width:140px !important;
+  height:120px !important;
+  bottom:18% !important;
+  background-size:contain !important;
+  background-position:center bottom !important;
   transform-origin:center bottom;
 }
 .bloop.art-sprite .bloop-label{
   position:absolute;left:50%;transform:translateX(-50%);
   bottom:-1.15rem;margin-top:0;white-space:nowrap;
 }
-/* NEVER paint full CVC UI mock behind live controls — duplicates Confirm/word */
+
 .read-panel.art-panel{
-  background-image:none!important;
-  background-size:auto;
+  background-image:none !important;
+  background-size:unset !important;
+  background-position:unset !important;
 }
+
 .power-chip.art-chip{
   background-size:280px 186px;
   background-repeat:no-repeat;
@@ -69,7 +87,7 @@
 .art-power-icon{
   display:inline-block;width:28px;height:28px;
   background-size:280px 186px;background-repeat:no-repeat;
-  image-rendering:pixelated;
+  image-rendering:pixelated;overflow:hidden;
 }
 .art-power-icon.star{background-position:0 -66px}
 .spark.art-vfx{
@@ -79,10 +97,11 @@
   background-position:-18px -28px;
   background-repeat:no-repeat;
   box-shadow:none;filter:none;
-  image-rendering:pixelated;
+  image-rendering:pixelated;overflow:hidden;
 }
 .spark.art-vfx.star-fx{background-position:-18px -28px;transform:scale(1.25)}
-/* Fight chrome: only one controls row; feedback empty until set */
+
+.dpad.hidden{display:none!important;}
 #view-fight .controls.hidden{display:none!important}
 #view-fight .power-picker.hidden{display:none!important}
 #view-fight .read-panel.hidden{display:none!important}
