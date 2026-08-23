@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Sparkelody — Meadow World 1 (Phase 3)</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@4d3f3c62da8f91682c0c3b6acfe15b6adb95fd8f/styles.css" />
 </head>
 <body>
   <div id="app">
@@ -22,19 +22,16 @@
         </div>
       </div>
     </header>
-
     <main class="view" id="view-overworld">
       <div class="world-wrap">
-        <canvas id="world" width="480" height="352" aria-label="Meadow overworld"></canvas>
+        <canvas id="world" width="480" height="360" aria-label="Meadow overworld"></canvas>
         <div class="world-hint" id="world-hint">Arrows / WASD · bump to talk</div>
       </div>
-
       <div class="dialogue hidden" id="dialogue" role="dialog" aria-live="polite">
         <p class="dialogue-name" id="dialogue-name"></p>
         <p class="dialogue-text" id="dialogue-text"></p>
         <button type="button" class="btn-confirm btn-sm" id="btn-dialogue">OK</button>
       </div>
-
       <div class="dpad" id="dpad" aria-label="D-pad">
         <button type="button" class="dpad-btn" data-dir="up" aria-label="Up">▲</button>
         <div class="dpad-mid">
@@ -45,90 +42,55 @@
         <button type="button" class="dpad-btn" data-dir="down" aria-label="Down">▼</button>
       </div>
     </main>
-
     <main class="view hidden" id="view-fight">
       <div class="stage" id="stage">
         <div class="sky"></div>
         <div class="hills"></div>
         <div class="grass"></div>
-
         <div class="fight-meta">
           <div class="hit-pips" id="hit-pips" aria-label="Hits"></div>
-          <div class="sandglass hidden" id="sandglass" aria-label="Timer">
-            <div class="sand-fill" id="sand-fill"></div>
-          </div>
+          <div class="sandglass hidden" id="sandglass" aria-label="Timer"><div class="sand-fill" id="sand-fill"></div></div>
         </div>
-
         <div class="actors">
           <div class="hero sparkelody" id="hero" title="Sparkelody">
-            <div class="cat-ear left"></div>
-            <div class="cat-ear right"></div>
-            <div class="cat-head">
-              <div class="cat-eye left"></div>
-              <div class="cat-eye right"></div>
-              <div class="cat-nose"></div>
-            </div>
-            <div class="cat-body"></div>
-            <div class="cat-tail"></div>
+            <div class="cat-ear left"></div><div class="cat-ear right"></div>
+            <div class="cat-head"><div class="cat-eye left"></div><div class="cat-eye right"></div><div class="cat-nose"></div></div>
+            <div class="cat-body"></div><div class="cat-tail"></div>
             <div class="cat-collar"><span class="cat-charm"></span></div>
             <div class="hero-label">Sparkelody</div>
           </div>
-
           <div class="chest hidden" id="chest" title="Treasure chest">
-            <div class="chest-lid"></div>
-            <div class="chest-box"></div>
-            <div class="chest-lock"></div>
-            <div class="chest-label">Chest</div>
+            <div class="chest-lid"></div><div class="chest-box"></div><div class="chest-lock"></div><div class="chest-label">Chest</div>
           </div>
-
           <div class="bloop" id="bloop" title="Foe">
-            <div class="bloop-body">
-              <div class="bloop-eye left"></div>
-              <div class="bloop-eye right"></div>
-              <div class="bloop-smile"></div>
-            </div>
+            <div class="bloop-body"><div class="bloop-eye left"></div><div class="bloop-eye right"></div><div class="bloop-smile"></div></div>
             <div class="bloop-label" id="foe-label">Bloop</div>
           </div>
         </div>
-
         <div class="fx" id="fx" aria-hidden="true"></div>
         <div class="flavor" id="flavor" aria-live="polite"></div>
       </div>
-
       <section class="power-picker hidden" id="power-picker" aria-label="Pick a power">
-        <p class="prompt">Pick a power</p>
-        <div class="power-choices" id="power-choices"></div>
+        <p class="prompt">Pick a power</p><div class="power-choices" id="power-choices"></div>
       </section>
-
       <section class="read-panel" id="read-panel">
         <p class="prompt" id="prompt">Sound it out!</p>
-        <div class="cvc-wrap" id="cvc-wrap">
-          <div class="cvc-word" id="cvc-word" aria-live="polite">CAT</div>
-        </div>
-
-        <div class="controls" id="controls-confirm">
-          <button type="button" class="btn-confirm" id="btn-confirm">Confirm ✓</button>
-        </div>
-
-        <div class="controls hidden" id="controls-match">
-          <button type="button" class="word-tile" id="choice-a"></button>
-          <button type="button" class="word-tile" id="choice-b"></button>
-        </div>
-
+        <div class="cvc-wrap" id="cvc-wrap"><div class="cvc-word" id="cvc-word" aria-live="polite">CAT</div></div>
+        <div class="controls" id="controls-confirm"><button type="button" class="btn-confirm" id="btn-confirm">Confirm ✓</button></div>
+        <div class="controls hidden" id="controls-match"><button type="button" class="word-tile" id="choice-a"></button><button type="button" class="word-tile" id="choice-b"></button></div>
         <p class="feedback" id="feedback" aria-live="assertive"></p>
         <button type="button" class="btn-flee" id="btn-flee">Back to meadow</button>
       </section>
     </main>
-
     <div class="win-overlay hidden" id="win-overlay">
       <div class="win-card">
         <p class="win-emoji">✨🏆✨</p>
         <h2 id="win-title">You did it!</h2>
-        <p id="win-msg">Great reading!</p>
+        <p id="win-msg">The chest opens. Star treasure for a great reader!</p>
         <button type="button" class="btn-confirm" id="btn-replay">Back to meadow</button>
       </div>
     </div>
   </div>
-  <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@4d3f3c62da8f91682c0c3b6acfe15b6adb95fd8f/app.js"></script>
 </body>
 </html>
