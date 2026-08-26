@@ -109,7 +109,7 @@
 #app.world-frost .title{color:#1565c0;}
 .bloop.ice_howl .bloop-body{background:radial-gradient(circle at 35% 30%,#e1f5fe,#4fc3f7 45%,#0277bd);border-color:#01579b;box-shadow:0 0 16px rgba(79,195,247,0.65);}
 
-#art-loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;font-size:1.05rem;font-weight:800;color:#1e3a28;text-shadow:0 1px 0 rgba(255,255,255,.8);background:#6aaa5a;}
+#art-loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:50;font-size:1.15rem;font-weight:800;color:#1e3a28;text-shadow:0 1px 0 rgba(255,255,255,.8);background:#6aaa5a;}
 #art-loader.hidden{display:none!important;}
 #world.art-wait{opacity:0;}
 #app.world-frost #art-loader{background:#90caf9;color:#0d47a1;}
