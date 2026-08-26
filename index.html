@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Sparkelody — Meadow World 1 (Phase 3)</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@5ae1c479b2bf4cef46ed9dad0d6f7cdf621402fe/styles.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@5ae1c479b2bf4cef46ed9dad0d6f7cdf621402fe/art-hotswap.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@10219b922dd8c7076f8a82158b084ba7db8d1926/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@10219b922dd8c7076f8a82158b084ba7db8d1926/art-hotswap.css" />
 </head>
 <body>
   <div id="app">
@@ -142,10 +142,14 @@
       if (n) { n.textContent="Loading Frost Path…"; n.style.background="#90caf9"; n.style.color="#0d47a1"; }
       var title=document.querySelector(".title");
       if (title) title.textContent="Sparkelody · World 2 Frost Path";
+      var wrap=document.querySelector(".world-wrap");
+      if (wrap) wrap.style.background="#90caf9";
+      var c=document.getElementById("world");
+      if (c) c.style.background="#bbdefb";
     }
   })();
   </script>
-  <script>window.MEADOW_JS_BASE="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@5ae1c479b2bf4cef46ed9dad0d6f7cdf621402fe/";window.MEADOW_ASSET_BASE="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@5ae1c479b2bf4cef46ed9dad0d6f7cdf621402fe/";</script>
-  <script src="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@5ae1c479b2bf4cef46ed9dad0d6f7cdf621402fe/app.js" data-base="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@5ae1c479b2bf4cef46ed9dad0d6f7cdf621402fe/"></script>
+  <script>window.MEADOW_JS_BASE="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@10219b922dd8c7076f8a82158b084ba7db8d1926/";window.MEADOW_ASSET_BASE="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@10219b922dd8c7076f8a82158b084ba7db8d1926/";</script>
+  <script src="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@10219b922dd8c7076f8a82158b084ba7db8d1926/app.js" data-base="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@10219b922dd8c7076f8a82158b084ba7db8d1926/"></script>
 </body>
 </html>
