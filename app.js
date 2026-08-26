@@ -52,7 +52,7 @@
   }catch(re){ console.error("meadow: repair failed", re); }
   var need=["sparkelody/walk/sheet.png","worlds/meadow/tiles.png","npcs/elder-kid-sheet.png","foes/bloop-fluff-sheet.png","worlds/frost/tiles.png"];
   var missing=false;
-  var frostUrl=!!(window.MEADOW_START_FROST)||/[?&(](w2|frost)=1/.test(location.search);
+  var frostUrl=!!(window.MEADOW_START_FROST)||/[?&](w2|frost)=1/.test(location.search);
   var frostEmbedMissing=false;
   for(var j=0;j<need.length;j++){
     var emb=window.MEADOW_ASSET_EMBED && (window.MEADOW_ASSET_EMBED[need[j]]||window.MEADOW_ASSET_EMBED["assets/"+need[j]]);
@@ -75,12 +75,19 @@
     try{delete window["__MVBQ"+i]}catch(e){}
   }
   if(!s){ console.error("meadow: no game"); return; }
-  s = s.replace(
-    "function drawWorld() {\n    updateCamera();",
-    "function drawWorld() {\n    try{if(window.MEADOW_START_FROST||/[?&(](w2|frost)=1/.test(location.search)){state.world=\"frost\";var _fa=document.getElementById(\"app\");if(_fa)_fa.classList.add(\"world-frost\");if(el&&el.worldHint)el.worldHint.textContent=\"Frost Path\";}}catch(_fe){}\n    updateCamera();"
-  );
+  if (frostUrl) {
+    s = s.replace('world: "meadow"', 'world: "frost"');
+    s = s.replace(
+      "function wantFrost() {\n    if (state.world === \"frost\") return true;",
+      "function wantFrost() {\n    return true; if (state.world === \"frost\") return true;"
+    );
+    s = s.replace(
+      "ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : null;",
+      "ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : null; ART.tiles = ART.frostTiles || null;"
+    );
+  }
   (0,eval)(s);
   window.addEventListener("pageshow", function(ev){
-    if (ev && ev.persisted && /[?&(](w2|frost)=1/.test(location.search)) location.reload();
+    if (ev && ev.persisted && /[?&](w2|frost)=1/.test(location.search)) location.reload();
   });
 })();
