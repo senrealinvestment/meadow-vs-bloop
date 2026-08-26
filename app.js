@@ -50,17 +50,23 @@
       }
     }
   }catch(re){ console.error("meadow: repair failed", re); }
-  var need=["sparkelody/walk/sheet.png","worlds/meadow/tiles.png","npcs/elder-kid-sheet.png","foes/bloop-fluff-sheet.png"];
-  if(/[?&](w2|frost)=1/.test(location.search)) need.push("worlds/frost/tiles.png");
+  var need=["sparkelody/walk/sheet.png","worlds/meadow/tiles.png","npcs/elder-kid-sheet.png","foes/bloop-fluff-sheet.png","worlds/frost/tiles.png"];
   var missing=false;
+  var frostUrl=!!(window.MEADOW_START_FROST)||/[?&](w2|frost)=1/.test(location.search);
+  var frostEmbedMissing=false;
   for(var j=0;j<need.length;j++){
     var emb=window.MEADOW_ASSET_EMBED && (window.MEADOW_ASSET_EMBED[need[j]]||window.MEADOW_ASSET_EMBED["assets/"+need[j]]);
     if(!emb || emb.indexOf("data:image")!==0 || emb.length<1000){
       console.error("meadow: missing/short embed", need[j], emb && emb.length);
       missing=true;
+      if(need[j]==="worlds/frost/tiles.png") frostEmbedMissing=true;
     }
   }
-  if(missing){ console.error("meadow: holding splash, Pixel embeds not ready"); }
+  if(frostUrl && frostEmbedMissing){
+    console.error("meadow: frost tiles embed missing on frost URL; holding splash, still eval game");
+  } else if(missing){
+    console.error("meadow: holding splash, Pixel embeds not ready");
+  }
   var q=['app.q0.js','app.q1.js','app.q2.js'];
   var s="";
   for(var i=0;i<q.length;i++){
