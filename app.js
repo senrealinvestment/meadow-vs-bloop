@@ -59,7 +59,7 @@
       console.error("meadow: missing/short embed", need[j], emb && emb.length);
     }
   }
-  var q=['app.q0.js','app.q1.js','app.q2.js','app.q3.js','app.q4.js','app.q5.js','app.q6.js','app.q7.js','app.q8.js','app.q9.js','app.q10.js','app.q11.js','app.q12.js','app.q13.js','app.q14.js','app.q15.js','app.q16.js','app.q17.js'];
+  var q=['app.q0.js','app.q1.js','app.q2.js','app.q3.js','app.q4.js','app.q5.js'];
   var s="";
   for(var i=0;i<q.length;i++){
     await tryLoad(base+q[i]);
