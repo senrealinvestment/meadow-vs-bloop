@@ -98,3 +98,32 @@
 #app.world-frost #world{background:#bbdefb;}
 #app.world-frost .title{color:#1565c0;}
 .bloop.ice_howl .bloop-body{background:radial-gradient(circle at 35% 30%,#e1f5fe,#4fc3f7 45%,#0277bd);border-color:#01579b;box-shadow:0 0 16px rgba(79,195,247,0.65);}
+
+#art-loader{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;font-size:1.05rem;font-weight:800;color:#1e3a28;text-shadow:0 1px 0 rgba(255,255,255,.8);background:#6aaa5a;}
+#art-loader.hidden{display:none!important;}
+#world.art-wait{opacity:0;}
+#app.world-frost #art-loader{background:#90caf9;color:#0d47a1;}
+#app.world-frost .sky{background:linear-gradient(180deg,#e3f2fd 0%,#b3e5fc 55%,#eceff1 100%);}
+#app.world-frost .hills{background:#90a4ae;box-shadow:inset 0 12px 0 rgba(255,255,255,0.35);}
+#app.world-frost .grass{background:linear-gradient(180deg,#cfd8dc 0%,#90caf9 100%);}
+#app.world-ember .world-wrap,#app.world-ember #world,#app.world-ember #art-loader{background:#bf360c;}
+#app.world-ember .sky{background:linear-gradient(180deg,#ffcc80,#ef6c00);}
+#app.world-ember .hills{background:#e65100;}
+#app.world-ember .grass{background:linear-gradient(180deg,#8d6e63,#5d4037);}
+#app.world-leaf .world-wrap,#app.world-leaf #world,#app.world-leaf #art-loader{background:#1b5e20;}
+#app.world-leaf .sky{background:linear-gradient(180deg,#c8e6c9,#66bb6a);}
+#app.world-leaf .hills{background:#2e7d32;}
+#app.world-leaf .grass{background:linear-gradient(180deg,#33691e,#1b5e20);}
+#app.world-wind .world-wrap,#app.world-wind #world,#app.world-wind #art-loader{background:#00838f;}
+#app.world-wind .sky{background:linear-gradient(180deg,#e0f7fa,#4dd0e1);}
+#app.world-wind .hills{background:#26a69a;}
+#app.world-wind .grass{background:linear-gradient(180deg,#80cbc4,#00897b);}
+#app.world-tide .world-wrap,#app.world-tide #world,#app.world-tide #art-loader{background:#01579b;}
+#app.world-tide .sky{background:linear-gradient(180deg,#e1f5fe,#0288d1);}
+#app.world-tide .hills{background:#0277bd;}
+#app.world-tide .grass{background:linear-gradient(180deg,#4fc3f7,#01579b);}
+#app.world-storm .world-wrap,#app.world-storm #world,#app.world-storm #art-loader{background:#4a148c;}
+#app.world-storm .sky{background:linear-gradient(180deg,#ce93d8,#6a1b9a);}
+#app.world-storm .hills{background:#7b1fa2;}
+#app.world-storm .grass{background:linear-gradient(180deg,#ffd54f,#4a148c);}
+#app.world-frost{background:#b3e5fc;}
