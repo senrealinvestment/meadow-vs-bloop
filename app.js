@@ -67,3 +67,7 @@
   } else if(missing){
     console.error("meadow: holding splash, Pixel embeds not ready");
   }
+  var s="INLINED_GAME_WANTFROST_FULL_FILE_60886";
+  if(!s){ console.error("meadow: no game"); return; }
+  (0,eval)(s);
+})();
