@@ -1,4 +1,4 @@
-/*WORLD1 soft loader + frost rebind on every W2 enter*/
+/*WORLD1 loader — hard-swap frost tileset in memory on every W2*/
 (async function(){
   var base=(document.currentScript&&document.currentScript.getAttribute("data-base"))||window.MEADOW_JS_BASE||"https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@main/";
   if(!base.endsWith("/")) base+="/";
@@ -8,16 +8,23 @@
     try{ var a=document.getElementById("app"); if(a&&a.classList.contains("world-frost")) return true; }catch(e2){}
     return false;
   }
-  var frostUrl=isFrostLoc();
+  var bootFrost=isFrostLoc();
   try{
     var prev=sessionStorage.getItem("mvb-world");
-    if(frostUrl && prev==="meadow"){
+    if(bootFrost && prev==="meadow"){
       sessionStorage.setItem("mvb-world","frost");
-      location.replace(location.href);
+      var u=new URL(location.href);
+      u.searchParams.set("_rebind", String(Date.now()));
+      location.replace(u.toString());
       return;
     }
-    sessionStorage.setItem("mvb-world", frostUrl ? "frost" : "meadow");
+    sessionStorage.setItem("mvb-world", bootFrost ? "frost" : "meadow");
   }catch(eSS){}
+  if(!bootFrost){
+    setInterval(function(){
+      if(isFrostLoc()) location.reload();
+    }, 250);
+  }
   try{
     var link=document.createElement("link");
     link.rel="stylesheet";
@@ -48,8 +55,8 @@
     return false;
   }
   await tryLoad(base+"asset-boss.js");
+  var frostUrl=isFrostLoc();
   var embeds=['a0.js','a1.js','a2.js','a3.js','a4.js','a5.js','a6.js','a7.js','a8.js','a9.js','a10.js','a11.js','a12.js','a13.js','a14.js','a15.js','a16.js','a17.js','a18.js','a19.js','a20.js','a21.js','a22.js','a23.js','a24.js','a25.js','a26.js','embed-tiles.js','embed-frost-tiles.js','embed-npcs.js'];
-  frostUrl=isFrostLoc();
   if(frostUrl){
     embeds=embeds.filter(function(e){ return e!=="embed-tiles.js"; });
   }
@@ -73,13 +80,10 @@
   frostUrl=isFrostLoc();
   var need=["sparkelody/walk/sheet.png","npcs/elder-kid-sheet.png","foes/bloop-fluff-sheet.png","worlds/frost/tiles.png"];
   if(!frostUrl) need.push("worlds/meadow/tiles.png");
-  var missing=false;
   var frostEmbedMissing=false;
   for(var j=0;j<need.length;j++){
     var emb=window.MEADOW_ASSET_EMBED && (window.MEADOW_ASSET_EMBED[need[j]]||window.MEADOW_ASSET_EMBED["assets/"+need[j]]);
     if(!emb || (emb.indexOf("data:image")!==0 && emb.indexOf("blob:")!==0) || emb.length<64){
-      console.error("meadow: missing/short embed", need[j], emb && emb.length);
-      missing=true;
       if(need[j]==="worlds/frost/tiles.png") frostEmbedMissing=true;
     }
   }
@@ -90,7 +94,6 @@
         var blob=await fr.blob();
         if(blob && blob.size>1000){
           window.MEADOW_ASSET_EMBED["worlds/frost/tiles.png"]=URL.createObjectURL(blob);
-          frostEmbedMissing=false;
         }
       }
     }catch(eFt){}
@@ -112,12 +115,12 @@
     "function enterFrost(opts) {\n    state.world = \"frost\"; ART.tiles = ART.frostTiles || null;"
   );
   s = s.replace(
-    "if (silent) return;\n    if (ART.frostTiles) drawWorld();",
-    "if (ART.frostTiles) { ART.locked = !!(ART.walk && ART.npcs && ART.foes && ART.frostTiles); drawWorld(); }\n    else { showArtLoader(true); preloadArt(); }\n    if (silent) return;\n    if (false && ART.frostTiles) drawWorld();"
-  );
-  s = s.replace(
     "let tilesheet = currentTiles();",
     "if (wantFrost()) { ART.tiles = ART.frostTiles || null; } let tilesheet = currentTiles();"
+  );
+  s = s.replace(
+    "preloadArt();\n})();",
+    "preloadArt();\n  setInterval(function(){\n    if (!wantFrost()) return;\n    state.world = \"frost\";\n    ART.tiles = ART.frostTiles || null;\n    var _ap=document.getElementById(\"app\"); if(_ap) _ap.classList.add(\"world-frost\");\n    if (!ART.frostTiles) { preloadArt(); return; }\n    if (state.scene === \"overworld\") drawWorld();\n  }, 400);\n})();"
   );
   frostUrl=isFrostLoc();
   if (frostUrl) {
@@ -128,10 +131,6 @@
       'loadImage(assetUrl("worlds/frost/tiles.png")),'
     );
     s = s.replace(
-      "function wantFrost() {\n    if (BOOT_FROST) return true;",
-      "function wantFrost() {\n    return true; if (BOOT_FROST) return true;"
-    );
-    s = s.replace(
       "function wantFrost() {",
       "function wantFrost() { return true; "
     );
@@ -140,16 +139,9 @@
       "ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : null; ART.tiles = ART.frostTiles || null;"
     );
     s = s.replace(
-      "ctx.clearRect(0, 0, w, h);",
-      "ctx.clearRect(0, 0, w, h); ctx.fillStyle=\"#bbdefb\";ctx.fillRect(0,0,w,h);"
-    );
-    s = s.replace(
       "function currentTiles() {",
       "function currentTiles() { return ART.frostTiles || null; "
     );
   }
   (0,eval)(s);
-  window.addEventListener("pageshow", function(ev){
-    if (/[?&](w2|frost)=1/.test(location.search) && ev && ev.persisted) location.reload();
-  });
 })();
