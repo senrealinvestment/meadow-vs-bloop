@@ -4,7 +4,7 @@
   if(!base.endsWith("/")) base+="/";
   function isFrostLoc(){
     try{ if(window.MEADOW_START_FROST) return true; }catch(e0){}
-    try{ if(/[?&](w2|frost)=1/.test(location.search)) return true; }catch(e1){}
+    try{ if(/[?&(w2|frost)=1/.test(location.search)) return true; }catch(e1){}
     try{ var a=document.getElementById("app"); if(a&&a.classList.contains("world-frost")) return true; }catch(e2){}
     return false;
   }
@@ -120,12 +120,12 @@
   );
   s = s.replace(
     "preloadArt();\n})();",
-    "preloadArt();\n  setInterval(function(){\n    if (!wantFrost()) return;\n    state.world = \"frost\";\n    ART.tiles = ART.frostTiles || null;\n    var _ap=document.getElementById(\"app\"); if(_ap) _ap.classList.add(\"world-frost\");\n    if (!ART.frostTiles) { preloadArt(); return; }\n    if (state.scene === \"overworld\") drawWorld();\n  }, 400);\n})();"
+    "preloadArt();\n  setInterval(function(){\n    if (!wantFrost()) return;\n    state.world = \"frost\";\n    ART.tiles = ART.frostTiles || null;\n    var _ap=document.getElementById(\"app\"); if(_ap) _ap.classList.add(\"world-frost\");\n    if (!ART.frostTiles) { if (!ART.locked) preloadArt(); return; }\n    if (state.scene === \"overworld\") drawWorld();\n  }, 400);\n})();"
   );
   frostUrl=isFrostLoc();
   if (frostUrl) {
     s = "var BOOT_FROST=true;" + s;
-    s = s.replace(/world:\s*"meadow"/g, 'world: "frost"');
+    s = s.replace(/world:\s*\"meadow\"/g, 'world: "frost"');
     s = s.replace(
       'loadImage(assetUrl("worlds/meadow/tiles.png")),',
       'loadImage(assetUrl("worlds/frost/tiles.png")),'
@@ -135,8 +135,8 @@
       "function wantFrost() { return true; "
     );
     s = s.replace(
-      "ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : null;",
-      "ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : null; ART.tiles = ART.frostTiles || null;"
+      "ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : (ART.frostTiles || null);",
+      "ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : (ART.frostTiles || null); ART.tiles = ART.frostTiles || ART.tiles;"
     );
     s = s.replace(
       "function currentTiles() {",
