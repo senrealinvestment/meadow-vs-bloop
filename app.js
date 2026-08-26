@@ -67,7 +67,13 @@
   } else if(missing){
     console.error("meadow: holding splash, Pixel embeds not ready");
   }
-  var s="INLINED_GAME_WANTFROST_FULL_FILE_60886";
+  var q=['app.q0.js','app.q1.js','app.q2.js'];
+  var s="";
+  for(var i=0;i<q.length;i++){
+    await tryLoad(base+q[i]);
+    s+=window["__MVBQ"+i]||"";
+    try{delete window["__MVBQ"+i]}catch(e){}
+  }
   if(!s){ console.error("meadow: no game"); return; }
   (0,eval)(s);
 })();
