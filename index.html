@@ -4,11 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Sparkelody — Meadow World 1 (Phase 3)</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@e67a272ca1f58bb93b6ae86dcef670fbd0b619fb/styles.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@e67a272ca1f58bb93b6ae86dcef670fbd0b619fb/art-hotswap.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@68e5cc5c945b3994b0319304939ecdbb20508ea4/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@68e5cc5c945b3994b0319304939ecdbb20508ea4/art-hotswap.css" />
 </head>
 <body>
   <div id="app">
+    <div id="art-loader" style="position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:#6aaa5a;font-weight:800;font-family:sans-serif;">Loading Meadow…</div>
     <header class="top-bar">
       <h1 class="title">Sparkelody · World 1 Meadow</h1>
       <div class="hud-row">
@@ -27,7 +28,7 @@
 
     <main class="view" id="view-overworld">
       <div class="world-wrap">
-        <canvas id="world" width="480" height="352" aria-label="Meadow overworld"></canvas>
+        <canvas id="world" class="art-wait" width="480" height="352" aria-label="Meadow overworld"></canvas>
         <div class="world-hint" id="world-hint">Arrows / WASD · bump to talk</div>
       </div>
 
@@ -131,7 +132,20 @@
       </div>
     </div>
   </div>
-  <script>window.MEADOW_JS_BASE="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@e67a272ca1f58bb93b6ae86dcef670fbd0b619fb/";</script>
-  <script src="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@e67a272ca1f58bb93b6ae86dcef670fbd0b619fb/app.js" data-base="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@e67a272ca1f58bb93b6ae86dcef670fbd0b619fb/"></script>
+  <script>
+  (function(){
+    if (/[?&(](w2|frost)=1/.test(location.search)) {
+      window.MEADOW_START_FROST=true;
+      var app=document.getElementById("app");
+      if (app) app.classList.add("world-frost");
+      var n=document.getElementById("art-loader");
+      if (n) { n.textContent="Loading Frost Path…"; n.style.background="#90caf9"; n.style.color="#0d47a1"; }
+      var title=document.querySelector(".title");
+      if (title) title.textContent="Sparkelody · World 2 Frost Path";
+    }
+  })();
+  </script>
+  <script>window.MEADOW_JS_BASE="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@68e5cc5c945b3994b0319304939ecdbb20508ea4/";window.MEADOW_ASSET_BASE="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@68e5cc5c945b3994b0319304939ecdbb20508ea4/";</script>
+  <script src="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@68e5cc5c945b3994b0319304939ecdbb20508ea4/app.js" data-base="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@68e5cc5c945b3994b0319304939ecdbb20508ea4/"></script>
 </body>
 </html>
