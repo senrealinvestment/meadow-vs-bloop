@@ -98,7 +98,7 @@
       }
     }catch(eFt){}
   }
-  var q=['app.q0.js','app.q1.js','app.q2.js'];
+  var q=['app.q0.js','app.q1.js','app.q2.js','app.q3.js','app.q4.js','app.q5.js'];
   var s="";
   for(var qi=0;qi<q.length;qi++){
     await tryLoad(base+q[qi]);
