@@ -4,7 +4,7 @@
   if(!base.endsWith("/")) base+="/";
   function isFrostLoc(){
     try{ if(window.MEADOW_START_FROST) return true; }catch(e0){}
-    try{ if(new RegExp("[?&](w2|frost)=1").test(location.search)) return true; }catch(e1){}
+    try{ if(new RegExp("[?&(w2|frost)=1").test(location.search)) return true; }catch(e1){}
     try{ var a=document.getElementById("app"); if(a&&a.classList.contains("world-frost")) return true; }catch(e2){}
     return false;
   }
@@ -62,6 +62,10 @@
   }
   for(var i=0;i<embeds.length;i++) await tryLoad(base+embeds[i]);
   var overrides=['embed-walk.js','embed-cast.js','embed-foes.js'];
+  if(frostUrl){
+    var frostArt=['ff0.js','ff1.js','ff2.js','ff3.js','ih0.js','ih1.js','ih2.js'];
+    for(var fi=0;fi<frostArt.length;fi++) await tryLoad(base+frostArt[fi]);
+  }
   for(var oi=0;oi<overrides.length;oi++) await tryLoad(base+overrides[oi]);
   try{
     var embMap=window.MEADOW_ASSET_EMBED||{};
@@ -79,6 +83,7 @@
   }catch(re){ console.error("meadow: repair failed", re); }
   frostUrl=isFrostLoc();
   var need=["sparkelody/walk/sheet.png","npcs/elder-kid-sheet.png","foes/bloop-fluff-sheet.png","worlds/frost/tiles.png"];
+  if(frostUrl){ need.push("foes/frost-bloop-fluff-sheet.png"); need.push("bosses/ice_howl.png"); }
   if(!frostUrl) need.push("worlds/meadow/tiles.png");
   var frostEmbedMissing=false;
   for(var j=0;j<need.length;j++){
