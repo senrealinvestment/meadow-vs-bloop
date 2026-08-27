@@ -4,7 +4,7 @@
   if(!base.endsWith("/")) base+="/";
   function isFrostLoc(){
     try{ if(window.MEADOW_START_FROST) return true; }catch(e0){}
-    try{ if(new RegExp("[?&](w2|frost)=1").test(location.search)) return true; }catch(e1){}
+    try{ if(new RegExp("[?&(](w2|frost)=1").test(location.search)) return true; }catch(e1){}
     try{ var a=document.getElementById("app"); if(a&&a.classList.contains("world-frost")) return true; }catch(e2){}
     return false;
   }
@@ -98,7 +98,7 @@
       }
     }catch(eFt){}
   }
-  var q=['app.q0.js','app.q1.js','app.q2.js','app.q3.js','app.q4.js','app.q5.js'];
+  var q=['app.q0.js','app.q1.js','app.q2.js','app.q3.js','app.q4.js','app.q5.js','app.q6.js','app.q7.js','app.q8.js','app.q9.js','app.q10.js','app.q11.js','app.q12.js','app.q13.js','app.q14.js','app.q15.js'];
   var s="";
   for(var qi=0;qi<q.length;qi++){
     await tryLoad(base+q[qi]);
