@@ -136,7 +136,7 @@
   </div>
   <script>
   (function(){
-    if (/[?&(w2|frost)=1/.test(location.search)) {
+    if (/[?&](w2|frost)=1/.test(location.search)) {
       window.MEADOW_START_FROST=true;
       var app=document.getElementById("app");
       if (app) app.classList.add("world-frost");
