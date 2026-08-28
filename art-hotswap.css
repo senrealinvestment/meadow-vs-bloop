@@ -38,8 +38,8 @@
 .bloop.art-sprite .bloop-smile{opacity:0!important;pointer-events:none}
 .bloop.art-sprite{
   /* lift above grass horizon so full cell fits */
-  bottom:22% !important;
-  width:96px !important;
+  bottom:18% !important;
+  width:120px !important;
   height:96px !important;
   overflow:hidden !important;
   image-rendering:pixelated;
