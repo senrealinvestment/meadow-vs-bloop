@@ -4,7 +4,7 @@
   if(!base.endsWith("/")) base+="/";
   function isFrostLoc(){
     try{ if(window.MEADOW_START_FROST) return true; }catch(e0){}
-    try{ if(new RegExp("[?&(w2|frost)=1").test(location.search)) return true; }catch(e1){}
+    try{ if(new RegExp("[?&](w2|frost)=1").test(location.search)) return true; }catch(e1){}
     try{ var a=document.getElementById("app"); if(a&&a.classList.contains("world-frost")) return true; }catch(e2){}
     return false;
   }
