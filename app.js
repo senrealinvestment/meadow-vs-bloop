@@ -73,7 +73,7 @@
       delete window.MEADOW_ASSET_EMBED["assets/bosses/ice_howl.png"];
     }
   }catch(eEmbDel){}
-  var fbFull=["fb0.js", "fb1.js", "fb2.js", "fb3.js", "fb4.js", "ffb0.js", "ffb1.js", "ffb2.js", "ffb3.js", "ffb4.js", "ihb0.js", "ihb1.js", "ihb2.js", "ihb3.js", "ihb4.js", "fb-join.js"];
+  var fbFull=["fb0.js", "fb1.js", "fb2.js", "fb3.js", "fb4.js", "fb5.js", "fb6.js", "fb7.js", "fb8.js", "fb9.js", "fb10.js", "fb11.js", "fb12.js", "fb13.js", "fb14.js", "fb15.js", "fb16.js", "fb17.js", "fb18.js", "fb19.js", "ffb0.js", "ffb1.js", "ffb2.js", "ffb3.js", "ffb4.js", "ffb5.js", "ffb6.js", "ffb7.js", "ffb8.js", "ffb9.js", "ffb10.js", "ffb11.js", "ffb12.js", "ffb13.js", "ffb14.js", "ffb15.js", "ffb16.js", "ffb17.js", "ffb18.js", "ffb19.js", "ihb0.js", "ihb1.js", "ihb2.js", "ihb3.js", "ihb4.js", "ihb5.js", "ihb6.js", "ihb7.js", "ihb8.js", "ihb9.js", "ihb10.js", "ihb11.js", "ihb12.js", "ihb13.js", "ihb14.js", "ihb15.js", "ihb16.js", "ihb17.js", "ihb18.js", "ihb19.js", "fb-join.js"];
   for(var fi=0;fi<fbFull.length;fi++) await tryLoad(base+fbFull[fi]);
 
   try{
@@ -139,7 +139,7 @@
   frostUrl=isFrostLoc();
   if (frostUrl) {
     s = "var BOOT_FROST=true;" + s;
-    s = s.replace(/world:\s*"meadow"/g, 'world: "frost"');
+    s = s.replace(/world:\s*\"meadow\"/g, 'world: "frost"');
     s = s.replace(
       'loadImage(assetUrl("worlds/meadow/tiles.png")),',
       'loadImage(assetUrl("worlds/frost/tiles.png")),'
