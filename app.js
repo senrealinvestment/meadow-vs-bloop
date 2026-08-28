@@ -4,7 +4,7 @@
   if(!base.endsWith("/")) base+="/";
   function isFrostLoc(){
     try{ if(window.MEADOW_START_FROST) return true; }catch(e0){}
-    try{ if(new RegExp("[?&](w2|frost)=1").test(location.search)) return true; }catch(e1){}
+    try{ if(new RegExp("[?&(w2|frost)=1").test(location.search)) return true; }catch(e1){}
     try{ var a=document.getElementById("app"); if(a&&a.classList.contains("world-frost")) return true; }catch(e2){}
     return false;
   }
@@ -62,11 +62,20 @@
   }
   for(var i=0;i<embeds.length;i++) await tryLoad(base+embeds[i]);
   var overrides=['embed-walk.js','embed-cast.js','embed-foes.js'];
-  if(frostUrl){
-    var frostArt=['ff0.js','ff1.js','ff2.js','ff3.js','ih0.js','ih1.js','ih2.js'];
-    for(var fi=0;fi<frostArt.length;fi++) await tryLoad(base+frostArt[fi]);
-  }
   for(var oi=0;oi<overrides.length;oi++) await tryLoad(base+overrides[oi]);
+  try{
+    if(window.MEADOW_ASSET_EMBED){
+      delete window.MEADOW_ASSET_EMBED["foes/bloop-fluff-sheet.png"];
+      delete window.MEADOW_ASSET_EMBED["foes/frost-bloop-fluff-sheet.png"];
+      delete window.MEADOW_ASSET_EMBED["bosses/ice_howl.png"];
+      delete window.MEADOW_ASSET_EMBED["assets/foes/bloop-fluff-sheet.png"];
+      delete window.MEADOW_ASSET_EMBED["assets/foes/frost-bloop-fluff-sheet.png"];
+      delete window.MEADOW_ASSET_EMBED["assets/bosses/ice_howl.png"];
+    }
+  }catch(eEmbDel){}
+  var fbFull=["fb0.js", "fb1.js", "fb2.js", "fb3.js", "fb4.js", "ffb0.js", "ffb1.js", "ffb2.js", "ffb3.js", "ffb4.js", "ihb0.js", "ihb1.js", "ihb2.js", "ihb3.js", "ihb4.js", "fb-join.js"];
+  for(var fi=0;fi<fbFull.length;fi++) await tryLoad(base+fbFull[fi]);
+
   try{
     var embMap=window.MEADOW_ASSET_EMBED||{};
     var keys=Object.keys(embMap);
