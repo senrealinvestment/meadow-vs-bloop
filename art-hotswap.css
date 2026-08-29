@@ -1,3 +1,5 @@
+.bloop-body,.bloop-eye,.bloop-smile,.bloop .bloop-body{display:none!important;opacity:0!important}
+.bloop:not(.art-sprite){visibility:hidden!important}
 /* Pixel Art Director + GE — one hero frame, no CVC panel paint */
 .hero.art-sprite .cat-ear,
 .hero.art-sprite .cat-head,
