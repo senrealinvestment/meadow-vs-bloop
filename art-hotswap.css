@@ -38,9 +38,9 @@
 .bloop.art-sprite .bloop-smile{opacity:0!important;pointer-events:none}
 .bloop.art-sprite{
   /* lift above grass horizon so full cell fits */
-  bottom:18% !important;
-  width:120px !important;
-  height:96px !important;
+  bottom:16% !important;
+  width:96px !important;
+  height:64px !important;
   overflow:hidden !important;
   image-rendering:pixelated;
   image-rendering:crisp-edges;
@@ -48,9 +48,9 @@
   background-repeat:no-repeat;
 }
 .bloop.art-sprite.boss-art{
-  width:140px !important;
-  height:120px !important;
-  bottom:18% !important;
+  width:108px !important;
+  height:96px !important;
+  bottom:16% !important;
   background-size:contain !important;
   background-position:center bottom !important;
   transform-origin:center bottom;
