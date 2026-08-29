@@ -73,8 +73,6 @@
       delete window.MEADOW_ASSET_EMBED["assets/bosses/ice_howl.png"];
     }
   }catch(eEmbDel){}
-  var fbFull=["fb0.js", "fb1.js", "fb2.js", "fb3.js", "fb4.js", "ffb0.js", "ffb1.js", "ffb2.js", "ffb3.js", "ffb4.js", "ihb0.js", "ihb1.js", "ihb2.js", "ihb3.js", "ihb4.js", "fb-join.js"];
-  for(var fi=0;fi<fbFull.length;fi++) await tryLoad(base+fbFull[fi]);
 
   try{
     var embMap=window.MEADOW_ASSET_EMBED||{};
