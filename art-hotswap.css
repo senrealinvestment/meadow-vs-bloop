@@ -160,3 +160,10 @@
 .cvc-word.phrase .stall-hi{color:#f9a825;-webkit-text-stroke:4px #3e2723}
 .word-tile{max-width:100%;letter-spacing:0.04em;text-indent:0;font-size:clamp(0.9rem,3.8vw,1.25rem);white-space:normal;line-height:1.2}
 #app.world-frost .bloop.art-sprite{filter:none}
+
+#app.world-harmony .world-wrap,#app.world-harmony #world,#app.world-harmony #art-loader{background:#4a148c;}
+#app.world-story .world-wrap,#app.world-story #world,#app.world-story #art-loader{background:#1a237e;}
+
+/* Pixel-only overworld: CSS slime/cat never paint over the canvas. */
+.hero .cat-ear,.hero .cat-head,.hero .cat-body,.hero .cat-tail,.hero .cat-collar,.hero .cat-nose,.hero .cat-eye,.hero .cat-charm{display:none!important;opacity:0!important;visibility:hidden!important}
+.bloop-body,.bloop-eye,.bloop-smile{display:none!important;opacity:0!important;visibility:hidden!important}

@@ -165,6 +165,7 @@
     if (m && worlds[m[1]]) {
       var w = worlds[m[1]];
       if (m[1]==="w2" || m[1]==="frost") window.MEADOW_START_FROST=true;
+      window.MEADOW_START_WORLD = ({w2:"frost",frost:"frost",w3:"ember",ember:"ember",w4:"leaf",leaf:"leaf",w5:"wind",wind:"wind",w6:"tide",tide:"tide",w7:"storm",storm:"storm",w8:"harmony",harmony:"harmony",w9:"story",story:"story"})[m[1]] || "meadow";
       var app=document.getElementById("app");
       if (app) app.classList.add(w[0]);
       var n=document.getElementById("art-loader");

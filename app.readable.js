@@ -8,11 +8,20 @@
   window.__MVB_BOOTED = true;
 
   // URL is source of truth — set before any draw. ?w2=1 never starts as meadow.
-  var BOOT_FROST = false;
+  var BOOT_WORLD = "meadow";
   try {
-    BOOT_FROST = !!(typeof window !== "undefined" && window.MEADOW_START_FROST) ||
-      (typeof location !== "undefined" && /[?&](w2|frost)=1/.test(location.search));
-  } catch (eBootFrost) {}
+    var _qs = (typeof location !== "undefined" && location.search) || "";
+    if (typeof window !== "undefined" && window.MEADOW_START_WORLD) BOOT_WORLD = window.MEADOW_START_WORLD;
+    if ((typeof window !== "undefined" && window.MEADOW_START_FROST) || /[?&](w2|frost)=1/.test(_qs)) BOOT_WORLD = "frost";
+    else if (/[?&](w3|ember)=1/.test(_qs)) BOOT_WORLD = "ember";
+    else if (/[?&](w4|leaf)=1/.test(_qs)) BOOT_WORLD = "leaf";
+    else if (/[?&](w5|wind)=1/.test(_qs)) BOOT_WORLD = "wind";
+    else if (/[?&](w6|tide)=1/.test(_qs)) BOOT_WORLD = "tide";
+    else if (/[?&](w7|storm)=1/.test(_qs)) BOOT_WORLD = "storm";
+    else if (/[?&](w8|harmony)=1/.test(_qs)) BOOT_WORLD = "harmony";
+    else if (/[?&](w9|story)=1/.test(_qs)) BOOT_WORLD = "story";
+  } catch (eBootWorld) {}
+  var BOOT_FROST = BOOT_WORLD === "frost";
 
   // Local W3 stub only. Accidental pin of readable still needs this flag to open Ember.
   // Flip/leave true at ship time; q files are NOT rebuilt from this file.
@@ -354,7 +363,7 @@
   function makeSkins(theme, n) {
     const a = [];
     for (let i = 0; i < n; i++) {
-      a.push({ artKey: i < Math.ceil(n / 2) ? "bloop" : "fluff_lite", name: theme + (i < Math.ceil(n / 2) ? " Bloop" : " Fluff") });
+      a.push({ artKey: "fluff_lite", name: theme + " Fluff" });
     }
     return a;
   }
@@ -575,8 +584,8 @@
   };
 
   const FOE_CELLS = {
-    bloop: { idle: [1, 0], hit: [1, 1] },
-    fluff_lite: { idle: [1, 0], hit: [1, 1] },
+    bloop: { idle: [0, 0], hit: [0, 1] },
+    fluff_lite: { idle: [0, 0], hit: [0, 1] },
   };
 
   // 32×32 samples from meadow tiles.png (fallback to flat colors if unloadable)
@@ -699,6 +708,23 @@
     return keySheet(img, { r: rgb[0], g: rgb[1], b: rgb[2], tol: tol || 36 });
   }
 
+  /* Pixel-only: keep the RIGHT column of the 2×2 bloop/fluff sheet (fluff idle + hit).
+     Never sample the left slime cells on the overworld. */
+  function cropFluffColumn(img) {
+    if (!img) return null;
+    const w = img.naturalWidth || img.width || 0;
+    const h = img.naturalHeight || img.height || 0;
+    if (w < 8 || h < 8) return img;
+    const cw = Math.max(1, Math.floor(w / 2));
+    const c = document.createElement("canvas");
+    c.width = cw;
+    c.height = h;
+    const g = c.getContext("2d");
+    g.imageSmoothingEnabled = false;
+    g.drawImage(img, cw, 0, cw, h, 0, 0, cw, h);
+    return c;
+  }
+
   var artLoadInFlight = false;
   var ART_WORLD_IDS = ["ember", "leaf", "wind", "tide", "storm", "harmony", "story"];
   async function preloadArt() {
@@ -706,6 +732,7 @@
     artLoadInFlight = true;
     try {
     if (!ART.walk || !ART.foes || !ART.meadowTiles) {
+      const bootId = BOOT_WORLD || "meadow";
       const packed = await Promise.all([
         loadImage(assetUrl("sparkelody/walk/sheet.png")),
         loadImage(assetUrl("sparkelody/cast/sheet.png")),
@@ -720,11 +747,12 @@
         loadImage(assetUrl("worlds/frost/tiles.png")),
         loadImage(assetUrl("foes/frost-bloop-fluff-sheet.png")),
         loadImage(assetUrl("outfits/sheet.png")),
+        (bootId !== "meadow" && bootId !== "frost") ? loadImage(assetUrl("worlds/" + bootId + "/tiles.png")) : Promise.resolve(null),
       ]);
-      const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12];
+      const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12], bootTiles = packed[13];
       ART.walk = walk ? keySheet(walk, CHROMA.walk) || walk : (ART.walk || null);
       ART.cast = cast ? keySheet(cast, CHROMA.cast) || cast : (ART.cast || null);
-      ART.foes = foes ? keySheet(foes, CHROMA.foes) || foes : (ART.foes || null);
+      ART.foes = foes ? cropFluffColumn(keySheet(foes, CHROMA.foes) || foes) : (ART.foes || null);
       ART.boss = boss ? keySheet(boss, CHROMA.boss) || boss : (ART.boss || null);
       ART.meadowTiles = tiles && (tiles.naturalWidth || tiles.width) ? tiles : (ART.meadowTiles || null);
       ART.tiles = ART.meadowTiles;
@@ -734,11 +762,15 @@
       ART.npcs = npcs ? keySheet(npcs, CHROMA.npcs) || npcs : (ART.npcs || null);
       ART.iceHowl = iceHowl ? keySheet(iceHowl, CHROMA.boss) || iceHowl : null;
       ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : (ART.frostTiles || null);
-      ART.frostFoes = frostFoes ? keySheet(frostFoes, CHROMA.foes) || frostFoes : (ART.frostFoes || null);
+      ART.frostFoes = frostFoes ? cropFluffColumn(keySheet(frostFoes, CHROMA.foes) || frostFoes) : (ART.frostFoes || null);
       ART.outfits = outfitImg ? keyChroma(outfitImg, [140, 158, 113], 48) : (ART.outfits || null);
       ART.worldTiles = ART.worldTiles || {};
       ART.worldFoes = ART.worldFoes || {};
       ART.worldBoss = ART.worldBoss || {};
+      if (bootTiles && (bootTiles.naturalWidth || bootTiles.width)) {
+        ART.worldTiles[bootId] = bootTiles;
+        if (bootId === "ember") ART.emberTiles = bootTiles;
+      }
     }
     if (BOOT_FROST || wantFrost()) {
       ART.tiles = ART.frostTiles || ART.tiles;
@@ -891,8 +923,9 @@
     el.bloop.style.setProperty("height", dispH + "px", "important");
     el.bloop.style.setProperty("overflow", "hidden", "important");
     el.bloop.style.backgroundImage = 'url("' + url + '")';
-    el.bloop.style.backgroundSize = dispW * 2 + "px " + dispH * 2 + "px";
-    el.bloop.style.backgroundPosition = -(cx * dispW) + "px " + -(cy * dispH) + "px";
+    /* Cropped fluff column: 1 col × 2 rows. Never 2×2 (that would show slime). */
+    el.bloop.style.backgroundSize = dispW + "px " + dispH * 2 + "px";
+    el.bloop.style.backgroundPosition = "0px " + -(cy * dispH) + "px";
     el.bloop.style.backgroundRepeat = "no-repeat";
   }
 
@@ -913,7 +946,7 @@
     camX: 0,
     camY: 0,
     powers: { star: false, leaf: false, wind: false, ice: false, fire: false, water: false, electric: false, shine: false, melody: false },
-    world: BOOT_FROST ? "frost" : "meadow",
+    world: BOOT_WORLD || "meadow",
     world2Open: false,
     world3Open: false,
     wonStory: false,
@@ -1047,15 +1080,20 @@
   }
   function currentFoeSheet() {
     const id = worldDef().id;
-    if (id === "frost") return ART.frostFoes || ART.foes || null;
-    if (id === "meadow") return ART.foes;
-    ART.worldFoes = ART.worldFoes || {};
-    if (!ART.worldFoes[id]) {
-      const d = WORLD_DEFS[id];
-      const base = id === "storm" ? (ART.frostFoes || ART.foes) : ART.foes;
-      ART.worldFoes[id] = d && d.foeTint && base ? tintSheet(base, d.foeTint, 0.4) : base;
+    let sheet = null;
+    if (id === "frost") sheet = ART.frostFoes || ART.foes || null;
+    else if (id === "meadow") sheet = ART.foes;
+    else {
+      ART.worldFoes = ART.worldFoes || {};
+      if (!ART.worldFoes[id]) {
+        const d = WORLD_DEFS[id];
+        const base = id === "storm" ? (ART.frostFoes || ART.foes) : ART.foes;
+        ART.worldFoes[id] = d && d.foeTint && base ? tintSheet(base, d.foeTint, 0.4) : base;
+      }
+      sheet = ART.worldFoes[id] || ART.foes;
     }
-    return ART.worldFoes[id] || ART.foes;
+    if (sheet && (sheet.width || 0) > (sheet.height || 0)) sheet = cropFluffColumn(sheet);
+    return sheet;
   }
   function currentBossSheet(artKey) {
     if (artKey === "star_bloom") return ART.boss;
@@ -1215,8 +1253,8 @@
       ctx.clearRect(0, 0, w, h);
     }
     if (!sheetsOk) {
-      // Ember tiles pending: show loader, never fall back to meadow/frost blit or procedural tiles.
-      if (wantEmber() && !ART.emberTiles) {
+      // Later worlds / frost: show loader, never fall back to meadow blit or procedural tiles.
+      if (laterWorld() || wantFrost() || wantEmber()) {
         showArtLoader(true);
         return;
       }
@@ -1248,7 +1286,7 @@
           usedTile = true;
         }
         if (!usedTile) {
-          if (ART.locked && !wantFrost()) {
+          if (ART.locked && !wantFrost() && !laterWorld()) {
             const mt = ART.meadowTiles;
             const srcLocked = TILE_SRC[t];
             if (mt && mt !== ART.frostTiles && (mt.naturalWidth || mt.width) && srcLocked != null) {
@@ -1295,14 +1333,13 @@
         const bw = howl ? 48 : 32;
         drawSheetFrame(bossSheet, 0, 0, bossSheet.width, bossSheet.height, cx - bw / 2, cy + TILE / 2 - bh - 2, bw, bh);
       } else if (spot.type === "foe" && currentFoeSheet()) {
-        const cell = FOE_CELLS.fluff_lite;
-        const [ccx, ccy] = cell.idle;
         const fs = currentFoeSheet();
-        const fw = fs.width / 2;
-        const fh = fs.height / 2;
-        const dh = 30;
-        const dw = 28;
-        drawSheetFrame(fs, ccx * fw, ccy * fh, fw, fh, cx - dw / 2, cy + TILE / 2 - dh - 2, dw, dh);
+        /* Cropped fluff column: full width × top half = idle fluff. Never slime. */
+        const fw = fs.width;
+        const fh = Math.max(1, Math.floor(fs.height / 2));
+        const dh = TILE;
+        const dw = TILE;
+        drawSheetFrame(fs, 0, 0, fw, fh, cx - dw / 2, cy + TILE / 2 - dh, dw, dh);
       }
     });
 
@@ -1572,9 +1609,17 @@
     applyWorldChrome();
     closeDialogueQuiet();
     const silent = !!(opts && opts.silent);
-    if (silent) return;
-    if (currentTiles()) drawWorld();
-    else {
+    if (silent) {
+      if (!currentTiles()) {
+        showArtLoader(true);
+        preloadArt();
+      }
+      return;
+    }
+    if (currentTiles()) {
+      showArtLoader(false);
+      drawWorld();
+    } else {
       showArtLoader(true);
       preloadArt();
     }
@@ -2186,16 +2231,8 @@
   });
 
   showArtLoader(true);
-  // Parse w2/frost=1 FIRST — before HUD/hints/showScene. Not inside a try that can skip enterFrost.
-  var frostBoot = false;
-  try {
-    frostBoot = !!(typeof window !== "undefined" && window.MEADOW_START_FROST);
-  } catch (eBoot0) {}
-  try {
-    if (!frostBoot && typeof location !== "undefined" && /[?&](w2|frost)=1/.test(location.search)) {
-      frostBoot = true;
-    }
-  } catch (eBoot1) {}
+  // Parse URL FIRST — before HUD/hints/showScene.
+  var frostBoot = BOOT_FROST;
   if (frostBoot) {
     state.powers.star = true;
     state.world2Open = true;
@@ -2204,7 +2241,7 @@
   try {
     const qs = new URLSearchParams(location.search);
     const bootMap = { w3: "ember", ember: "ember", w4: "leaf", leaf: "leaf", w5: "wind", wind: "wind", w6: "tide", tide: "tide", w7: "storm", storm: "storm", w8: "harmony", harmony: "harmony", w9: "story", story: "story" };
-    let bootId = null;
+    let bootId = (BOOT_WORLD && BOOT_WORLD !== "meadow" && BOOT_WORLD !== "frost") ? BOOT_WORLD : null;
     Object.keys(bootMap).forEach(function (k) { if (qs.get(k) === "1") bootId = bootMap[k]; });
     if (bootId && !frostBoot) {
       const order = ["meadow", "frost", "ember", "leaf", "wind", "tide", "storm", "harmony", "story"];
@@ -2236,49 +2273,34 @@
   setMode("confirm");
   showScene("overworld");
   applyWorldChrome();
-  function ensureFrostFromUrl() {
-    if (!wantFrost()) return;
-    enterFrost({ silent: true });
-    if (!ART.frostTiles) {
-      showArtLoader(true);
-      preloadArt();
-      return;
+  function ensureWorldFromUrl() {
+    if (BOOT_WORLD === "frost" || wantFrost()) {
+      enterFrost({ silent: true });
+    } else if (BOOT_WORLD && BOOT_WORLD !== "meadow" && state.world !== BOOT_WORLD) {
+      enterWorld(BOOT_WORLD, { silent: true, spawn: "west" });
     }
-    ART.ready = !!(ART.walk && ART.npcs && ART.foes && ART.frostTiles);
-    if (ART.locked) artEverLocked = true;
-    ART.locked = ART.locked || ART.ready || artEverLocked;
-    if (ART.locked) artEverLocked = true;
-    if (!ART.locked) {
-      showArtLoader(true);
-      preloadArt();
-      return;
+    if (currentTiles() && (currentFoeSheet() || ART.foes) && ART.walk) {
+      ART.locked = true;
+      artEverLocked = true;
+      applyDomArt();
+      if (state.scene === "overworld") drawWorld();
+      showArtLoader(false);
     }
-    applyDomArt();
-    if (state.scene === "overworld") drawWorld();
-    showArtLoader(false);
   }
-  window.addEventListener("pageshow", function (ev) {
-    // bfcache can restore Meadow canvas under a Frost URL — hard reload.
-    if (ev && ev.persisted && wantFrost()) {
-      location.reload();
-      return;
-    }
-    ensureFrostFromUrl();
+  window.addEventListener("pageshow", function () {
+    ensureWorldFromUrl();
   });
   window.addEventListener("popstate", function () {
-    ensureFrostFromUrl();
+    ensureWorldFromUrl();
   });
-  setInterval(function () {
-    if (!wantFrost()) return;
-    state.world = "frost";
-    ART.tiles = ART.frostTiles || ART.tiles;
-    var _ap = document.getElementById("app");
-    if (_ap) _ap.classList.add("world-frost");
-    if (!ART.frostTiles) {
-      if (!ART.locked) preloadArt();
-      return;
+  setTimeout(function () {
+    /* Never leave #art-loader up forever if a sheet is late. */
+    if (ART.walk && currentTiles() && (currentFoeSheet() || ART.foes)) {
+      ART.locked = true;
+      artEverLocked = true;
+      if (state.scene === "overworld") drawWorld();
     }
-    if (state.scene === "overworld") drawWorld();
-  }, 400);
+    showArtLoader(false);
+  }, 8000);
   preloadArt();
 })();
