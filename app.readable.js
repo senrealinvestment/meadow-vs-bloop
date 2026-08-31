@@ -499,6 +499,16 @@
     btnFlee: document.getElementById("btn-flee"),
   };
 
+  /* Kill the bad path: clone #world so a leftover p-chain ctx paints a detached node. */
+  (function lockPixelCanvas() {
+    const old = el.canvas || document.getElementById("world");
+    if (!old || old.dataset.pixelLock === "1") return;
+    const neu = old.cloneNode(false);
+    neu.dataset.pixelLock = "1";
+    neu.classList.add("art-wait");
+    if (old.parentNode) old.parentNode.replaceChild(neu, old);
+    el.canvas = neu;
+  })();
   const ctx = el.canvas.getContext("2d");
 
   /** Hot-swap pixel art — relative assets/ or CDN base via window.MEADOW_ASSET_BASE */
@@ -720,9 +730,12 @@
      Never sample the left slime cells on the overworld. */
   function cropFluffColumn(img) {
     if (!img) return null;
+    if (img._fluffCrop) return img;
     const w = img.naturalWidth || img.width || 0;
     const h = img.naturalHeight || img.height || 0;
     if (w < 8 || h < 8) return img;
+    /* 2×2 sheet is wider than tall (1536×1024). Keep RIGHT fluff column only. */
+    if (w <= h) { img._fluffCrop = true; return img; }
     const cw = Math.max(1, Math.floor(w / 2));
     const c = document.createElement("canvas");
     c.width = cw;
@@ -730,6 +743,7 @@
     const g = c.getContext("2d");
     g.imageSmoothingEnabled = false;
     g.drawImage(img, cw, 0, cw, h, 0, 0, cw, h);
+    c._fluffCrop = true;
     return c;
   }
 
@@ -780,21 +794,21 @@
         if (bootId === "ember") ART.emberTiles = bootTiles;
       }
     }
-    if (BOOT_FROST || wantFrost()) {
-      ART.tiles = ART.frostTiles || ART.tiles;
+    syncWorldFromUrl();
+    if (BOOT_WORLD === "frost" || BOOT_FROST || wantFrost()) {
+      ART.tiles = ART.frostTiles || null;
       ART.ready = !!(ART.walk && ART.frostTiles && (ART.frostFoes || ART.foes));
-    } else if (laterWorld()) {
-      ART.tiles = currentTiles() || ART.tiles;
+    } else if (laterWorld() || (BOOT_WORLD && BOOT_WORLD !== "meadow" && BOOT_WORLD !== "frost")) {
+      ART.tiles = currentTiles();
       ART.ready = !!(ART.walk && currentTiles() && (currentFoeSheet() || ART.foes));
     } else {
-      ART.tiles = ART.meadowTiles || ART.tiles;
+      ART.tiles = ART.meadowTiles || null;
       ART.ready = !!(ART.walk && ART.tiles && ART.foes);
     }
-    if (ART.locked) artEverLocked = true;
-    ART.locked = ART.locked || ART.ready || artEverLocked;
-    if (ART.locked) artEverLocked = true;
+    ART.locked = !!ART.ready;
+    if (ART.ready) artEverLocked = true;
     if (ART.walk) applyDomArt();
-    if (ART.locked) {
+    if (ART.ready) {
       if (state.scene === "overworld") drawWorld();
       showArtLoader(false);
     } else {
@@ -1023,15 +1037,20 @@
   function laterWorld() {
     return !!(state.world && state.world !== "meadow" && state.world !== "frost");
   }
+  function syncWorldFromUrl() {
+    if (!BOOT_WORLD || BOOT_WORLD === "meadow") return;
+    if (state.world === BOOT_WORLD) return;
+    if (state.world === "meadow") state.world = BOOT_WORLD;
+  }
   function wantFrost() {
-    if (state.world === "meadow" || laterWorld()) return false;
-    if (BOOT_FROST) return true;
+    if (laterWorld() && state.world !== "frost") return false;
+    if (BOOT_WORLD === "frost" || BOOT_FROST) return true;
     if (state.world === "frost") return true;
     try {
-      if (typeof window !== "undefined" && window.MEADOW_START_FROST) return true;
+      if (typeof window !== "undefined" && window.MEADOW_START_FROST) return !laterWorld();
     } catch (e0) {}
     try {
-      if (typeof location !== "undefined" && /[?&](w2|frost)=1/.test(location.search)) return true;
+      if (typeof location !== "undefined" && /[?&](w2|frost)=1/.test(location.search) && !laterWorld()) return true;
     } catch (e1) {}
     return false;
   }
@@ -1083,8 +1102,8 @@
   function currentTiles() {
     const id = worldDef().id;
     if (id === "frost") return ART.frostTiles || null;
-    if (id === "meadow") return ART.meadowTiles || ART.tiles;
-    return ART.worldTiles[id] || null;
+    if (id === "meadow") return ART.meadowTiles || null;
+    return (ART.worldTiles && ART.worldTiles[id]) || null;
   }
   function currentFoeSheet() {
     const id = worldDef().id;
@@ -1237,26 +1256,13 @@
   }
 
   function drawWorld() {
-    // URL wins: a warm Meadow tab that lands on ?w2=1 must never keep meadow tiles.
-    try {
-      if (state.world !== "meadow" && !laterWorld() &&
-          ((typeof window !== "undefined" && window.MEADOW_START_FROST) ||
-          (typeof location !== "undefined" && /[?&](w2|frost)=1/.test(location.search)))) {
-        if (state.world !== "frost") {
-          state.world = "frost";
-          const app = document.getElementById("app");
-          if (app) app.classList.add("world-frost");
-          const title = document.querySelector(".title");
-          if (title) title.textContent = "Sparkelody · World 2 Frost Path";
-          if (el.worldHint) el.worldHint.textContent = "Frost Path";
-        }
-      }
-    } catch (eDrawFrost) {}
+    syncWorldFromUrl();
     updateCamera();
-    if (artEverLocked) ART.locked = true;
     const w = VIEW_COLS * TILE;
     const h = VIEW_ROWS * TILE;
-    const sheetsOk = !!(ART.walk && currentTiles() && (currentFoeSheet() || ART.foes));
+    const tilesheetReady = currentTiles();
+    const foeReady = currentFoeSheet() || ART.foes;
+    const sheetsOk = !!(ART.walk && tilesheetReady && foeReady);
     if (sheetsOk) { ART.locked = true; artEverLocked = true; }
     if (el.canvas.width !== w || el.canvas.height !== h) {
       el.canvas.width = w;
@@ -1265,12 +1271,7 @@
       ctx.clearRect(0, 0, w, h);
     }
     if (!sheetsOk) {
-      // Later worlds / frost: show loader, never fall back to meadow blit or procedural tiles.
-      if (laterWorld() || wantFrost() || wantEmber()) {
-        showArtLoader(true);
-        return;
-      }
-      if (artEverLocked) return;
+      /* One path: Pixel sheets for THIS world, or loader. Never meadow/slime fallback. */
       showArtLoader(true);
       return;
     }
@@ -1287,7 +1288,6 @@
       let usedTile = false;
       let tilesheet = currentTiles();
       if (wantFrost()) tilesheet = ART.frostTiles || null;
-      else if (!laterWorld() && ART.locked && tilesheet === ART.frostTiles) tilesheet = ART.meadowTiles || null;
       const atlas = tileAtlas();
       const srcMap = atlas.src;
       const srcSize = atlas.size;
@@ -1298,18 +1298,7 @@
         ctx.drawImage(tilesheet, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
         usedTile = true;
       }
-      if (!usedTile) {
-        if (ART.locked && !wantFrost() && !laterWorld()) {
-          const mt = ART.meadowTiles;
-          const srcLocked = TILE_SRC[t];
-          if (mt && mt !== ART.frostTiles && (mt.naturalWidth || mt.width) && srcLocked != null) {
-            ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(mt, srcLocked[0], srcLocked[1], 32, 32, sx, sy, TILE, TILE);
-            usedTile = true;
-          }
-        }
-      }
-      /* no procedural tiles — skip cell if sheets miss */
+      /* no procedural tiles, no meadow substitute on frost/ember/w4-w9 */
       if (t === T.GATE) {
         if (!usedTile) {
           let open = state.world2Open;
@@ -2207,7 +2196,7 @@
       holdDelay = setTimeout(function () {
         holdRepeat = setInterval(step, 180);
       }, 280);
-    });
+    }, true);
     const clear = () => {
       if (holdDelay) { clearTimeout(holdDelay); holdDelay = null; }
       if (holdRepeat) { clearInterval(holdRepeat); holdRepeat = null; }
@@ -2221,6 +2210,8 @@
     if (state.scene === "overworld" && !el.dialogue.classList.contains("hidden")) {
       if (e.key === "Enter" || e.key === " " || e.key === "e" || e.key === "E") {
         e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
         closeDialogue();
       }
       return;
@@ -2233,17 +2224,25 @@
     };
     if (map[e.key] && state.scene === "overworld") {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       tryMove(map[e.key][0], map[e.key][1]);
+      return;
     }
     if ((e.key === "e" || e.key === "E" || e.key === " ") && state.scene === "overworld") {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       interact();
+      return;
     }
     if ((e.key === "q" || e.key === "Q") && state.scene === "overworld") {
       e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
       cycleWear();
     }
-  });
+  }, true);
 
   showArtLoader(true);
   // Parse URL FIRST — before HUD/hints/showScene.
@@ -2309,13 +2308,13 @@
     ensureWorldFromUrl();
   });
   setTimeout(function () {
-    /* Never leave #art-loader up forever if a sheet is late. */
+    /* Never leave #art-loader up forever — but only reveal a Pixel frame. */
     if (ART.walk && currentTiles() && (currentFoeSheet() || ART.foes)) {
       ART.locked = true;
       artEverLocked = true;
       if (state.scene === "overworld") drawWorld();
+      showArtLoader(false);
     }
-    showArtLoader(false);
   }, 8000);
   preloadArt();
 })();

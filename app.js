@@ -1,5 +1,7 @@
 /* Same-origin WORLD1-9 loader. No _rebind, no 250ms reload, no 20-chunk eval stall. */
 (async function(){
+  if(window.__MVB_LOADER) return;
+  window.__MVB_LOADER=true;
   var base=(document.currentScript&&document.currentScript.getAttribute("data-base"))||window.MEADOW_JS_BASE||"./";
   if(!base.endsWith("/")) base+="/";
 
@@ -83,7 +85,9 @@
   }catch(re){ console.error("meadow: repair failed", re); }
 
   var gameOk=await tryLoad(base+"app.readable.js", 8000);
-  if(!gameOk){
+  /* Never eval q-chunks (or any second IIFE) once readable has booted. */
+  if(window.__MVB_BOOTED) gameOk=true;
+  if(!gameOk && !window.__MVB_BOOTED){
     console.error("meadow: readable failed, trying q-chain with timeouts");
     var q=["app.q0.js","app.q1.js","app.q2.js","app.q3.js","app.q4.js","app.q5.js","app.q6.js","app.q7.js","app.q8.js","app.q9.js","app.q10.js","app.q11.js","app.q12.js","app.q13.js","app.q14.js","app.q15.js","app.q16.js","app.q17.js","app.q18.js","app.q19.js"];
     var src="";
