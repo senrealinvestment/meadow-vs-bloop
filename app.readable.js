@@ -477,6 +477,7 @@
     chipShine: document.getElementById("chip-shine"),
     chipMelody: document.getElementById("chip-melody"),
     btnWear: document.getElementById("btn-wear"),
+    btnNewgame: document.getElementById("btn-newgame"),
     cvcWord: document.getElementById("cvc-word"),
     cvcWrap: document.getElementById("cvc-wrap"),
     controlsConfirm: document.getElementById("controls-confirm"),
@@ -971,14 +972,18 @@
   }
 
 
+  const SAVE_KEY = "mvb.kid.v1";
+  let saveReady = false;
+  let saveTimer = 0;
   const state = {
     scene: "overworld",
     mode: "confirm",
     px: 16,
     py: 14,
     facing: "up",
-    camX: 0,
-    camY: 0,
+    /* Camera must match the hero from frame 0 — never start at 0,0 and snap on the first step. */
+    camX: Math.max(0, Math.min(COLS - VIEW_COLS, 16 - Math.floor(VIEW_COLS / 2))),
+    camY: Math.max(0, Math.min(ROWS - VIEW_ROWS, 14 - Math.floor(VIEW_ROWS / 2))),
     powers: { star: false, leaf: false, wind: false, ice: false, fire: false, water: false, electric: false, shine: false, melody: false },
     world: BOOT_WORLD || "meadow",
     world2Open: false,
@@ -1245,6 +1250,91 @@
     state.camX = Math.max(0, Math.min(COLS - VIEW_COLS, state.px - Math.floor(VIEW_COLS / 2)));
     state.camY = Math.max(0, Math.min(ROWS - VIEW_ROWS, state.py - Math.floor(VIEW_ROWS / 2)));
   }
+  function placeHero(x, y, facing) {
+    state.px = x;
+    state.py = y;
+    if (facing) state.facing = facing;
+    updateCamera();
+  }
+  function clampTile(v, maxEx) {
+    v = Math.round(Number(v));
+    if (!isFinite(v)) return 0;
+    return Math.max(0, Math.min(maxEx - 1, v));
+  }
+  function readSave() {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw) return null;
+      const s = JSON.parse(raw);
+      if (!s || s.v !== 1 || !s.world || !WORLD_DEFS[s.world]) return null;
+      return s;
+    } catch (eR) {
+      return null;
+    }
+  }
+  function writeSave() {
+    if (!saveReady) return;
+    try {
+      const payload = {
+        v: 1,
+        world: state.world,
+        px: state.px,
+        py: state.py,
+        facing: state.facing,
+        camX: state.camX,
+        camY: state.camY,
+        cleared: state.cleared,
+        powers: state.powers,
+        unlockedWear: state.unlockedWear,
+        wearIndex: state.wearIndex,
+        world2Open: state.world2Open,
+        world3Open: state.world3Open,
+        wonStory: state.wonStory,
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+    } catch (eW) {}
+  }
+  function scheduleSave() {
+    if (!saveReady) return;
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(writeSave, 50);
+  }
+  function applySave(s) {
+    state.world = s.world;
+    state.px = clampTile(s.px, COLS);
+    state.py = clampTile(s.py, ROWS);
+    state.facing = s.facing === "left" || s.facing === "right" || s.facing === "down" || s.facing === "up" ? s.facing : "up";
+    state.cleared = s.cleared && typeof s.cleared === "object" ? s.cleared : {};
+    if (s.powers && typeof s.powers === "object") {
+      Object.keys(state.powers).forEach(function (k) {
+        if (s.powers[k]) state.powers[k] = true;
+      });
+    }
+    state.unlockedWear = s.unlockedWear && typeof s.unlockedWear === "object" ? s.unlockedWear : {};
+    state.wearIndex = typeof s.wearIndex === "number" ? s.wearIndex : -1;
+    state.world2Open = !!s.world2Open;
+    state.world3Open = !!s.world3Open;
+    state.wonStory = !!s.wonStory;
+    updateCamera();
+  }
+  function confirmNewGame() {
+    var ok = false;
+    try {
+      ok = window.confirm("Start over?\nYour stars and looks go away.");
+    } catch (eC) {
+      ok = true;
+    }
+    if (!ok) return;
+    saveReady = false;
+    try {
+      localStorage.removeItem(SAVE_KEY);
+    } catch (eRm) {}
+    try {
+      location.replace(location.pathname || "/");
+    } catch (eGo) {
+      location.href = "/";
+    }
+  }
 
   function showArtLoader(on) {
     let n = document.getElementById("art-loader");
@@ -1278,6 +1368,7 @@
   }
 
   function drawWorld() {
+    updateCamera();
     syncWorldFromUrl();
     updateCamera();
     const w = VIEW_COLS * TILE;
@@ -1478,8 +1569,8 @@
     }
 
     if (!walkable(nx, ny)) return;
-    state.px = nx;
-    state.py = ny;
+    placeHero(nx, ny);
+    scheduleSave();
     drawWorld();
 
     const spot = spotAt(nx, ny);
@@ -1493,19 +1584,16 @@
   function enterFrost(opts) {
     state.world = "frost";
     const spawn = opts && opts.spawn;
-    if (spawn === "east") {
-      state.px = 17;
-      state.py = 2;
-      state.facing = "left";
-    } else {
-      state.px = 2;
-      state.py = 14;
-      state.facing = "up";
-    }
+    if (spawn === "east") placeHero(17, 2, "left");
+    else placeHero(2, 14, "up");
     applyWorldChrome();
     closeDialogueQuiet();
+    scheduleSave();
     const silent = !!(opts && opts.silent);
-    if (silent) return;
+    if (silent) {
+      if (ART.frostTiles && state.scene === "overworld") drawWorld();
+      return;
+    }
     if (ART.frostTiles) drawWorld();
     else {
       showArtLoader(true);
@@ -1514,11 +1602,10 @@
   }
   function enterMeadow() {
     state.world = "meadow";
-    state.px = 17;
-    state.py = 2;
-    state.facing = "left";
+    placeHero(17, 2, "left");
     applyWorldChrome();
     closeDialogueQuiet();
+    scheduleSave();
     drawWorld();
   }
   function closeDialogueQuiet() {
@@ -1585,9 +1672,7 @@
       return;
     }
     state.world = "ember";
-    state.px = 2;
-    state.py = 14;
-    state.facing = "up";
+    placeHero(2, 14, "up");
     const app = document.getElementById("app");
     if (app) {
       app.classList.remove("world-frost");
@@ -1598,8 +1683,12 @@
     if (el.worldHint) el.worldHint.textContent = "Ember Grove · clear all foes, then Ember Maw on the east gate";
     applyWorldChrome();
     closeDialogueQuiet();
+    scheduleSave();
     const silent = !!(opts && opts.silent);
-    if (silent) return;
+    if (silent) {
+      if (currentTiles() && state.scene === "overworld") drawWorld();
+      return;
+    }
     if (currentTiles()) {
       showArtLoader(false);
       drawWorld();
@@ -1633,20 +1722,15 @@
     if (!d) return;
     state.world = id;
     const spawn = opts && opts.spawn;
-    if (spawn === "east") {
-      state.px = 17;
-      state.py = 2;
-      state.facing = "left";
-    } else {
-      state.px = 2;
-      state.py = 14;
-      state.facing = "up";
-    }
+    if (spawn === "east") placeHero(17, 2, "left");
+    else placeHero(2, 14, "up");
     applyWorldChrome();
     closeDialogueQuiet();
+    scheduleSave();
     const silent = !!(opts && opts.silent);
     if (silent) {
-      if (!currentTiles()) {
+      if (currentTiles() && state.scene === "overworld") drawWorld();
+      else if (!currentTiles()) {
         showArtLoader(true);
         preloadArt();
       }
@@ -1698,6 +1782,7 @@
     if (state.wearIndex < 0) state.wearIndex = c.frame;
     applyWearArt();
     updatePowerHud();
+    scheduleSave();
   }
   function cycleWear() {
     const unlocked = COSMETICS.filter(function (c) { return state.unlockedWear[c.id]; });
@@ -1710,6 +1795,7 @@
     i = (i + 1) % frames.length;
     state.wearIndex = frames[i];
     applyWearArt();
+    scheduleSave();
     if (state.scene === "overworld") drawWorld();
   }
   function applyWearArt() {
@@ -2133,6 +2219,7 @@
         : ("Great reading! Clear the rest, then " + d.bossName + " on the east gate.");
     }
     setFeedback("Win!", "good");
+    scheduleSave();
     await wait(450);
     el.winOverlay.classList.remove("hidden");
     state.busy = false;
@@ -2147,6 +2234,7 @@
     showScene("overworld");
     updatePowerHud();
     applyWearArt();
+    scheduleSave();
   }
 
   el.modeConfirm.addEventListener("click", () => setMode("confirm"));
@@ -2164,6 +2252,13 @@
       e.preventDefault();
       e.stopPropagation();
       cycleWear();
+    });
+  }
+  if (el.btnNewgame) {
+    el.btnNewgame.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      confirmNewGame();
     });
   }
   el.btnFlee.addEventListener("click", () => {
@@ -2266,8 +2361,19 @@
   }, true);
 
   showArtLoader(true);
-  // Parse URL FIRST — before HUD/hints/showScene.
-  var frostBoot = BOOT_FROST;
+  // Kid save resumes on the same origin. URL world flags (?w2=1 …) skip save so vis-QA still works.
+  var resumed = false;
+  if (BOOT_WORLD === "meadow") {
+    var saved = readSave();
+    if (saved) {
+      applySave(saved);
+      BOOT_WORLD = saved.world;
+      BOOT_FROST = saved.world === "frost";
+      resumed = true;
+    }
+  }
+  // Parse URL FIRST — before HUD/hints/showScene. Do not re-spawn over a resumed save.
+  var frostBoot = !resumed && BOOT_FROST;
   if (frostBoot) {
     state.powers.star = true;
     state.world2Open = true;
@@ -2278,7 +2384,7 @@
     const bootMap = { w3: "ember", ember: "ember", w4: "leaf", leaf: "leaf", w5: "wind", wind: "wind", w6: "tide", tide: "tide", w7: "storm", storm: "storm", w8: "harmony", harmony: "harmony", w9: "story", story: "story" };
     let bootId = (BOOT_WORLD && BOOT_WORLD !== "meadow" && BOOT_WORLD !== "frost") ? BOOT_WORLD : null;
     Object.keys(bootMap).forEach(function (k) { if (qs.get(k) === "1") bootId = bootMap[k]; });
-    if (bootId && !frostBoot) {
+    if (!resumed && bootId && !frostBoot) {
       const order = ["meadow", "frost", "ember", "leaf", "wind", "tide", "storm", "harmony", "story"];
       const idx = order.indexOf(bootId);
       for (let i = 0; i < idx; i++) {
@@ -2299,21 +2405,28 @@
       state.wearIndex = 0;
     }
     if (qs.get("atgate") === "1") {
-      state.px = 17;
-      state.py = 1;
-      state.facing = "right";
+      placeHero(17, 1, "right");
     }
   } catch (eQs) {}
+  updateCamera();
   updatePowerHud();
   setMode("confirm");
   showScene("overworld");
   applyWorldChrome();
+  saveReady = true;
+  try {
+    window.__MVB_KID = function () {
+      return { world: state.world, px: state.px, py: state.py, camX: state.camX, camY: state.camY, facing: state.facing, wearIndex: state.wearIndex, world2Open: !!state.world2Open, world3Open: !!state.world3Open };
+    };
+  } catch (eKid) {}
   function ensureWorldFromUrl() {
-    if (BOOT_WORLD === "frost" || wantFrost()) {
+    /* Never re-spawn to west-gate if we are already on that world (save / walk). */
+    if ((BOOT_WORLD === "frost" || wantFrost()) && state.world !== "frost") {
       enterFrost({ silent: true });
     } else if (BOOT_WORLD && BOOT_WORLD !== "meadow" && state.world !== BOOT_WORLD) {
       enterWorld(BOOT_WORLD, { silent: true, spawn: "west" });
     }
+    updateCamera();
     if (currentTiles() && (currentFoeSheet() || ART.foes) && ART.walk) {
       ART.locked = true;
       artEverLocked = true;
@@ -2327,6 +2440,12 @@
   });
   window.addEventListener("popstate", function () {
     ensureWorldFromUrl();
+  });
+  window.addEventListener("pagehide", function () {
+    writeSave();
+  });
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") writeSave();
   });
   setTimeout(function () {
     /* Never leave #art-loader up forever — but only reveal a Pixel frame. */
