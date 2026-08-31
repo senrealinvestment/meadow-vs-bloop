@@ -5,7 +5,12 @@
 (function () {
   "use strict";
   if (window.__MVB_BOOTED) return;
-  window.__MVB_BOOTED = true;
+  try {
+    Object.defineProperty(window, "__MVB_BOOTED", { value: true, writable: false, configurable: false });
+  } catch (eBootLock) {
+    window.__MVB_BOOTED = true;
+  }
+  window.__MVB_NO_QCHAIN = true;
 
   // URL is source of truth — set before any draw. ?w2=1 never starts as meadow.
   var BOOT_WORLD = "meadow";
@@ -427,7 +432,8 @@
   ];
   const WEAR_BTN_SRC = [575, 208, 177, 98];
   const LADDER_TILE_SRC = {
-    ember: { size: 96, src: { 0: [16, 24], 1: [16, 408], 2: [208, 408], 3: [16, 656], 4: [656, 24], 5: [1000, 648], 6: [1184, 160] } },
+    /* Ember: seamless dirt + pits only. Never the cave-door crop (that painted leftover W2 chips). */
+    ember: { size: 96, src: { 0: [22, 28], 1: [145, 28], 2: [266, 28], 3: [385, 28], 4: [640, 31], 5: [22, 274], 6: [22, 28] } },
     leaf: { size: 96, src: { 0: [16, 16], 1: [1100, 480], 2: [1100, 560], 3: [16, 500], 4: [16, 850], 5: [400, 500], 6: [1000, 80] } },
     wind: { size: 96, src: { 0: [16, 16], 1: [400, 400], 2: [500, 400], 3: [16, 200], 4: [700, 700], 5: [16, 700], 6: [1100, 80] } },
     tide: { size: 96, src: { 0: [16, 16], 1: [200, 16], 2: [1100, 240], 3: [16, 200], 4: [400, 200], 5: [1200, 400], 6: [1100, 80] } },
@@ -564,6 +570,12 @@
     elder: [0, 0, 192, 256],
     kid: [192, 0, 192, 256],
   };
+  function npcFrameOf(npc) {
+    const id = (npc && npc.id) || "";
+    if (NPC_FRAMES[id]) return NPC_FRAMES[id];
+    if (/guide|elder|scout/i.test(id)) return NPC_FRAMES.elder;
+    return NPC_FRAMES.kid;
+  }
 
   const WALK_FRAMES = {
     down: [
@@ -1149,6 +1161,16 @@
     if (id === "meadow") return { size: 32, src: TILE_SRC };
     return LADDER_TILE_SRC[id] || LADDER_TILE_SRC.ember;
   }
+  function keyedWorldTiles() {
+    const id = worldDef().id;
+    ART.worldTilesKeyed = ART.worldTilesKeyed || {};
+    if (ART.worldTilesKeyed[id]) return ART.worldTilesKeyed[id];
+    const sheet = currentTiles();
+    if (!sheet) return null;
+    /* Pixel concept-sheet beige (not dirt, not pit). */
+    ART.worldTilesKeyed[id] = keySheet(sheet, { r: 236, g: 196, b: 143, tol: 48 }) || sheet;
+    return ART.worldTilesKeyed[id];
+  }
   function distractorFor(word) {
     const bank = currentBank();
     const others = bank.filter((w) => w !== word);
@@ -1295,26 +1317,27 @@
       if (frostSheetOk) {
         const src = srcMap[t];
         ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(tilesheet, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
+        if (laterWorld()) {
+          /* Concept sheets sit on beige. Lay dirt first, then keyed overlay. GATE stays dirt. */
+          const dirt = srcMap[0] || src;
+          ctx.drawImage(tilesheet, dirt[0], dirt[1], srcSize, srcSize, sx, sy, TILE, TILE);
+          if (t !== T.GRASS && t !== T.GATE) {
+            const keyed = keyedWorldTiles() || tilesheet;
+            ctx.drawImage(keyed, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
+          }
+        } else {
+          ctx.drawImage(tilesheet, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
+        }
         usedTile = true;
       }
       /* no procedural tiles, no meadow substitute on frost/ember/w4-w9 */
-      if (t === T.GATE) {
-        if (!usedTile) {
-          let open = state.world2Open;
-          if (isEmber()) open = x <= 1 || state.powers.fire;
-          else if (isFrost()) open = x <= 1 || state.powers.ice;
-          ctx.fillStyle = open ? "#bbdefb" : "#546e7a";
-          ctx.fillRect(sx + 6, sy + 4, TILE - 12, TILE - 8);
-        }
-        ctx.fillStyle = "#fff";
-        ctx.font = "bold 10px sans-serif";
-        const gd = worldDef();
-        let glabel = "gate";
-        if (x <= 1 && gd.prev) glabel = gd.prev === "meadow" ? "W1" : gd.prev === "frost" ? "W2" : ("W" + Math.max(1, gd.num - 1));
-        else if (gd.next) glabel = state.powers[gd.power] ? ("W" + (gd.num + 1)) : "lock";
-        else glabel = state.wonStory ? "END" : "lock";
-        ctx.fillText(glabel, sx + 6, sy + 20);
+      /* no W2/W1/lock fillText on the playfield */
+      if (t === T.GATE && !usedTile) {
+        let open = state.world2Open;
+        if (isEmber()) open = x <= 1 || state.powers.fire;
+        else if (isFrost()) open = x <= 1 || state.powers.ice;
+        ctx.fillStyle = open ? "#bbdefb" : "#546e7a";
+        ctx.fillRect(sx + 6, sy + 4, TILE - 12, TILE - 8);
       }
     }
     /* Draw order: ground tiles, then fences, then foes/npcs/hero on top. */
@@ -1357,15 +1380,13 @@
       if (vx < -1 || vy < -1 || vx >= VIEW_COLS || vy >= VIEW_ROWS) return;
       const nx = vx * TILE + 2;
       const ny = vy * TILE;
-      const fr = NPC_FRAMES[npc.id];
+      const fr = npcFrameOf(npc);
       if (ART.npcs && fr) {
         const dw = 28;
         const dh = 36;
         drawSheetFrame(ART.npcs, fr[0], fr[1], fr[2], fr[3], nx + (TILE - dw) / 2, ny + (TILE - dh) / 2 - 4, dw, dh);
       }
-      ctx.fillStyle = "#1e3a28";
-      ctx.font = "bold 9px sans-serif";
-      ctx.fillText(npc.name.split(" ")[1] || npc.name, nx - 2, ny + 38);
+      /* no Pip/Guide/Pup name labels on the playfield */
     });
 
     drawSparkelody((state.px - state.camX) * TILE, (state.py - state.camY) * TILE);

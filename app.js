@@ -41,6 +41,7 @@
           if(attempt<1) await sleep(150);
           continue;
         }
+        if(window.__MVB_BOOTED && /app\.(q|p)\d/.test(url)) return true;
         (0,eval)(t);
         return true;
       }catch(e){
@@ -85,23 +86,10 @@
   }catch(re){ console.error("meadow: repair failed", re); }
 
   var gameOk=await tryLoad(base+"app.readable.js", 8000);
-  /* Never eval q-chunks (or any second IIFE) once readable has booted. */
+  /* Dual-path is dead: never fetch or eval q-chunks / a second IIFE. */
   if(window.__MVB_BOOTED) gameOk=true;
-  if(!gameOk && !window.__MVB_BOOTED){
-    console.error("meadow: readable failed, trying q-chain with timeouts");
-    var q=["app.q0.js","app.q1.js","app.q2.js","app.q3.js","app.q4.js","app.q5.js","app.q6.js","app.q7.js","app.q8.js","app.q9.js","app.q10.js","app.q11.js","app.q12.js","app.q13.js","app.q14.js","app.q15.js","app.q16.js","app.q17.js","app.q18.js","app.q19.js"];
-    var src="";
-    var qDeadline=Date.now()+8000;
-    for(var qi=0;qi<q.length;qi++){
-      if(Date.now()>qDeadline){ console.error("meadow: q-chain timeout after", qi); break; }
-      await tryLoad(base+q[qi], 2000);
-      src+=window["__MVBQ"+qi]||"";
-      try{delete window["__MVBQ"+qi];}catch(eQ){}
-    }
-    if(src){
-      try{ (0,eval)(src); }catch(eEval){ console.error("meadow: q eval failed", eEval); hideLoader(); }
-    } else {
-      hideLoader();
-    }
+  if(!gameOk){
+    console.error("meadow: readable failed; q-chain disabled (Pixel-only)");
+    hideLoader();
   }
 })();
