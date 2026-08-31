@@ -204,3 +204,6 @@
 .power-pick-btn.melody{background:#f3e5f5;border-color:#8e24aa;color:#4a148c;}
 .word-tile{max-width:100%;letter-spacing:0.04em;text-indent:0;font-size:clamp(0.9rem,3.8vw,1.25rem);white-space:normal;line-height:1.2}
 #app.world-frost .bloop.art-sprite{filter:none}
+
+#art-loader.hidden{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;}
+#world.art-wait{opacity:0;}

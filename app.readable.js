@@ -66,16 +66,16 @@
   const WORLD3_BANK = "ash bag bug cap cop cot cub cut dad dot fan fox gas gum hop hot hug hut jam job jog jug lap log lot mad mug nap nod nut pan pat pod pop pot pug ram rat red rod rot rub rug sad sap sob sub sum tab tag tap tub tug van wag wax wet yum zap".split(" ");
 
   const FOE_SKINS = [
-    { artKey: "bloop", name: "Bloop" },
-    { artKey: "bloop", name: "Sunny Bloop" },
-    { artKey: "bloop", name: "Moss Bloop" },
-    { artKey: "bloop", name: "Puddle Bloop" },
-    { artKey: "bloop", name: "Puff Bloop" },
-    { artKey: "bloop", name: "Petal Bloop" },
-    { artKey: "bloop", name: "Daisy Bloop" },
-    { artKey: "bloop", name: "Clover Bloop" },
-    { artKey: "bloop", name: "Berry Bloop" },
-    { artKey: "bloop", name: "Cloud Bloop" },
+    { artKey: "fluff_lite", name: "Bloop" },
+    { artKey: "fluff_lite", name: "Sunny Bloop" },
+    { artKey: "fluff_lite", name: "Moss Bloop" },
+    { artKey: "fluff_lite", name: "Puddle Bloop" },
+    { artKey: "fluff_lite", name: "Puff Bloop" },
+    { artKey: "fluff_lite", name: "Petal Bloop" },
+    { artKey: "fluff_lite", name: "Daisy Bloop" },
+    { artKey: "fluff_lite", name: "Clover Bloop" },
+    { artKey: "fluff_lite", name: "Berry Bloop" },
+    { artKey: "fluff_lite", name: "Cloud Bloop" },
     { artKey: "fluff_lite", name: "Fluff Pup" },
     { artKey: "fluff_lite", name: "Fluff Kit" },
     { artKey: "fluff_lite", name: "Fluff Cub" },
@@ -132,18 +132,18 @@
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   ];
   const FROST_FOE_SKINS = [
-    { artKey: "bloop", name: "Ice Bloop" },
-    { artKey: "bloop", name: "Frost Bloop" },
-    { artKey: "bloop", name: "Snow Bloop" },
-    { artKey: "bloop", name: "Chill Bloop" },
-    { artKey: "bloop", name: "Glaze Bloop" },
-    { artKey: "bloop", name: "Crystal Bloop" },
-    { artKey: "bloop", name: "Puff Ice" },
-    { artKey: "bloop", name: "Rime Bloop" },
-    { artKey: "bloop", name: "Hail Bloop" },
-    { artKey: "bloop", name: "Shiver Bloop" },
-    { artKey: "bloop", name: "Nip Bloop" },
-    { artKey: "bloop", name: "Mint Bloop" },
+    { artKey: "fluff_lite", name: "Ice Bloop" },
+    { artKey: "fluff_lite", name: "Frost Bloop" },
+    { artKey: "fluff_lite", name: "Snow Bloop" },
+    { artKey: "fluff_lite", name: "Chill Bloop" },
+    { artKey: "fluff_lite", name: "Glaze Bloop" },
+    { artKey: "fluff_lite", name: "Crystal Bloop" },
+    { artKey: "fluff_lite", name: "Puff Ice" },
+    { artKey: "fluff_lite", name: "Rime Bloop" },
+    { artKey: "fluff_lite", name: "Hail Bloop" },
+    { artKey: "fluff_lite", name: "Shiver Bloop" },
+    { artKey: "fluff_lite", name: "Nip Bloop" },
+    { artKey: "fluff_lite", name: "Mint Bloop" },
     { artKey: "fluff_lite", name: "Snow Fluff" },
     { artKey: "fluff_lite", name: "Frost Pup" },
     { artKey: "fluff_lite", name: "Ice Kit" },
@@ -229,22 +229,22 @@
   ];
   // 28 placeholder skins — reuse bloop / fluff_lite until Ember foe sheets exist.
   const EMBER_FOE_SKINS = [
-    { artKey: "bloop", name: "Ember Bloop" },
-    { artKey: "bloop", name: "Cinder Bloop" },
-    { artKey: "bloop", name: "Spark Bloop" },
-    { artKey: "bloop", name: "Coal Bloop" },
-    { artKey: "bloop", name: "Flame Bloop" },
-    { artKey: "bloop", name: "Heat Bloop" },
-    { artKey: "bloop", name: "Glow Bloop" },
-    { artKey: "bloop", name: "Ash Bloop" },
-    { artKey: "bloop", name: "Soot Bloop" },
-    { artKey: "bloop", name: "Torch Bloop" },
-    { artKey: "bloop", name: "Chili Bloop" },
-    { artKey: "bloop", name: "Magma Bloop" },
-    { artKey: "bloop", name: "Forge Bloop" },
-    { artKey: "bloop", name: "Camp Bloop" },
-    { artKey: "bloop", name: "Kindle Bloop" },
-    { artKey: "bloop", name: "Blaze Bloop" },
+    { artKey: "fluff_lite", name: "Ember Bloop" },
+    { artKey: "fluff_lite", name: "Cinder Bloop" },
+    { artKey: "fluff_lite", name: "Spark Bloop" },
+    { artKey: "fluff_lite", name: "Coal Bloop" },
+    { artKey: "fluff_lite", name: "Flame Bloop" },
+    { artKey: "fluff_lite", name: "Heat Bloop" },
+    { artKey: "fluff_lite", name: "Glow Bloop" },
+    { artKey: "fluff_lite", name: "Ash Bloop" },
+    { artKey: "fluff_lite", name: "Soot Bloop" },
+    { artKey: "fluff_lite", name: "Torch Bloop" },
+    { artKey: "fluff_lite", name: "Chili Bloop" },
+    { artKey: "fluff_lite", name: "Magma Bloop" },
+    { artKey: "fluff_lite", name: "Forge Bloop" },
+    { artKey: "fluff_lite", name: "Camp Bloop" },
+    { artKey: "fluff_lite", name: "Kindle Bloop" },
+    { artKey: "fluff_lite", name: "Blaze Bloop" },
     { artKey: "fluff_lite", name: "Ember Fluff" },
     { artKey: "fluff_lite", name: "Cinder Pup" },
     { artKey: "fluff_lite", name: "Spark Kit" },
@@ -707,6 +707,14 @@
   function keyChroma(img, rgb, tol) {
     return keySheet(img, { r: rgb[0], g: rgb[1], b: rgb[2], tol: tol || 36 });
   }
+  function keyOutfitSheet(img) {
+    /* Olive atlas bg + cream hat-plate. Keep the accessory pixels so WEAR sits on the cat. */
+    let c = keyChroma(img, [140, 156, 117], 44);
+    c = keySheet(c || img, { r: 251, g: 231, b: 186, tol: 34 });
+    c = keySheet(c || img, { r: 242, g: 224, b: 184, tol: 28 });
+    c = keySheet(c || img, { r: 252, g: 241, b: 212, tol: 22 });
+    return c || img;
+  }
 
   /* Pixel-only: keep the RIGHT column of the 2×2 bloop/fluff sheet (fluff idle + hit).
      Never sample the left slime cells on the overworld. */
@@ -763,7 +771,7 @@
       ART.iceHowl = iceHowl ? keySheet(iceHowl, CHROMA.boss) || iceHowl : null;
       ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : (ART.frostTiles || null);
       ART.frostFoes = frostFoes ? cropFluffColumn(keySheet(frostFoes, CHROMA.foes) || frostFoes) : (ART.frostFoes || null);
-      ART.outfits = outfitImg ? keyChroma(outfitImg, [140, 158, 113], 48) : (ART.outfits || null);
+      ART.outfits = outfitImg ? keyOutfitSheet(outfitImg) : (ART.outfits || null);
       ART.worldTiles = ART.worldTiles || {};
       ART.worldFoes = ART.worldFoes || {};
       ART.worldBoss = ART.worldBoss || {};
@@ -1216,10 +1224,14 @@
           n.style.color = "#0d47a1";
         }
         n.classList.remove("hidden");
+        n.style.display = "flex";
       }
       if (el.canvas) el.canvas.classList.add("art-wait");
     } else {
-      if (n) n.classList.add("hidden");
+      if (n) {
+        n.classList.add("hidden");
+        n.style.display = "none";
+      }
       if (el.canvas) el.canvas.classList.remove("art-wait");
     }
   }
@@ -1264,57 +1276,64 @@
     }
     showArtLoader(false);
 
-    for (let vy = 0; vy < VIEW_ROWS; vy++) {
-      for (let vx = 0; vx < VIEW_COLS; vx++) {
-        const x = vx + state.camX;
-        const y = vy + state.camY;
-        const t = currentMap()[y] && currentMap()[y][x];
-        const sx = vx * TILE;
-        const sy = vy * TILE;
-        let usedTile = false;
-        let tilesheet = currentTiles();
-        if (wantFrost()) tilesheet = ART.frostTiles || null;
-        else if (!laterWorld() && ART.locked && tilesheet === ART.frostTiles) tilesheet = ART.meadowTiles || null;
-        const atlas = tileAtlas();
-        const srcMap = atlas.src;
-        const srcSize = atlas.size;
-        const frostSheetOk = !!(tilesheet && (tilesheet.naturalWidth || tilesheet.width) && srcMap[t] != null);
-        if (frostSheetOk) {
-          const src = srcMap[t];
-          ctx.imageSmoothingEnabled = false;
-          ctx.drawImage(tilesheet, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
-          usedTile = true;
-        }
-        if (!usedTile) {
-          if (ART.locked && !wantFrost() && !laterWorld()) {
-            const mt = ART.meadowTiles;
-            const srcLocked = TILE_SRC[t];
-            if (mt && mt !== ART.frostTiles && (mt.naturalWidth || mt.width) && srcLocked != null) {
-              ctx.imageSmoothingEnabled = false;
-              ctx.drawImage(mt, srcLocked[0], srcLocked[1], 32, 32, sx, sy, TILE, TILE);
-              usedTile = true;
-            }
+    function blitCell(vx, vy, fencePass) {
+      const x = vx + state.camX;
+      const y = vy + state.camY;
+      const t = currentMap()[y] && currentMap()[y][x];
+      const isFence = t === T.TALL;
+      if (fencePass ? !isFence : isFence) return;
+      const sx = vx * TILE;
+      const sy = vy * TILE;
+      let usedTile = false;
+      let tilesheet = currentTiles();
+      if (wantFrost()) tilesheet = ART.frostTiles || null;
+      else if (!laterWorld() && ART.locked && tilesheet === ART.frostTiles) tilesheet = ART.meadowTiles || null;
+      const atlas = tileAtlas();
+      const srcMap = atlas.src;
+      const srcSize = atlas.size;
+      const frostSheetOk = !!(tilesheet && (tilesheet.naturalWidth || tilesheet.width) && srcMap[t] != null);
+      if (frostSheetOk) {
+        const src = srcMap[t];
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(tilesheet, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
+        usedTile = true;
+      }
+      if (!usedTile) {
+        if (ART.locked && !wantFrost() && !laterWorld()) {
+          const mt = ART.meadowTiles;
+          const srcLocked = TILE_SRC[t];
+          if (mt && mt !== ART.frostTiles && (mt.naturalWidth || mt.width) && srcLocked != null) {
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(mt, srcLocked[0], srcLocked[1], 32, 32, sx, sy, TILE, TILE);
+            usedTile = true;
           }
-        }
-        /* no procedural tiles — skip cell if sheets miss */
-        if (t === T.GATE) {
-          if (!usedTile) {
-            let open = state.world2Open;
-            if (isEmber()) open = x <= 1 || state.powers.fire;
-            else if (isFrost()) open = x <= 1 || state.powers.ice;
-            ctx.fillStyle = open ? "#bbdefb" : "#546e7a";
-            ctx.fillRect(sx + 6, sy + 4, TILE - 12, TILE - 8);
-          }
-          ctx.fillStyle = "#fff";
-          ctx.font = "bold 10px sans-serif";
-          const gd = worldDef();
-          let glabel = "gate";
-          if (x <= 1 && gd.prev) glabel = gd.prev === "meadow" ? "W1" : gd.prev === "frost" ? "W2" : ("W" + Math.max(1, gd.num - 1));
-          else if (gd.next) glabel = state.powers[gd.power] ? ("W" + (gd.num + 1)) : "lock";
-          else glabel = state.wonStory ? "END" : "lock";
-          ctx.fillText(glabel, sx + 6, sy + 20);
         }
       }
+      /* no procedural tiles — skip cell if sheets miss */
+      if (t === T.GATE) {
+        if (!usedTile) {
+          let open = state.world2Open;
+          if (isEmber()) open = x <= 1 || state.powers.fire;
+          else if (isFrost()) open = x <= 1 || state.powers.ice;
+          ctx.fillStyle = open ? "#bbdefb" : "#546e7a";
+          ctx.fillRect(sx + 6, sy + 4, TILE - 12, TILE - 8);
+        }
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 10px sans-serif";
+        const gd = worldDef();
+        let glabel = "gate";
+        if (x <= 1 && gd.prev) glabel = gd.prev === "meadow" ? "W1" : gd.prev === "frost" ? "W2" : ("W" + Math.max(1, gd.num - 1));
+        else if (gd.next) glabel = state.powers[gd.power] ? ("W" + (gd.num + 1)) : "lock";
+        else glabel = state.wonStory ? "END" : "lock";
+        ctx.fillText(glabel, sx + 6, sy + 20);
+      }
+    }
+    /* Draw order: ground tiles, then fences, then foes/npcs/hero on top. */
+    for (let vy = 0; vy < VIEW_ROWS; vy++) {
+      for (let vx = 0; vx < VIEW_COLS; vx++) blitCell(vx, vy, false);
+    }
+    for (let vy = 0; vy < VIEW_ROWS; vy++) {
+      for (let vx = 0; vx < VIEW_COLS; vx++) blitCell(vx, vy, true);
     }
 
     currentSpots().forEach((spot) => {
@@ -1368,13 +1387,6 @@
     const dh = 30;
     const dx = px + (TILE - dw) / 2;
     const dy = py + (TILE - dh) / 2 - 2;
-    if (state.wearIndex >= 0 && ART.outfits) {
-      const of = OUTFIT_FRAMES[state.wearIndex];
-      if (of) {
-        drawSheetFrame(ART.outfits, of[0], of[1], of[2], of[3], dx, dy - 6, dw, dh + 8);
-        return;
-      }
-    }
     const face =
       state.facing === "up"
         ? "up"
@@ -1383,9 +1395,23 @@
           : state.facing === "left"
             ? "left"
             : "right";
-    if (!ART.walk) return;
-    const fr = WALK_FRAMES[face][0];
-    drawSheetFrame(ART.walk, fr[0], fr[1], fr[2], fr[3], dx, dy, dw, dh);
+    if (ART.walk) {
+      const fr = WALK_FRAMES[face][0];
+      drawSheetFrame(ART.walk, fr[0], fr[1], fr[2], fr[3], dx, dy, dw, dh);
+    }
+    if (state.wearIndex >= 0 && ART.outfits) {
+      const of = OUTFIT_FRAMES[state.wearIndex];
+      if (of) {
+        const pad = 8;
+        const sx = of[0] + pad;
+        const sy = of[1] + pad;
+        const sw = Math.max(8, of[2] - pad * 2);
+        const sh = Math.max(8, of[3] - pad * 2);
+        const aw = 14;
+        const ah = 14;
+        drawSheetFrame(ART.outfits, sx, sy, sw, sh, dx + (dw - aw) / 2, dy - 5, aw, ah);
+      }
+    }
   }
 
   function walkable(x, y) {
@@ -1677,20 +1703,9 @@
     if (state.scene === "overworld") drawWorld();
   }
   function applyWearArt() {
-    if (!el.hero || state.wearIndex < 0 || !ART.outfits) return;
-    const of = OUTFIT_FRAMES[state.wearIndex];
-    if (!of) return;
-    const url = ART.outfits.toDataURL ? ART.outfits.toDataURL("image/png") : ART.outfits.src;
+    if (!el.hero || state.wearIndex < 0) return;
+    /* Fight keeps the walk sprite. Closet look is painted on the overworld cat, not a floating hat plate. */
     el.hero.classList.add("art-sprite", "wear-look");
-    el.hero.style.setProperty("--hero-sheet", 'url("' + url + '")');
-    const sw = ART.outfits.naturalWidth || ART.outfits.width || 1536;
-    const sh = ART.outfits.naturalHeight || ART.outfits.height || 1024;
-    el.hero.style.setProperty("--hero-sheet-w", sw + "px");
-    el.hero.style.setProperty("--hero-sheet-h", sh + "px");
-    el.hero.style.setProperty("--hero-sx", -of[0] + "px");
-    el.hero.style.setProperty("--hero-sy", -of[1] + "px");
-    el.hero.style.setProperty("--hero-sw", of[2] + "px");
-    el.hero.style.setProperty("--hero-sh", of[3] + "px");
   }
   function openW3Message() {
     el.dialogueName.textContent = "World 3";

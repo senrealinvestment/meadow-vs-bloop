@@ -6,7 +6,7 @@
   function hideLoader(){
     try{
       var n=document.getElementById("art-loader");
-      if(n) n.classList.add("hidden");
+      if(n){ n.classList.add("hidden"); n.style.display="none"; }
       var c=document.getElementById("world");
       if(c) c.classList.remove("art-wait");
     }catch(e){}
@@ -52,7 +52,7 @@
   }
 
   /* Essential embeds only — skip a0–a26 and the 20-chunk q chain (that stall after q12 in real Chrome). */
-  var embeds=["embed-tiles.js","embed-frost-tiles.js","embed-npcs.js","embed-walk.js","embed-cast.js","asset-boss.js"];
+  var embeds=["embed-tiles.js","embed-npcs.js","embed-walk.js","embed-cast.js","asset-boss.js"];
   await Promise.all(embeds.map(function(f){ return tryLoad(base+f, 10000); }));
 
   try{
