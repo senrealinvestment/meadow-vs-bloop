@@ -777,7 +777,7 @@
       ART.foes = foes ? cropFluffColumn(keySheet(foes, CHROMA.foes) || foes) : (ART.foes || null);
       ART.boss = boss ? keySheet(boss, CHROMA.boss) || boss : (ART.boss || null);
       ART.meadowTiles = tiles && (tiles.naturalWidth || tiles.width) ? tiles : (ART.meadowTiles || null);
-      ART.tiles = ART.meadowTiles;
+      /* ART.tiles is set per-world below — never park meadow under frost/ember. */
       ART.icons = icons && (icons.naturalWidth || icons.width) ? icons : null;
       ART.vfx = vfx && (vfx.naturalWidth || vfx.width) ? vfx : null;
       ART.panel = panel && (panel.naturalWidth || panel.width) ? panel : null;
