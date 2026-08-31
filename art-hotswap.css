@@ -143,3 +143,20 @@
 #app.world-storm .hills{background:#7b1fa2;}
 #app.world-storm .grass{background:linear-gradient(180deg,#ffd54f,#4a148c);}
 #app.world-frost{background:#b3e5fc !important;}
+
+/* Pixel-only: never show CSS cat/slime. Transparent over grass. */
+.hero .cat-ear,.hero .cat-head,.hero .cat-body,.hero .cat-tail,.hero .cat-collar,.hero .cat-nose,.hero .cat-eye,.hero .cat-charm{display:none!important;opacity:0!important}
+.bloop,.bloop.art-sprite{background-color:transparent!important;box-shadow:none!important;border:none!important}
+.bloop-body,.bloop-eye,.bloop-smile,.bloop .bloop-body{display:none!important;opacity:0!important}
+.bloop:not(.art-sprite){visibility:hidden!important}
+.bloop.art-sprite.boss-art.ice_howl,.bloop.art-sprite.ice_howl{
+  width:144px !important;height:96px !important;bottom:12% !important;
+}
+.cvc-word.phrase{
+  letter-spacing:0.04em;text-indent:0;font-size:clamp(1.15rem,6vw,2.05rem);
+  max-width:430px;margin:0 auto;-webkit-text-stroke:4px #0d1333;paint-order:stroke fill;
+  line-height:1.22;word-spacing:0.14em;white-space:normal;
+}
+.cvc-word.phrase .stall-hi{color:#f9a825;-webkit-text-stroke:4px #3e2723}
+.word-tile{max-width:100%;letter-spacing:0.04em;text-indent:0;font-size:clamp(0.9rem,3.8vw,1.25rem);white-space:normal;line-height:1.2}
+#app.world-frost .bloop.art-sprite{filter:none}
