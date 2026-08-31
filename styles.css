@@ -119,3 +119,68 @@
 #app.world-frost #world{background:#bbdefb;}
 #app.world-frost .title{color:#1565c0;}
 .bloop.ice_howl .bloop-body{background:radial-gradient(circle at 35% 30%,#e1f5fe,#4fc3f7 45%,#0277bd);border-color:#01579b;box-shadow:0 0 16px rgba(79,195,247,0.65);}
+
+/* Ladder W3-W9 palettes + closet. Pixel-only foes remain hidden without art-sprite. */
+.power-hud{flex-wrap:wrap;max-width:230px;}
+.power-chip{width:1.7rem;height:1.7rem;font-size:0.85rem;}
+.power-chip.fire:not(.locked){background:#ffe0b2;border-color:#ef6c00;box-shadow:0 0 6px rgba(239,108,0,0.55);}
+.power-chip.water:not(.locked){background:#e1f5fe;border-color:#0288d1;}
+.power-chip.electric:not(.locked){background:#ede7f6;border-color:#7e57c2;}
+.power-chip.shine:not(.locked){background:#fff8e1;border-color:#fbc02d;}
+.power-pick-btn.fire{background:#ffe0b2;border-color:#ef6c00;color:#e65100;}
+.power-pick-btn.water{background:#e1f5fe;border-color:#0288d1;color:#01579b;}
+.power-pick-btn.electric{background:#ede7f6;border-color:#7e57c2;color:#4527a0;}
+.power-pick-btn.shine{background:#fff8e1;border-color:#fbc02d;color:#f57f17;}
+.cvc-word.phrase{letter-spacing:0.06em;text-indent:0;font-size:clamp(1.35rem,7vw,2.4rem);-webkit-text-stroke-width:2px;}
+.word-tile{letter-spacing:0.06em;text-indent:0;font-size:clamp(0.95rem,4.2vw,1.35rem);}
+.btn-wear{
+  min-width:92px;min-height:56px;padding:0.45rem 0.85rem;border:4px solid #5d4037;border-radius:16px;
+  background:#f3e5ab;color:#3e2723;font-size:1.35rem;font-weight:900;letter-spacing:0.08em;
+  box-shadow:0 4px 0 #5d4037;cursor:pointer;
+}
+.btn-wear.locked{opacity:0.45;filter:grayscale(0.4);}
+.btn-wear:active{transform:translateY(2px);box-shadow:0 2px 0 #5d4037;}
+#app.world-ember .world-wrap{background:#e65100;}
+#app.world-ember #world{background:#bf360c;}
+#app.world-ember .title{color:#bf360c;}
+#app.world-ember .stage .sky{background:linear-gradient(180deg,#ffcc80,#ef6c00);}
+#app.world-ember .stage .hills{background:#d84315;}
+#app.world-ember .stage .grass{background:linear-gradient(180deg,#ef6c00,#bf360c);}
+#app.world-leaf .world-wrap{background:#33691e;}
+#app.world-leaf #world{background:#1b5e20;}
+#app.world-leaf .title{color:#1b5e20;}
+#app.world-leaf .stage .sky{background:linear-gradient(180deg,#c5e1a5,#7cb342);}
+#app.world-leaf .stage .hills{background:#558b2f;}
+#app.world-leaf .stage .grass{background:linear-gradient(180deg,#7cb342,#33691e);}
+#app.world-wind .world-wrap{background:#607d8b;}
+#app.world-wind #world{background:#455a64;}
+#app.world-wind .title{color:#37474f;}
+#app.world-wind .stage .sky{background:linear-gradient(180deg,#eceff1,#90a4ae);}
+#app.world-wind .stage .hills{background:#78909c;}
+#app.world-wind .stage .grass{background:linear-gradient(180deg,#90a4ae,#546e7a);}
+#app.world-tide .world-wrap{background:#0277bd;}
+#app.world-tide #world{background:#01579b;}
+#app.world-tide .title{color:#01579b;}
+#app.world-tide .stage .sky{background:linear-gradient(180deg,#b3e5fc,#0288d1);}
+#app.world-tide .stage .hills{background:#0277bd;}
+#app.world-tide .stage .grass{background:linear-gradient(180deg,#29b6f6,#01579b);}
+#app.world-storm .world-wrap{background:#311b92;}
+#app.world-storm #world{background:#1a237e;}
+#app.world-storm .title{color:#d1c4e9;}
+#app.world-storm .stage .sky{background:linear-gradient(180deg,#7e57c2,#311b92);}
+#app.world-storm .stage .hills{background:#4527a0;}
+#app.world-storm .stage .grass{background:linear-gradient(180deg,#5e35b1,#1a237e);}
+#app.world-harmony .world-wrap{background:#ce93d8;}
+#app.world-harmony #world{background:#f6c26b;}
+#app.world-harmony .title{color:#6a1b9a;}
+#app.world-harmony .stage .sky{background:linear-gradient(180deg,#f3e5f5,#f6c26b);}
+#app.world-harmony .stage .hills{background:#e1bee7;}
+#app.world-harmony .stage .grass{background:linear-gradient(180deg,#ffe082,#ce93d8);}
+#app.world-story .world-wrap{background:#1a237e;}
+#app.world-story #world{background:#fff8e1;}
+#app.world-story .title{color:#1a237e;}
+#app.world-story .stage .sky{background:linear-gradient(180deg,#e8eaf6,#1a237e);}
+#app.world-story .stage .hills{background:#5c6bc0;}
+#app.world-story .stage .grass{background:linear-gradient(180deg,#fff8e1,#3f51b5);}
+.bloop.art-sprite{z-index:3;}
+.hero.wear-look{z-index:3;}
