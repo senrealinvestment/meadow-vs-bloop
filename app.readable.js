@@ -337,6 +337,7 @@
   const WATER_CASTS = ["wet", "mud", "hop"];
   const ELEC_CASTS = ["zap", "zip", "run"];
   const SHINE_CASTS = ["and", "on", "up"];
+  const MELODY_CASTS = ["and", "on", "a"];
   const STRETCH_BANK = ["and", "on", "up", "a", "fast", "well", "him"];
   const WORLD4_BANK = "belt bump camp clap crib desk drip drum flag frog gift grab hand jump lamp land lift list milk nest plan pond rest sand sled slip spot stop swim tent trap vest wind".split(" ");
   const WORLD5_BANK = ["cat hop","sun run","wet mud","big fan","red hen","hot pot","sad pup","log hut","fox cub","pig pen","dog run","kid sip","bug hid","cup lid","hat box","net dip","map pin","bat hit","ten men","wet dog","big cat","red fox","hot sun","dad nap"];
@@ -401,19 +402,21 @@
     { id: "wind-ribbon", world: "wind", name: "Wind Ribbon", frame: 4 },
     { id: "shell-clip", world: "tide", name: "Shell Clip", frame: 5 },
     { id: "bolt-bow", world: "storm", name: "Bolt Bow", frame: 6 },
-    { id: "shine-charm", world: "harmony", name: "Shine Charm", frame: 0 },
-    { id: "melody-book", world: "story", name: "Melody Book", frame: 3 },
+    { id: "shine-charm", world: "harmony", name: "Shine Charm", frame: 7 },
+    { id: "melody-book", world: "story", name: "Melody Book", frame: 8 },
   ];
   const OUTFIT_FRAMES = [
-    [59, 414, 151, 214],
-    [210, 414, 151, 214],
-    [363, 414, 151, 214],
-    [516, 414, 151, 214],
-    [669, 414, 151, 214],
-    [822, 414, 151, 214],
-    [970, 414, 151, 214],
+    [17, 213, 62, 85],
+    [75, 213, 66, 85],
+    [137, 213, 66, 85],
+    [199, 213, 64, 85],
+    [259, 213, 65, 85],
+    [320, 213, 66, 85],
+    [383, 213, 69, 85],
+    [448, 213, 66, 85],
+    [510, 213, 64, 85],
   ];
-  const WEAR_BTN_SRC = [1119, 414, 379, 214];
+  const WEAR_BTN_SRC = [575, 208, 177, 98];
   const LADDER_TILE_SRC = {
     ember: { size: 96, src: { 0: [16, 24], 1: [16, 408], 2: [208, 408], 3: [16, 656], 4: [656, 24], 5: [1000, 648], 6: [1184, 160] } },
     leaf: { size: 96, src: { 0: [16, 16], 1: [1100, 480], 2: [1100, 560], 3: [16, 500], 4: [16, 850], 5: [400, 500], 6: [1000, 80] } },
@@ -432,7 +435,7 @@
     tide: { id: "tide", num: 6, title: "Sparkelody · World 6 Tide Pools", hint: "Tide Pools · mix words · Tide Shell on the east gate", map: TIDE_MAP, spots: TIDE_SPOTS, npcs: TIDE_NPCS, bank: WORLD6_BANK, skins: TIDE_FOE_SKINS, prefix: "t:", next: "storm", prev: "wind", power: "water", bossId: "tide_shell", bossName: "Tide Shell", nextName: "Storm Peak", appClass: "world-tide", foeTint: [40, 120, 170] },
     storm: { id: "storm", num: 7, title: "Sparkelody · World 7 Storm Peak", hint: "Storm Peak · three words · Storm Fang on the east gate", map: STORM_MAP, spots: STORM_SPOTS, npcs: STORM_NPCS, bank: WORLD7_BANK, skins: STORM_FOE_SKINS, prefix: "s:", next: "harmony", prev: "tide", power: "electric", bossId: "storm_fang", bossName: "Storm Fang", nextName: "Harmony Hill", appClass: "world-storm", foeTint: [90, 60, 150] },
     harmony: { id: "harmony", num: 8, title: "Sparkelody · World 8 Harmony Hill", hint: "Harmony Hill · four-word lines · Shine Bell on the east gate", map: HARMONY_MAP, spots: HARMONY_SPOTS, npcs: HARMONY_NPCS, bank: WORLD8_BANK, skins: HARMONY_FOE_SKINS, prefix: "h:", next: "story", prev: "storm", power: "shine", bossId: "shine_bell", bossName: "Shine Bell", nextName: "Story Gate", appClass: "world-harmony", foeTint: [210, 170, 80] },
-    story: { id: "story", num: 9, title: "Sparkelody · World 9 Story Gate", hint: "Story Gate · story lines · Melody Gate on the east", map: STORY_MAP, spots: STORY_SPOTS, npcs: STORY_NPCS, bank: WORLD9_BANK, skins: STORY_FOE_SKINS, prefix: "y:", next: null, prev: "harmony", power: "story", bossId: "melody_gate", bossName: "Melody Gate", nextName: null, appClass: "world-story", foeTint: [80, 90, 140] },
+    story: { id: "story", num: 9, title: "Sparkelody · World 9 Story Gate", hint: "Story Gate · 5-6 word lines · Melody Gate on the east", map: STORY_MAP, spots: STORY_SPOTS, npcs: STORY_NPCS, bank: WORLD9_BANK, skins: STORY_FOE_SKINS, prefix: "y:", next: null, prev: "harmony", power: "melody", bossId: "melody_gate", bossName: "Melody Gate", nextName: null, appClass: "world-story", foeTint: [80, 90, 140] },
   };
   const BOSS_IDS = { star_bloom: 1, ice_howl: 1, ember_maw: 1, thorn_crown: 1, gale_whisk: 1, tide_shell: 1, storm_fang: 1, shine_bell: 1, melody_gate: 1 };
 
@@ -457,6 +460,7 @@
     chipWater: document.getElementById("chip-water"),
     chipElectric: document.getElementById("chip-electric"),
     chipShine: document.getElementById("chip-shine"),
+    chipMelody: document.getElementById("chip-melody"),
     btnWear: document.getElementById("btn-wear"),
     cvcWord: document.getElementById("cvc-word"),
     cvcWrap: document.getElementById("cvc-wrap"),
@@ -908,7 +912,7 @@
     facing: "up",
     camX: 0,
     camY: 0,
-    powers: { star: false, leaf: false, wind: false, ice: false, fire: false, water: false, electric: false, shine: false },
+    powers: { star: false, leaf: false, wind: false, ice: false, fire: false, water: false, electric: false, shine: false, melody: false },
     world: BOOT_FROST ? "frost" : "meadow",
     world2Open: false,
     world3Open: false,
@@ -1106,6 +1110,7 @@
     if (el.chipWater) el.chipWater.classList.toggle("locked", !state.powers.water);
     if (el.chipElectric) el.chipElectric.classList.toggle("locked", !state.powers.electric);
     if (el.chipShine) el.chipShine.classList.toggle("locked", !state.powers.shine);
+    if (el.chipMelody) el.chipMelody.classList.toggle("locked", !state.powers.melody);
     if (el.btnWear) el.btnWear.classList.toggle("locked", !Object.keys(state.unlockedWear).length);
   }
 
@@ -1119,8 +1124,10 @@
     el.controlsConfirm.classList.toggle("hidden", mode !== "confirm");
     el.controlsMatch.classList.toggle("hidden", mode !== "match");
     if (state.scene === "fight" && state.current) {
-      el.prompt.textContent =
-        mode === "confirm" ? "Sound it out! Parent taps Confirm." : "Sound it out! Pick the matching word.";
+      const phrase = /\s/.test(state.current.word);
+      el.prompt.textContent = phrase
+        ? (mode === "confirm" ? "Read the line! Parent taps Confirm." : "Read the line! Pick the matching line.")
+        : (mode === "confirm" ? "Sound it out! Parent taps Confirm." : "Sound it out! Pick the matching word.");
       renderChoices();
     }
   }
@@ -1265,7 +1272,7 @@
           const gd = worldDef();
           let glabel = "gate";
           if (x <= 1 && gd.prev) glabel = gd.prev === "meadow" ? "W1" : gd.prev === "frost" ? "W2" : ("W" + Math.max(1, gd.num - 1));
-          else if (gd.next) glabel = gd.power === "story" ? (state.wonStory ? "END" : "lock") : (state.powers[gd.power] ? ("W" + (gd.num + 1)) : "lock");
+          else if (gd.next) glabel = state.powers[gd.power] ? ("W" + (gd.num + 1)) : "lock";
           else glabel = state.wonStory ? "END" : "lock";
           ctx.fillText(glabel, sx + 6, sy + 20);
         }
@@ -1355,8 +1362,6 @@
         if (!state.world2Open) return false;
       } else if (x <= 1) {
         return true;
-      } else if (d.power === "story") {
-        return !!state.wonStory;
       } else {
         return !!state.powers[d.power];
       }
@@ -1591,11 +1596,11 @@
       startEncounter(b);
       return;
     }
-    if (d.power === "story") {
-      if (!state.wonStory) {
-        el.worldHint.textContent = "Beat Melody Gate first!";
-        return;
-      }
+    if (d.power && !state.powers[d.power]) {
+      el.worldHint.textContent = (d.nextName || "Next") + " locked — beat " + d.bossName + " first!";
+      return;
+    }
+    if (!d.next) {
       el.dialogueName.textContent = "Story Gate";
       el.dialogueText.textContent = "You read the whole path! What a tale.";
       el.dialogue.classList.remove("hidden");
@@ -1603,11 +1608,7 @@
       drawWorld();
       return;
     }
-    if (d.power && !state.powers[d.power]) {
-      el.worldHint.textContent = (d.nextName || "Next") + " locked — beat " + d.bossName + " first!";
-      return;
-    }
-    if (d.next) enterWorld(d.next, { spawn: "west" });
+    enterWorld(d.next, { spawn: "west" });
   }
   function unlockWearForWorld(wid) {
     const c = COSMETICS.filter(function (x) { return x.world === wid; })[0];
@@ -1802,7 +1803,7 @@
 
   function hasAnyPower() {
     const p = state.powers;
-    return !!(p.star || p.ice || p.fire || p.leaf || p.wind || p.water || p.electric || p.shine);
+    return !!(p.star || p.ice || p.fire || p.leaf || p.wind || p.water || p.electric || p.shine || p.melody);
   }
 
   function showPowerPicker() {
@@ -1816,6 +1817,7 @@
       ["water", "water", "Water"],
       ["electric", "electric", "Electric"],
       ["shine", "shine", "Shine"],
+      ["melody", "melody", "Melody"],
     ];
     catalog.forEach(function (row) {
       const id = row[0];
@@ -1865,6 +1867,8 @@
       word = pickCapped(ELEC_CASTS, state.recentElec);
     } else if (state.selectedPower === "shine") {
       word = pickCapped(SHINE_CASTS, state.recentStar);
+    } else if (state.selectedPower === "melody") {
+      word = pickCapped(MELODY_CASTS, state.recentStar);
     } else if (enc.isBoss) {
       word = pickCapped(currentBank(), state.recentBoss);
     } else {
@@ -1905,13 +1909,13 @@
     if (!state.current) return;
     const raw = state.current.word;
     const words = raw.split(/\s+/);
-    if (hi == null || hi < 0 || words.length < 2) {
+    if (words.length < 2) {
       el.cvcWord.textContent = raw.toUpperCase();
       return;
     }
     el.cvcWord.innerHTML = words.map(function (w, i) {
-      const t = w.toUpperCase();
-      return i === hi ? '<span class="stall-hi">' + t + "</span>" : t;
+      const cls = i === hi ? ' class="stall-hi"' : "";
+      return "<span" + cls + ">" + w.toUpperCase() + "</span>";
     }).join(" ");
   }
   function armStall() {
@@ -1933,7 +1937,8 @@
     el.cvcWord.classList.remove("pop");
     el.cvcWrap.classList.remove("miss-shake");
     paintPhrase(-1);
-    if (el.prompt) el.prompt.textContent = phrase ? "Read the line!" : "Sound it out!";
+    if (el.prompt) el.prompt.textContent = phrase ? "Read the line! Parent taps Confirm." : "Sound it out!";
+    if (el.btnConfirm) el.btnConfirm.textContent = phrase ? "Confirm the line ✓" : "Confirm ✓";
     armStall();
     renderChoices();
   }
@@ -2035,14 +2040,14 @@
 
     if (enc.isBoss) {
       const d = worldDef();
-      if (enc.id === "melody_gate" || d.power === "story") state.wonStory = true;
-      else if (d.power) state.powers[d.power] = true;
+      if (enc.id === "melody_gate" || d.power === "melody") state.wonStory = true;
+      if (d.power) state.powers[d.power] = true;
       if (enc.id === "star_bloom") state.world2Open = true;
       if (enc.id === "ice_howl") state.world3Open = true;
       updatePowerHud();
       el.chest.classList.remove("hidden");
       el.chest.classList.add("open");
-      const pname = d.power === "story" ? "the tale" : (d.power.charAt(0).toUpperCase() + d.power.slice(1));
+      const pname = d.power ? (d.power.charAt(0).toUpperCase() + d.power.slice(1)) : "the tale";
       setFlavor(d.bossName + " calms! " + pname + " unlocked!");
       el.winTitle.textContent = d.bossName + " cleared!";
       el.winMsg.textContent = d.nextName
@@ -2206,7 +2211,7 @@
       const idx = order.indexOf(bootId);
       for (let i = 0; i < idx; i++) {
         const pd = WORLD_DEFS[order[i]];
-        if (pd && pd.power && pd.power !== "story") state.powers[pd.power] = true;
+        if (pd && pd.power) state.powers[pd.power] = true;
       }
       state.world2Open = idx >= 1;
       state.world3Open = idx >= 2;

@@ -29,6 +29,6 @@ Literacy-first overworld + read-to-hit fights. CVC only.
 - W6 Tide Pools `?w6=1` — CVC+4-letter pairs, Tide Shell, Water
 - W7 Storm Peak `?w7=1` — 3-word trios, Storm Fang, Electric
 - W8 Harmony Hill `?w8=1` — 20 four-word lines, Shine Bell, Shine
-- W9 Story Gate `?w9=1` — 20 five/six-word lines, Melody Gate
+- W9 Story Gate `?w9=1` — 20 five/six-word lines, Melody Gate, Melody
 - Wear: clear a regular foe to auto-unlock that world's look; giant WEAR cycles
 - Pixel-only foes (CSS slime stays hidden)
