@@ -21,14 +21,14 @@ Literacy-first overworld + read-to-hit fights. CVC only.
 
 ## Branch ladder (not GREEN)
 
-`feat/full-ladder-cosmetics` — Worlds 1–7 playable, W8/W9 shells. Same-origin `index.html` on this branch (not a production pin). Live vis pin on main stays `3337fad7`. GREEN hold remains `7179fc44`.
+`feat/full-ladder-cosmetics` — Worlds 1–9 playable with official banks. Same-origin `index.html` on this branch (not a production pin). Live vis pin on main stays `3337fad7`. GREEN hold remains `7179fc44`.
 
 - W3 Ember Grove `?w3=1` — CVC mastery, Ember Maw, Fire
 - W4 Leaf Hollow `?w4=1` — 4-letter closed, Thorn Crown, Leaf
 - W5 Windy Ridge `?w5=1` — 2 CVC words, Gale Whisk, Wind
 - W6 Tide Pools `?w6=1` — CVC+4-letter pairs, Tide Shell, Water
 - W7 Storm Peak `?w7=1` — 3-word trios, Storm Fang, Electric
-- W8 Harmony Hill `?w8=1` — tiles/palette only until Coach 4-word lines
-- W9 Story Gate `?w9=1` — tiles/palette only until Coach 5–6-word lines
+- W8 Harmony Hill `?w8=1` — 20 four-word lines, Shine Bell, Shine
+- W9 Story Gate `?w9=1` — 20 five/six-word lines, Melody Gate
 - Wear: clear a regular foe to auto-unlock that world's look; giant WEAR cycles
 - Pixel-only foes (CSS slime stays hidden)

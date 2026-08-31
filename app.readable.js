@@ -1,7 +1,6 @@
 /**
- * Sparkelody Phase 3 — Worlds 1-9 ladder + foe cosmetics (Pixel-only).
- * W1 Meadow + W2 Frost live. W3-W7 playable. W8-W9 shells (Coach lines pending).
- * Do not GREEN. Live vis pin stays 3337fad7 until renderer PASS.
+ * Sparkelody Phase 3 — Worlds 1-9 ladder + closet (Pixel-only).
+ * Official literacy banks W1-W9. One Pixel fluff foe path. Do not GREEN.
  */
 (function () {
   "use strict";
@@ -183,7 +182,7 @@
       x: 5, y: 13,
       color: "#4fc3f7",
       talk: function (st) {
-        if (st.powers.ice) return "Ice is yours! The east gate is World 3 — coming soon.";
+        if (st.powers.ice) return "Ice is yours! Walk the east gate into Ember Grove.";
         return "Clear every frost foe first. Then Ice Howl stands on the east World 3 gate. Twenty reads — Ice after you win.";
       },
     },
@@ -193,7 +192,7 @@
       x: 12, y: 9,
       color: "#90caf9",
       talk: function (st) {
-        if (st.powers.ice) return "You beat Ice Howl! Brr-avo. World 3 gate is east.";
+        if (st.powers.ice) return "You beat Ice Howl! Brr-avo. Ember Grove is east.";
         return "All 24 foes, then Ice Howl on the east gate. Twenty reads. No scary turns — just reading!";
       },
     },
@@ -289,7 +288,7 @@
       x: 5, y: 13,
       color: "#ef6c00",
       talk: function (st) {
-        if (st.powers.fire) return "Fire is yours! East is World 4 — not yet. Rest here in the Grove.";
+        if (st.powers.fire) return "Fire is yours! Walk the east gate into Leaf Hollow.";
         return "Clear every ember foe first. Then Ember Maw stands on the east World 4 gate. Twenty reads — Fire after you win.";
       },
     },
@@ -299,7 +298,7 @@
       x: 12, y: 9,
       color: "#ff8a65",
       talk: function (st) {
-        if (st.powers.fire) return "You beat Ember Maw! The Grove glows. World 4 is coming later.";
+        if (st.powers.fire) return "You beat Ember Maw! The Grove glows. Leaf Hollow is east.";
         return "All 28 foes, then Ember Maw on the east gate. Twenty reads. No scary turns — just reading!";
       },
     },
@@ -326,7 +325,7 @@
       color: "#42a5f5",
       talk: function (st) {
         if (st.powers.star) {
-          return "You beat Star Bloom! Star power is so cool. The east Frost Path gate is open — World 2 coming soon.";
+          return "You beat Star Bloom! Star power is so cool. The east Frost Path gate is open.";
         }
         return "Beat all the Bloops, then Star Bloom shows up on the east gate. Twenty reads for Star!";
       },
@@ -343,8 +342,8 @@
   const WORLD5_BANK = ["cat hop","sun run","wet mud","big fan","red hen","hot pot","sad pup","log hut","fox cub","pig pen","dog run","kid sip","bug hid","cup lid","hat box","net dip","map pin","bat hit","ten men","wet dog","big cat","red fox","hot sun","dad nap"];
   const WORLD6_BANK = ["frog hop","wet nest","jump top","stop van","gift box","lamp lit","pond mud","hand pot","sand pit","drip wet","drum tap","slip pad","tent nap","wind fan","nest egg","milk cup","desk top","grab hat","trap lid","camp log","bump van","lift cup","rest bed","rest hut"];
   const WORLD7_BANK = ["big cat ran","wet dog hid","red hen sat","hot sun set","sad pup ran","fox cub hid","kid can hop","dog can nap","hen can sit","cat can run","pig can dig","bus can run","cub can hop","man can jog","pup can run","mom can hug","dad can nap","ten men ran","big pig sat","red van ran","wet bug hid","bat can sit","log can rot","bug can zip"];
-  const WORLD8_BANK = [];
-  const WORLD9_BANK = [];
+  const WORLD8_BANK = ["a big cat ran","big cat can hop","wet dog can run","red hen can sit","hot sun can set","sad pup can nap","fox cub can dig","ten men can jog","kid can hop fast","dog can run fast","a red hen sat","big pig can sit","wet bug can zip","dad can nap well","mom can hug him","a fox can run","big bus can run","cub can hop fast","hen can sit up","pup can run fast"];
+  const WORLD9_BANK = ["a big cat can hop","wet dog can run fast","a big red hen sat","red hen sat on log","a fox cub can dig","big cat can hop fast","dad can nap on log","a big pig can sit","kid can hop and run","a sad pup can nap","ten men can jog fast","mom can hug a pup","a red van can run","big dog can run fast","hen can sit on log","a cat can hop fast","a big bus can run","pup can hop and run","wet bug can zip and hop","a cub can dig fast"];
   const LEAF_MAP = EMBER_MAP;
   const WIND_MAP = EMBER_MAP;
   const TIDE_MAP = EMBER_MAP;
@@ -387,21 +386,23 @@
     { id: "spark_pup", name: "Spark Pup", x: 12, y: 9, color: "#b39ddb", talk: function (st) { return st.powers.electric ? "You beat Storm Fang! The peak is quiet." : "All 24 trios, then Storm Fang on the east gate. Three words. Twenty reads."; } },
   ];
   const HARMONY_NPCS = [
-    { id: "song_guide", name: "Song Guide", x: 5, y: 13, color: "#f6c26b", talk: function (st) { return st.powers.shine ? "Shine is yours! East is Story Gate." : "Harmony Hill is waiting on Coach lines. Clear foes for the look. Shine Bell on the east gate after all foes."; } },
-    { id: "bell_pup", name: "Bell Pup", x: 12, y: 9, color: "#ce93d8", talk: function (st) { return st.powers.shine ? "You beat Shine Bell! The hill hums." : "Four-word lines are coming from Coach. Stretch words only until then: and, on, up, a, fast, well, him."; } },
+    { id: "song_guide", name: "Song Guide", x: 5, y: 13, color: "#f6c26b", talk: function (st) { return st.powers.shine ? "Shine is yours! East is Story Gate." : "Clear every song foe first. Then Shine Bell stands on the east gate. Four-word lines. Twenty reads — Shine after you win."; } },
+    { id: "bell_pup", name: "Bell Pup", x: 12, y: 9, color: "#ce93d8", talk: function (st) { return st.powers.shine ? "You beat Shine Bell! The hill hums." : "All 20 four-word lines, then Shine Bell on the east gate. Twenty reads."; } },
   ];
   const STORY_NPCS = [
-    { id: "tale_guide", name: "Tale Guide", x: 5, y: 13, color: "#5c6bc0", talk: function (st) { return st.wonStory ? "The Story Gate is open. You read the whole path!" : "Story Gate is the end. Coach 5-6 word lines pending. Melody Gate on the east after all foes."; } },
-    { id: "book_pup", name: "Book Pup", x: 12, y: 9, color: "#9fa8da", talk: function (st) { return st.wonStory ? "What a tale!" : "Stretch words until Coach lines: and, on, up, a, fast, well, him."; } },
+    { id: "tale_guide", name: "Tale Guide", x: 5, y: 13, color: "#5c6bc0", talk: function (st) { return st.wonStory ? "The Story Gate is open. You read the whole path!" : "Clear every tale foe first. Then Melody Gate stands on the east. Five- and six-word lines. Twenty reads."; } },
+    { id: "book_pup", name: "Book Pup", x: 12, y: 9, color: "#9fa8da", talk: function (st) { return st.wonStory ? "What a tale!" : "All 20 story lines, then Melody Gate on the east gate. Twenty reads."; } },
   ];
   const COSMETICS = [
-    { id: "flower", world: "meadow", name: "Flower Crown", frame: 0 },
-    { id: "scarf", world: "frost", name: "Frost Scarf", frame: 1 },
-    { id: "cape", world: "ember", name: "Ember Cape", frame: 2 },
-    { id: "leafhat", world: "leaf", name: "Leaf Hat", frame: 3 },
-    { id: "feather", world: "wind", name: "Wind Feather", frame: 4 },
-    { id: "gem", world: "tide", name: "Water Gem", frame: 5 },
-    { id: "bow", world: "storm", name: "Storm Bow", frame: 6 },
+    { id: "daisy-bow", world: "meadow", name: "Daisy Bow", frame: 0 },
+    { id: "frost-scarf", world: "frost", name: "Frost Scarf", frame: 1 },
+    { id: "spark-hat", world: "ember", name: "Spark Hat", frame: 2 },
+    { id: "clover-pin", world: "leaf", name: "Clover Pin", frame: 3 },
+    { id: "wind-ribbon", world: "wind", name: "Wind Ribbon", frame: 4 },
+    { id: "shell-clip", world: "tide", name: "Shell Clip", frame: 5 },
+    { id: "bolt-bow", world: "storm", name: "Bolt Bow", frame: 6 },
+    { id: "shine-charm", world: "harmony", name: "Shine Charm", frame: 0 },
+    { id: "melody-book", world: "story", name: "Melody Book", frame: 3 },
   ];
   const OUTFIT_FRAMES = [
     [59, 414, 151, 214],
@@ -430,8 +431,8 @@
     wind: { id: "wind", num: 5, title: "Sparkelody · World 5 Windy Ridge", hint: "Windy Ridge · two words · Gale Whisk on the east gate", map: WIND_MAP, spots: WIND_SPOTS, npcs: WIND_NPCS, bank: WORLD5_BANK, skins: WIND_FOE_SKINS, prefix: "n:", next: "tide", prev: "leaf", power: "wind", bossId: "gale_whisk", bossName: "Gale Whisk", nextName: "Tide Pools", appClass: "world-wind", foeTint: [120, 180, 190] },
     tide: { id: "tide", num: 6, title: "Sparkelody · World 6 Tide Pools", hint: "Tide Pools · mix words · Tide Shell on the east gate", map: TIDE_MAP, spots: TIDE_SPOTS, npcs: TIDE_NPCS, bank: WORLD6_BANK, skins: TIDE_FOE_SKINS, prefix: "t:", next: "storm", prev: "wind", power: "water", bossId: "tide_shell", bossName: "Tide Shell", nextName: "Storm Peak", appClass: "world-tide", foeTint: [40, 120, 170] },
     storm: { id: "storm", num: 7, title: "Sparkelody · World 7 Storm Peak", hint: "Storm Peak · three words · Storm Fang on the east gate", map: STORM_MAP, spots: STORM_SPOTS, npcs: STORM_NPCS, bank: WORLD7_BANK, skins: STORM_FOE_SKINS, prefix: "s:", next: "harmony", prev: "tide", power: "electric", bossId: "storm_fang", bossName: "Storm Fang", nextName: "Harmony Hill", appClass: "world-storm", foeTint: [90, 60, 150] },
-    harmony: { id: "harmony", num: 8, title: "Sparkelody · World 8 Harmony Hill", hint: "Harmony Hill · Coach 4-word lines pending · Shine Bell on the east gate", map: HARMONY_MAP, spots: HARMONY_SPOTS, npcs: HARMONY_NPCS, bank: WORLD8_BANK, skins: HARMONY_FOE_SKINS, prefix: "h:", next: "story", prev: "storm", power: "shine", bossId: "shine_bell", bossName: "Shine Bell", nextName: "Story Gate", appClass: "world-harmony", foeTint: [210, 170, 80], stub: true },
-    story: { id: "story", num: 9, title: "Sparkelody · World 9 Story Gate", hint: "Story Gate · Coach 5-6 word lines pending · Melody Gate on the east", map: STORY_MAP, spots: STORY_SPOTS, npcs: STORY_NPCS, bank: WORLD9_BANK, skins: STORY_FOE_SKINS, prefix: "y:", next: null, prev: "harmony", power: "story", bossId: "melody_gate", bossName: "Melody Gate", nextName: null, appClass: "world-story", foeTint: [80, 90, 140], stub: true },
+    harmony: { id: "harmony", num: 8, title: "Sparkelody · World 8 Harmony Hill", hint: "Harmony Hill · four-word lines · Shine Bell on the east gate", map: HARMONY_MAP, spots: HARMONY_SPOTS, npcs: HARMONY_NPCS, bank: WORLD8_BANK, skins: HARMONY_FOE_SKINS, prefix: "h:", next: "story", prev: "storm", power: "shine", bossId: "shine_bell", bossName: "Shine Bell", nextName: "Story Gate", appClass: "world-harmony", foeTint: [210, 170, 80] },
+    story: { id: "story", num: 9, title: "Sparkelody · World 9 Story Gate", hint: "Story Gate · story lines · Melody Gate on the east", map: STORY_MAP, spots: STORY_SPOTS, npcs: STORY_NPCS, bank: WORLD9_BANK, skins: STORY_FOE_SKINS, prefix: "y:", next: null, prev: "harmony", power: "story", bossId: "melody_gate", bossName: "Melody Gate", nextName: null, appClass: "world-story", foeTint: [80, 90, 140] },
   };
   const BOSS_IDS = { star_bloom: 1, ice_howl: 1, ember_maw: 1, thorn_crown: 1, gale_whisk: 1, tide_shell: 1, storm_fang: 1, shine_bell: 1, melody_gate: 1 };
 
@@ -570,7 +571,7 @@
   };
 
   const FOE_CELLS = {
-    bloop: { idle: [0, 0], hit: [0, 1] },
+    bloop: { idle: [1, 0], hit: [1, 1] },
     fluff_lite: { idle: [1, 0], hit: [1, 1] },
   };
 
@@ -596,11 +597,11 @@
   };
 
   const CHROMA = {
-    walk: { r: 156, g: 196, b: 127, tol: 32 },
-    cast: { r: 80, g: 118, b: 90, tol: 35 },
-    foes: { r: 141, g: 160, b: 121, tol: 32 },
-    boss: { r: 132, g: 158, b: 95, tol: 35 },
-    npcs: { r: 156, g: 196, b: 127, tol: 40 },
+    walk: { r: 156, g: 196, b: 127, tol: 48 },
+    cast: { r: 80, g: 118, b: 90, tol: 42 },
+    foes: { r: 141, g: 160, b: 116, tol: 48 },
+    boss: { r: 132, g: 158, b: 95, tol: 42 },
+    npcs: { r: 156, g: 196, b: 127, tol: 48 },
   };
 
   function loadImageDirect(url) {
@@ -642,17 +643,24 @@
     } catch (e) {
       return img;
     }
-    // Already keyed (transparent corner) — return canvas as-is
-    if (data.data[3] < 10) {
-      return c;
-    }
     const d = data.data;
-    const tol = chroma.tol;
+    const tol = chroma.tol || 40;
+    const cr = d[0], cg = d[1], cb = d[2], ca = d[3];
+    const cornerTol = 36;
     for (let i = 0; i < d.length; i += 4) {
       if (
         Math.abs(d[i] - chroma.r) <= tol &&
         Math.abs(d[i + 1] - chroma.g) <= tol &&
         Math.abs(d[i + 2] - chroma.b) <= tol
+      ) {
+        d[i + 3] = 0;
+        continue;
+      }
+      if (
+        ca > 8 &&
+        Math.abs(d[i] - cr) <= cornerTol &&
+        Math.abs(d[i + 1] - cg) <= cornerTol &&
+        Math.abs(d[i + 2] - cb) <= cornerTol
       ) {
         d[i + 3] = 0;
       }
@@ -688,83 +696,79 @@
   }
 
   var artLoadInFlight = false;
+  var ART_WORLD_IDS = ["ember", "leaf", "wind", "tide", "storm", "harmony", "story"];
   async function preloadArt() {
     if (artLoadInFlight) return;
     artLoadInFlight = true;
     try {
-    const worldIds = ["ember", "leaf", "wind", "tide", "storm", "harmony", "story"];
-    const packed = await Promise.all([
-      loadImage(assetUrl("sparkelody/walk/sheet.png")),
-      loadImage(assetUrl("sparkelody/cast/sheet.png")),
-      loadImage(assetUrl("foes/bloop-fluff-sheet.png")),
-      loadImage(assetUrl("bosses/star_bloom.png")),
-      loadImage(assetUrl("worlds/meadow/tiles.png")),
-      loadImage(assetUrl("powers/icons-sheet.png")),
-      loadImage(assetUrl("powers/vfx-sheet.png")),
-      loadImage(assetUrl("ui/cvc-panel.png")),
-      loadImage(assetUrl("npcs/elder-kid-sheet.png")),
-      loadImage(assetUrl("bosses/ice_howl.png")),
-      loadImage(assetUrl("worlds/frost/tiles.png")),
-      loadImage(assetUrl("foes/frost-bloop-fluff-sheet.png")),
-      loadImage(assetUrl("outfits/sheet.png")),
-    ].concat(worldIds.map(function (id) { return loadImage(assetUrl("worlds/" + id + "/tiles.png")); })));
-    const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12];
-    const worldImgs = packed.slice(13);
-    ART.walk = walk ? keySheet(walk, CHROMA.walk) || walk : (ART.walk || null);
-    ART.cast = cast ? keySheet(cast, CHROMA.cast) || cast : (ART.cast || null);
-    ART.foes = foes ? keySheet(foes, CHROMA.foes) || foes : (ART.foes || null);
-    ART.boss = boss ? keySheet(boss, CHROMA.boss) || boss : (ART.boss || null);
-    ART.meadowTiles = tiles && (tiles.naturalWidth || tiles.width) ? tiles : (ART.meadowTiles || null);
-    ART.tiles = ART.meadowTiles;
-    ART.icons = icons && (icons.naturalWidth || icons.width) ? icons : null;
-    ART.vfx = vfx && (vfx.naturalWidth || vfx.width) ? vfx : null;
-    ART.panel = panel && (panel.naturalWidth || panel.width) ? panel : null;
-    ART.npcs = npcs ? keySheet(npcs, CHROMA.npcs) || npcs : (ART.npcs || null);
-    ART.iceHowl = iceHowl ? keySheet(iceHowl, CHROMA.boss) || iceHowl : null;
-    ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : (ART.frostTiles || null);
-    ART.frostFoes = frostFoes ? keySheet(frostFoes, CHROMA.foes) || frostFoes : null;
-    ART.outfits = outfitImg ? keyChroma(outfitImg, [140, 158, 113], 42) : (ART.outfits || null);
-    ART.worldTiles = ART.worldTiles || {};
-    ART.worldFoes = ART.worldFoes || {};
-    ART.worldBoss = ART.worldBoss || {};
-    worldIds.forEach(function (id, i) {
-      const im = worldImgs[i];
-      ART.worldTiles[id] = im && (im.naturalWidth || im.width) ? im : ART.worldTiles[id] || null;
-      const d = WORLD_DEFS[id];
-      const baseFoe = id === "storm" ? (ART.frostFoes || ART.foes) : ART.foes;
-      ART.worldFoes[id] = d && d.foeTint && baseFoe ? tintSheet(baseFoe, d.foeTint, 0.4) : baseFoe;
-    });
-    ART.emberTiles = ART.worldTiles.ember || ART.emberTiles;
-    ART.emberFoes = ART.worldFoes.ember || ART.emberFoes;
-    const bbase = ART.iceHowl || ART.boss;
-    ART.worldBoss.ember_maw = tintSheet(bbase, [220, 90, 40], 0.48);
-    ART.worldBoss.thorn_crown = tintSheet(ART.boss || bbase, [70, 140, 60], 0.48);
-    ART.worldBoss.gale_whisk = tintSheet(bbase, [120, 180, 190], 0.48);
-    ART.worldBoss.tide_shell = tintSheet(bbase, [40, 120, 170], 0.48);
-    ART.worldBoss.storm_fang = tintSheet(bbase, [90, 60, 150], 0.48);
-    ART.worldBoss.shine_bell = tintSheet(bbase, [210, 170, 80], 0.48);
-    ART.worldBoss.melody_gate = tintSheet(ART.boss || bbase, [80, 90, 140], 0.48);
-    ART.emberMaw = ART.worldBoss.ember_maw;
+    if (!ART.walk || !ART.foes || !ART.meadowTiles) {
+      const packed = await Promise.all([
+        loadImage(assetUrl("sparkelody/walk/sheet.png")),
+        loadImage(assetUrl("sparkelody/cast/sheet.png")),
+        loadImage(assetUrl("foes/bloop-fluff-sheet.png")),
+        loadImage(assetUrl("bosses/star_bloom.png")),
+        loadImage(assetUrl("worlds/meadow/tiles.png")),
+        loadImage(assetUrl("powers/icons-sheet.png")),
+        loadImage(assetUrl("powers/vfx-sheet.png")),
+        loadImage(assetUrl("ui/cvc-panel.png")),
+        loadImage(assetUrl("npcs/elder-kid-sheet.png")),
+        loadImage(assetUrl("bosses/ice_howl.png")),
+        loadImage(assetUrl("worlds/frost/tiles.png")),
+        loadImage(assetUrl("foes/frost-bloop-fluff-sheet.png")),
+        loadImage(assetUrl("outfits/sheet.png")),
+      ]);
+      const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12];
+      ART.walk = walk ? keySheet(walk, CHROMA.walk) || walk : (ART.walk || null);
+      ART.cast = cast ? keySheet(cast, CHROMA.cast) || cast : (ART.cast || null);
+      ART.foes = foes ? keySheet(foes, CHROMA.foes) || foes : (ART.foes || null);
+      ART.boss = boss ? keySheet(boss, CHROMA.boss) || boss : (ART.boss || null);
+      ART.meadowTiles = tiles && (tiles.naturalWidth || tiles.width) ? tiles : (ART.meadowTiles || null);
+      ART.tiles = ART.meadowTiles;
+      ART.icons = icons && (icons.naturalWidth || icons.width) ? icons : null;
+      ART.vfx = vfx && (vfx.naturalWidth || vfx.width) ? vfx : null;
+      ART.panel = panel && (panel.naturalWidth || panel.width) ? panel : null;
+      ART.npcs = npcs ? keySheet(npcs, CHROMA.npcs) || npcs : (ART.npcs || null);
+      ART.iceHowl = iceHowl ? keySheet(iceHowl, CHROMA.boss) || iceHowl : null;
+      ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : (ART.frostTiles || null);
+      ART.frostFoes = frostFoes ? keySheet(frostFoes, CHROMA.foes) || frostFoes : (ART.frostFoes || null);
+      ART.outfits = outfitImg ? keyChroma(outfitImg, [140, 158, 113], 48) : (ART.outfits || null);
+      ART.worldTiles = ART.worldTiles || {};
+      ART.worldFoes = ART.worldFoes || {};
+      ART.worldBoss = ART.worldBoss || {};
+    }
     if (BOOT_FROST || wantFrost()) {
       ART.tiles = ART.frostTiles || ART.tiles;
-      ART.ready = !!(ART.walk && ART.npcs && ART.frostFoes && ART.frostTiles);
+      ART.ready = !!(ART.walk && ART.frostTiles && (ART.frostFoes || ART.foes));
     } else if (laterWorld()) {
       ART.tiles = currentTiles() || ART.tiles;
-      ART.ready = !!(ART.walk && ART.npcs && currentTiles() && currentFoeSheet());
+      ART.ready = !!(ART.walk && currentTiles() && (currentFoeSheet() || ART.foes));
     } else {
       ART.tiles = ART.meadowTiles || ART.tiles;
-      ART.ready = !!(ART.walk && ART.tiles && ART.npcs && ART.foes);
+      ART.ready = !!(ART.walk && ART.tiles && ART.foes);
     }
     if (ART.locked) artEverLocked = true;
     ART.locked = ART.locked || ART.ready || artEverLocked;
     if (ART.locked) artEverLocked = true;
-    if (!ART.locked) {
+    if (ART.walk) applyDomArt();
+    if (ART.locked) {
+      if (state.scene === "overworld") drawWorld();
+      showArtLoader(false);
+    } else {
       showArtLoader(true);
-      return;
     }
-    applyDomArt();
-    if (state.scene === "overworld") drawWorld();
-    showArtLoader(false);
+    if (!ART.ladderLoaded) {
+      const worldImgs = await Promise.all(ART_WORLD_IDS.map(function (id) {
+        return loadImage(assetUrl("worlds/" + id + "/tiles.png"));
+      }));
+      ART.worldTiles = ART.worldTiles || {};
+      ART_WORLD_IDS.forEach(function (id, i) {
+        const im = worldImgs[i];
+        ART.worldTiles[id] = im && (im.naturalWidth || im.width) ? im : ART.worldTiles[id] || null;
+      });
+      ART.emberTiles = ART.worldTiles.ember || ART.emberTiles;
+      ART.ladderLoaded = true;
+      if (laterWorld() && currentTiles() && state.scene === "overworld") drawWorld();
+    }
     } finally {
       artLoadInFlight = false;
     }
@@ -854,10 +858,15 @@
       }
       const url = sheet.toDataURL ? sheet.toDataURL("image/png") : sheet.src;
       el.bloop.classList.add("art-sprite", "boss-art");
+      el.bloop.style.backgroundColor = "transparent";
       el.bloop.style.backgroundImage = 'url("' + url + '")';
       el.bloop.style.backgroundSize = "contain";
       el.bloop.style.backgroundRepeat = "no-repeat";
       el.bloop.style.backgroundPosition = "center bottom";
+      if (artKey === "ice_howl") {
+        el.bloop.style.setProperty("width", "144px", "important");
+        el.bloop.style.setProperty("height", "96px", "important");
+      }
       return;
     }
     const foeSheet = currentFoeSheet();
@@ -866,14 +875,14 @@
       clearFoeArtBg();
       return;
     }
-    const cell = FOE_CELLS[artKey] || FOE_CELLS.bloop;
+    const cell = FOE_CELLS.fluff_lite;
     const [cx, cy] = hit ? cell.hit : cell.idle;
     const url = foeSheet.toDataURL ? foeSheet.toDataURL("image/png") : foeSheet.src;
-    const cellW = (foeSheet.naturalWidth || foeSheet.width) / 2;
-    const cellH = (foeSheet.naturalHeight || foeSheet.height) / 2;
     const dispH = 64;
-    const dispW = Math.max(56, Math.round(dispH * (cellW / cellH)));
+    const dispW = 64;
     el.bloop.classList.add("art-sprite");
+    el.bloop.classList.remove("boss-art");
+    el.bloop.style.backgroundColor = "transparent";
     el.bloop.style.setProperty("width", dispW + "px", "important");
     el.bloop.style.setProperty("height", dispH + "px", "important");
     el.bloop.style.setProperty("overflow", "hidden", "important");
@@ -927,6 +936,8 @@
   };
   let talkBlockUntil = 0;
   let artEverLocked = false;
+  let stallTimer = 0;
+  let stallWordIdx = 0;
 
   function shuffle(arr) {
     const a = arr.slice();
@@ -968,7 +979,7 @@
     return !!(state.world && state.world !== "meadow" && state.world !== "frost");
   }
   function wantFrost() {
-    if (laterWorld()) return false;
+    if (state.world === "meadow" || laterWorld()) return false;
     if (BOOT_FROST) return true;
     if (state.world === "frost") return true;
     try {
@@ -1032,13 +1043,35 @@
   }
   function currentFoeSheet() {
     const id = worldDef().id;
-    if (id === "frost") return ART.frostFoes || null;
+    if (id === "frost") return ART.frostFoes || ART.foes || null;
     if (id === "meadow") return ART.foes;
+    ART.worldFoes = ART.worldFoes || {};
+    if (!ART.worldFoes[id]) {
+      const d = WORLD_DEFS[id];
+      const base = id === "storm" ? (ART.frostFoes || ART.foes) : ART.foes;
+      ART.worldFoes[id] = d && d.foeTint && base ? tintSheet(base, d.foeTint, 0.4) : base;
+    }
     return ART.worldFoes[id] || ART.foes;
   }
   function currentBossSheet(artKey) {
     if (artKey === "star_bloom") return ART.boss;
     if (artKey === "ice_howl") return ART.iceHowl;
+    ART.worldBoss = ART.worldBoss || {};
+    if (!ART.worldBoss[artKey]) {
+      const tints = {
+        ember_maw: [220, 90, 40],
+        thorn_crown: [70, 140, 60],
+        gale_whisk: [120, 180, 190],
+        tide_shell: [40, 120, 170],
+        storm_fang: [90, 60, 150],
+        shine_bell: [210, 170, 80],
+        melody_gate: [80, 90, 140],
+      };
+      const rgb = tints[artKey];
+      const bbase = artKey === "thorn_crown" || artKey === "melody_gate" ? (ART.boss || ART.iceHowl) : (ART.iceHowl || ART.boss);
+      ART.worldBoss[artKey] = rgb && bbase ? tintSheet(bbase, rgb, 0.48) : bbase;
+      if (artKey === "ember_maw") ART.emberMaw = ART.worldBoss[artKey];
+    }
     return ART.worldBoss[artKey] || ART.iceHowl || ART.boss;
   }
   function tileAtlas() {
@@ -1149,8 +1182,9 @@
   function drawWorld() {
     // URL wins: a warm Meadow tab that lands on ?w2=1 must never keep meadow tiles.
     try {
-      if ((typeof window !== "undefined" && window.MEADOW_START_FROST) ||
-          (typeof location !== "undefined" && /[?&](w2|frost)=1/.test(location.search))) {
+      if (state.world !== "meadow" && !laterWorld() &&
+          ((typeof window !== "undefined" && window.MEADOW_START_FROST) ||
+          (typeof location !== "undefined" && /[?&](w2|frost)=1/.test(location.search)))) {
         if (state.world !== "frost") {
           state.world = "frost";
           const app = document.getElementById("app");
@@ -1165,7 +1199,7 @@
     if (artEverLocked) ART.locked = true;
     const w = VIEW_COLS * TILE;
     const h = VIEW_ROWS * TILE;
-    const sheetsOk = !!(ART.walk && ART.npcs && currentTiles());
+    const sheetsOk = !!(ART.walk && currentTiles() && (currentFoeSheet() || ART.foes));
     if (sheetsOk) { ART.locked = true; artEverLocked = true; }
     if (el.canvas.width !== w || el.canvas.height !== h) {
       el.canvas.width = w;
@@ -1228,10 +1262,12 @@
           }
           ctx.fillStyle = "#fff";
           ctx.font = "bold 10px sans-serif";
-          let glabel = state.world2Open ? "W2" : "������";
-          if (isEmber()) glabel = x <= 1 ? "W2" : (state.powers.fire ? "W4" : "������");
-          else if (isFrost()) glabel = x <= 1 ? "W1" : (state.powers.ice ? "W3" : "������");
-          ctx.fillText(glabel, sx + 8, sy + 20);
+          const gd = worldDef();
+          let glabel = "gate";
+          if (x <= 1 && gd.prev) glabel = gd.prev === "meadow" ? "W1" : gd.prev === "frost" ? "W2" : ("W" + Math.max(1, gd.num - 1));
+          else if (gd.next) glabel = gd.power === "story" ? (state.wonStory ? "END" : "lock") : (state.powers[gd.power] ? ("W" + (gd.num + 1)) : "lock");
+          else glabel = state.wonStory ? "END" : "lock";
+          ctx.fillText(glabel, sx + 6, sy + 20);
         }
       }
     }
@@ -1247,20 +1283,19 @@
       const cy = vy * TILE + TILE / 2;
       const bossSheet = currentBossSheet(spot.id || worldDef().bossId);
       if (spot.type === "boss" && bossSheet) {
-        const bh = 44;
-        const bw = Math.max(40, Math.round(bh * ((bossSheet.width || 1) / (bossSheet.height || 1))));
-        drawSheetFrame(bossSheet, 0, 0, bossSheet.width, bossSheet.height, cx - bw / 2, cy + TILE / 2 - bh + 4, bw, bh);
+        const howl = (spot.id === "ice_howl" || worldDef().bossId === "ice_howl");
+        const bh = howl ? 48 : 32;
+        const bw = howl ? 48 : 32;
+        drawSheetFrame(bossSheet, 0, 0, bossSheet.width, bossSheet.height, cx - bw / 2, cy + TILE / 2 - bh - 2, bw, bh);
       } else if (spot.type === "foe" && currentFoeSheet()) {
-        const skins = currentSkins();
-        const skin = skins[spot.foe] || skins[0];
-        const cell = FOE_CELLS[skin.artKey] || FOE_CELLS.bloop;
+        const cell = FOE_CELLS.fluff_lite;
         const [ccx, ccy] = cell.idle;
         const fs = currentFoeSheet();
         const fw = fs.width / 2;
         const fh = fs.height / 2;
         const dh = 30;
-        const dw = Math.max(28, Math.round(dh * (fw / fh)));
-        drawSheetFrame(fs, ccx * fw, ccy * fh, fw, fh, cx - dw / 2, cy + TILE / 2 - dh + 4, dw, dh);
+        const dw = 28;
+        drawSheetFrame(fs, ccx * fw, ccy * fh, fw, fh, cx - dw / 2, cy + TILE / 2 - dh - 2, dw, dh);
       }
     });
 
@@ -1379,17 +1414,17 @@
 
   function enterFrost(opts) {
     state.world = "frost";
-    state.px = 2;
-    state.py = 14;
-    state.facing = "up";
-    const app = document.getElementById("app");
-    if (app) {
-      app.classList.add("world-frost");
-      app.classList.remove("world-ember");
+    const spawn = opts && opts.spawn;
+    if (spawn === "east") {
+      state.px = 17;
+      state.py = 2;
+      state.facing = "left";
+    } else {
+      state.px = 2;
+      state.py = 14;
+      state.facing = "up";
     }
-    const title = document.querySelector(".title");
-    if (title) title.textContent = "Sparkelody · World 2 Frost Path";
-    if (el.worldHint) el.worldHint.textContent = "Frost Path";
+    applyWorldChrome();
     closeDialogueQuiet();
     const silent = !!(opts && opts.silent);
     if (silent) return;
@@ -1404,11 +1439,7 @@
     state.px = 17;
     state.py = 2;
     state.facing = "left";
-    const app = document.getElementById("app");
-    if (app) app.classList.remove("world-frost", "world-ember");
-    const title = document.querySelector(".title");
-    if (title) title.textContent = "Sparkelody · World 1 Meadow";
-    el.worldHint.textContent = "Meadow · clear all Bloops, then Star Bloom on the east gate";
+    applyWorldChrome();
     closeDialogueQuiet();
     drawWorld();
   }
@@ -1487,16 +1518,21 @@
     const title = document.querySelector(".title");
     if (title) title.textContent = "Sparkelody · World 3 Ember Grove";
     if (el.worldHint) el.worldHint.textContent = "Ember Grove · clear all foes, then Ember Maw on the east gate";
+    applyWorldChrome();
     closeDialogueQuiet();
     const silent = !!(opts && opts.silent);
     if (silent) return;
-    // No Ember tiles yet — loader, Pixel-only draw once sheetsOk. Never blit frost/meadow here.
-    showArtLoader(true);
-    drawWorld();
+    if (currentTiles()) {
+      showArtLoader(false);
+      drawWorld();
+    } else {
+      showArtLoader(true);
+      preloadArt();
+    }
   }
   function handleEmberGate(nx, ny) {
     if (nx <= 1) {
-      enterFrost();
+      enterFrost({ spawn: "east" });
       return;
     }
     const b = bossSpot();
@@ -1541,7 +1577,7 @@
   function handleLadderGate(nx, ny) {
     const d = worldDef();
     if (nx <= 1) {
-      if (d.prev === "frost") enterFrost();
+      if (d.prev === "frost") enterFrost({ spawn: "east" });
       else if (d.prev === "meadow") enterMeadow();
       else if (d.prev) enterWorld(d.prev, { spawn: "east" });
       return;
@@ -1653,7 +1689,7 @@
       return;
     }
     const npc = npcAt(f.x, f.y);
-    // ������ talks only if that facing tile is cardinal-adjacent. D-pad dirs never call this.
+    // Interact talks only if that facing tile is cardinal-adjacent. D-pad dirs never call this.
     if (npc && Math.abs(state.px - npc.x) + Math.abs(state.py - npc.y) === 1) openDialogue(npc, "talk");
   }
 
@@ -1672,7 +1708,7 @@
   function closeDialogue() {
     el.dialogue.classList.add("hidden");
     el.dpad.classList.remove("hidden");
-    el.worldHint.textContent = "Arrows / WASD · bump to talk · ������ Interact";
+    el.worldHint.textContent = worldDef().hint;
     drawWorld();
   }
 
@@ -1794,7 +1830,7 @@
     const basic = document.createElement("button");
     basic.type = "button";
     basic.className = "power-pick-btn basic";
-    basic.textContent = "������ Read";
+    basic.textContent = "Read";
     basic.addEventListener("click", () => pickPower(null));
     el.powerChoices.appendChild(basic);
 
@@ -1852,17 +1888,53 @@
       setFlavor("Ice cast — sound it out!");
     } else if (state.selectedPower === "fire") {
       setFlavor("Fire cast — sound it out!");
+    } else if (/\s/.test(state.current.word)) {
+      setFlavor("Read the whole line!");
     } else {
       setFlavor("Your turn — read to hit!");
     }
   }
 
+  function clearStall() {
+    if (stallTimer) {
+      clearTimeout(stallTimer);
+      stallTimer = 0;
+    }
+  }
+  function paintPhrase(hi) {
+    if (!state.current) return;
+    const raw = state.current.word;
+    const words = raw.split(/\s+/);
+    if (hi == null || hi < 0 || words.length < 2) {
+      el.cvcWord.textContent = raw.toUpperCase();
+      return;
+    }
+    el.cvcWord.innerHTML = words.map(function (w, i) {
+      const t = w.toUpperCase();
+      return i === hi ? '<span class="stall-hi">' + t + "</span>" : t;
+    }).join(" ");
+  }
+  function armStall() {
+    clearStall();
+    if (!state.current || !/\s/.test(state.current.word)) return;
+    stallWordIdx = 0;
+    stallTimer = setTimeout(function tick() {
+      if (!state.current || state.busy || state.won || state.scene !== "fight") return;
+      paintPhrase(stallWordIdx);
+      const n = state.current.word.split(/\s+/).length;
+      stallWordIdx = (stallWordIdx + 1) % n;
+      stallTimer = setTimeout(tick, 850);
+    }, 3200);
+  }
   function showCurrentWord() {
     if (!state.current) return;
-    el.cvcWord.textContent = state.current.word.toUpperCase();
-    el.cvcWord.classList.toggle("phrase", /\s/.test(state.current.word));
+    const phrase = /\s/.test(state.current.word);
+    el.cvcWord.classList.toggle("phrase", phrase);
     el.cvcWord.classList.remove("pop");
     el.cvcWrap.classList.remove("miss-shake");
+    paintPhrase(-1);
+    if (el.prompt) el.prompt.textContent = phrase ? "Read the line!" : "Sound it out!";
+    armStall();
     renderChoices();
   }
 
@@ -1880,6 +1952,7 @@
   async function onSuccess() {
     if (state.busy || state.won) return;
     state.busy = true;
+    clearStall();
     setControlsEnabled(false);
 
     const pow = state.selectedPower;
@@ -1936,6 +2009,7 @@
   async function onMiss() {
     if (state.busy || state.won) return;
     state.busy = true;
+    clearStall();
     setControlsEnabled(false);
     setFeedback("Almost! Try again", "soft");
     el.cvcWrap.classList.remove("miss-shake");
@@ -1947,6 +2021,8 @@
     setFeedback("");
     state.busy = false;
     setControlsEnabled(true);
+    paintPhrase(-1);
+    armStall();
   }
 
   async function winFight() {
@@ -1988,6 +2064,7 @@
   }
 
   function endFightToOverworld() {
+    clearStall();
     state.busy = false;
     state.won = false;
     state.encounter = null;
