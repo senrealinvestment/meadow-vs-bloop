@@ -130,6 +130,11 @@
 @keyframes burstPop{0%{transform:scale(.4);opacity:1}70%{transform:scale(1.3);opacity:1}100%{transform:scale(1.65);opacity:0}}
 .bloop.art-sprite.boss-art{width:144px !important;height:96px !important;bottom:12% !important;}
 .btn-wear:not(.locked){opacity:1;filter:none;background:#ffe082;border-color:#ef6c00;}
+.save-hud{display:flex;align-items:center;justify-content:center;gap:0.4rem;margin:0.15rem 0 0;flex-wrap:wrap;}
+.save-status{font-size:0.85rem;font-weight:900;color:#1b5e20;background:#c8e6c9;border-radius:999px;padding:0.18rem 0.65rem;}
+.save-status.hidden{display:none;}
+.btn-continue{min-height:36px;padding:0.28rem 0.8rem;border:3px solid #2e7d32;border-radius:12px;background:#e8f5e9;color:#1b5e20;font-size:0.95rem;font-weight:900;cursor:pointer;}
+.btn-continue.hidden{display:none;}
 #app.world-frost .world-wrap{background:#90caf9 !important;}
 #app.world-frost #world{background:#bbdefb !important;}
 #app.world-frost .title{color:#1565c0;}

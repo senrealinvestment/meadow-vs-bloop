@@ -479,6 +479,8 @@
     chipMelody: document.getElementById("chip-melody"),
     btnWear: document.getElementById("btn-wear"),
     btnNewgame: document.getElementById("btn-newgame"),
+    saveStatus: document.getElementById("save-status"),
+    btnContinue: document.getElementById("btn-continue"),
     cvcWord: document.getElementById("cvc-word"),
     cvcWrap: document.getElementById("cvc-wrap"),
     controlsConfirm: document.getElementById("controls-confirm"),
@@ -1146,6 +1148,39 @@
   const SAVE_KEY = "mvb.kid.v1";
   let saveReady = false;
   let saveTimer = 0;
+  function visWorldFlag() {
+    try {
+      var qs = (typeof location !== "undefined" && location.search) || "";
+      return /[?&](w2|frost|w3|ember|w4|leaf|w5|wind|w6|tide|w7|storm|w8|harmony|w9|story)=1/i.test(qs);
+    } catch (eVis) {
+      return false;
+    }
+  }
+  function saveWorldLabel(id) {
+    const d = WORLD_DEFS[id] || WORLD_DEFS.meadow;
+    const t = String(d.title || id);
+    const cut = t.split("·");
+    let name = (cut.length > 1 ? cut[cut.length - 1] : t).trim();
+    name = name.replace(/^World\s+\d+\s+/i, "");
+    return name || "Meadow";
+  }
+  function paintSaveHud(kind) {
+    const status = el.saveStatus || document.getElementById("save-status");
+    const cont = el.btnContinue || document.getElementById("btn-continue");
+    const has = (function () { try { return !!readSave(); } catch (eH) { return false; } })();
+    if (status) {
+      if (kind === "empty") status.textContent = "";
+      else if (kind === "saved") status.textContent = "Saved";
+      else if (kind === "continue") status.textContent = "Continue · " + saveWorldLabel(state.world);
+      else if (has) status.textContent = "Saved · " + saveWorldLabel(state.world);
+      else status.textContent = "";
+      status.classList.toggle("hidden", !status.textContent);
+    }
+    if (cont) {
+      cont.classList.toggle("hidden", !has || visWorldFlag());
+      if (has) cont.textContent = "Continue";
+    }
+  }
   const state = {
     scene: "overworld",
     mode: "confirm",
@@ -1457,6 +1492,7 @@
   }
   function writeSave() {
     if (!saveReady) return;
+    if (visWorldFlag()) return;
     try {
       const payload = {
         v: 1,
@@ -1475,10 +1511,12 @@
         wonStory: state.wonStory,
       };
       localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+      paintSaveHud("saved");
     } catch (eW) {}
   }
   function scheduleSave() {
     if (!saveReady) return;
+    if (visWorldFlag()) return;
     if (saveTimer) clearTimeout(saveTimer);
     saveTimer = setTimeout(writeSave, 50);
   }
@@ -1499,6 +1537,22 @@
     state.world3Open = !!s.world3Open;
     state.wonStory = !!s.wonStory;
     updateCamera();
+  }
+  function continueFromSave() {
+    const s = readSave();
+    if (!s) return;
+    applySave(s);
+    applyWorldChrome();
+    updatePowerHud();
+    applyWearArt();
+    updateCamera();
+    paintSaveHud("continue");
+    if (!currentTiles()) {
+      showArtLoader(true);
+      preloadArt();
+    } else if (state.scene === "overworld") {
+      drawWorld();
+    }
   }
   function confirmNewGame() {
     var ok = false;
@@ -2466,6 +2520,13 @@
       confirmNewGame();
     });
   }
+  if (el.btnContinue) {
+    el.btnContinue.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      continueFromSave();
+    });
+  }
   el.btnFlee.addEventListener("click", () => {
     if (state.busy) return;
     endFightToOverworld();
@@ -2583,9 +2644,10 @@
   }, true);
 
   showArtLoader(true);
-  // Kid save resumes on the same origin. URL world flags (?w2=1 …) skip save so vis-QA still works.
+  // Kid save resumes on the same origin, including Frost/Ember/Leaf.
+  // URL world flags (?w2=1 …) skip save so vis-QA still works.
   var resumed = false;
-  if (BOOT_WORLD === "meadow") {
+  if (!visWorldFlag()) {
     var saved = readSave();
     if (saved) {
       applySave(saved);
@@ -2636,19 +2698,31 @@
   showScene("overworld");
   applyWorldChrome();
   saveReady = true;
+  if (visWorldFlag()) {
+    paintSaveHud("empty");
+  } else if (resumed) {
+    applyWearArt();
+    updatePowerHud();
+    writeSave();
+    paintSaveHud("continue");
+  } else {
+    paintSaveHud(readSave() ? "saved" : "empty");
+  }
   try {
     window.__MVB_KID = function () {
       const fs = currentFoeSheet();
       const bs = currentBossSheet(worldDef().bossId);
-      return { world: state.world, px: state.px, py: state.py, camX: state.camX, camY: state.camY, facing: state.facing, wearIndex: state.wearIndex, world2Open: !!state.world2Open, world3Open: !!state.world3Open, wearUnlocked: Object.keys(state.unlockedWear), bank0: currentBank()[0], bankN: currentBank().length, bankWord: currentBank()[0], foeSheet: fs ? [fs.width, fs.height] : null, bossSheet: bs ? [bs.width, bs.height] : null, vfxIce: ART.vfxIce ? [ART.vfxIce.width, ART.vfxIce.height] : null, vfxFire: ART.vfxFire ? [ART.vfxFire.width, ART.vfxFire.height] : null };
+      return { world: state.world, px: state.px, py: state.py, camX: state.camX, camY: state.camY, facing: state.facing, wearIndex: state.wearIndex, world2Open: !!state.world2Open, world3Open: !!state.world3Open, wearUnlocked: Object.keys(state.unlockedWear), bank0: currentBank()[0], bankN: currentBank().length, bankWord: currentBank()[0], foeSheet: fs ? [fs.width, fs.height] : null, bossSheet: bs ? [bs.width, bs.height] : null, vfxIce: ART.vfxIce ? [ART.vfxIce.width, ART.vfxIce.height] : null, vfxFire: ART.vfxFire ? [ART.vfxFire.width, ART.vfxFire.height] : null, saved: !!(function(){try{return localStorage.getItem(SAVE_KEY)}catch(e){return null}})(), saveHud: (el.saveStatus && el.saveStatus.textContent) || "" };
     };
   } catch (eKid) {}
   function ensureWorldFromUrl() {
-    /* Never re-spawn to west-gate if we are already on that world (save / walk). */
-    if ((BOOT_WORLD === "frost" || wantFrost()) && state.world !== "frost") {
-      enterFrost({ silent: true });
-    } else if (BOOT_WORLD && BOOT_WORLD !== "meadow" && state.world !== BOOT_WORLD) {
-      enterWorld(BOOT_WORLD, { silent: true, spawn: "west" });
+    /* Vis-QA URL flags may snap world. Kid save must not be yanked back to BOOT_WORLD on pageshow. */
+    if (visWorldFlag()) {
+      if ((BOOT_WORLD === "frost" || wantFrost()) && state.world !== "frost") {
+        enterFrost({ silent: true });
+      } else if (BOOT_WORLD && BOOT_WORLD !== "meadow" && state.world !== BOOT_WORLD) {
+        enterWorld(BOOT_WORLD, { silent: true, spawn: "west" });
+      }
     }
     updateCamera();
     if (currentTiles() && (currentFoeSheet() || ART.foes) && ART.walk) {
@@ -2666,6 +2740,9 @@
     ensureWorldFromUrl();
   });
   window.addEventListener("pagehide", function () {
+    writeSave();
+  });
+  window.addEventListener("beforeunload", function () {
     writeSave();
   });
   document.addEventListener("visibilitychange", function () {

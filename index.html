@@ -32,7 +32,11 @@
           <button type="button" id="mode-match" class="mode-btn" role="tab" aria-selected="false">Pick word</button>
         </div>
       </div>
-      <button type="button" class="btn-newgame" id="btn-newgame">New game</button>
+      <div class="save-hud" id="save-hud">
+        <span class="save-status hidden" id="save-status" aria-live="polite"></span>
+        <button type="button" class="btn-continue hidden" id="btn-continue">Continue</button>
+        <button type="button" class="btn-newgame" id="btn-newgame">New game</button>
+      </div>
     </header>
 
     <main class="view" id="view-overworld">
