@@ -132,7 +132,7 @@
 .btn-wear:not(.locked){opacity:1;filter:none;background:#ffe082;border-color:#ef6c00;pointer-events:auto;}
 .btn-wear.locked{pointer-events:auto;}
 .hero-wear{
-  position:absolute;left:50%;top:-2px;width:40px;height:36px;margin-left:-20px;
+  position:absolute;left:50%;top:-8px;width:52px;height:48px;margin-left:-26px;
   background-repeat:no-repeat;background-size:contain;background-position:center bottom;
   image-rendering:pixelated;pointer-events:none;z-index:5;
 }

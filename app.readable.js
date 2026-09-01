@@ -478,6 +478,10 @@
     chipShine: document.getElementById("chip-shine"),
     chipMelody: document.getElementById("chip-melody"),
     btnWear: document.getElementById("btn-wear"),
+    closet: document.getElementById("closet"),
+    closetGrid: document.getElementById("closet-grid"),
+    closetNone: document.getElementById("closet-none"),
+    closetClose: document.getElementById("closet-close"),
     btnNewgame: document.getElementById("btn-newgame"),
     saveStatus: document.getElementById("save-status"),
     btnContinue: document.getElementById("btn-continue"),
@@ -1779,9 +1783,9 @@
     if (state.wearIndex >= 0) {
       const icon = ART.wearIcons && ART.wearIcons[state.wearIndex];
       if (icon && (icon.width || 0) > 2) {
-        const aw = 22;
-        const ah = Math.max(14, Math.round(aw * ((icon.height || 1) / (icon.width || 1))));
-        drawSheetFrame(icon, 0, 0, icon.width, icon.height, dx + (dw - aw) / 2, dy - 9, aw, ah);
+        const aw = 28;
+        const ah = Math.max(20, Math.round(aw * ((icon.height || 1) / (icon.width || 1))));
+        drawSheetFrame(icon, 0, 0, icon.width, icon.height, dx + (dw - aw) / 2, dy - 14, aw, ah);
       }
     }
   }
@@ -1816,6 +1820,7 @@
     talkBlockUntil = Date.now() + 1000;
     if (state.scene !== "overworld") return;
     if (!el.dialogue.classList.contains("hidden")) return;
+    if (closetOpen()) return;
 
     if (dy < 0) state.facing = "up";
     else if (dy > 0) state.facing = "down";
@@ -2055,23 +2060,80 @@
     updatePowerHud();
     scheduleSave();
     if (state.scene === "overworld") drawWorld();
+    if (closetOpen()) paintCloset();
   }
-  function cycleWear() {
-    const unlocked = COSMETICS.filter(function (c) { return state.unlockedWear[c.id]; });
-    if (!unlocked.length) {
-      if (el.worldHint) el.worldHint.textContent = "Clear a Bloop to unlock a look!";
+  function closetOpen() {
+    return !!(el.closet && !el.closet.classList.contains("hidden"));
+  }
+  function paintCloset() {
+    const grid = el.closetGrid || document.getElementById("closet-grid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    COSMETICS.forEach(function (c) {
+      const earned = !!state.unlockedWear[c.id];
+      const on = state.wearIndex === c.frame;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "closet-slot" + (earned ? "" : " locked") + (on ? " on" : "");
+      btn.setAttribute("aria-label", c.name + (earned ? "" : " locked"));
+      const thumb = document.createElement("span");
+      thumb.className = "closet-thumb";
+      const icon = ART.wearIcons && ART.wearIcons[c.frame];
+      if (earned && icon && icon.toDataURL) {
+        thumb.style.backgroundImage = 'url("' + icon.toDataURL("image/png") + '")';
+      }
+      const lab = document.createElement("span");
+      lab.className = "closet-name";
+      lab.textContent = c.name;
+      btn.appendChild(thumb);
+      btn.appendChild(lab);
+      const tap = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        pickWear(c.frame);
+      };
+      btn.addEventListener("pointerdown", tap);
+      btn.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); });
+      grid.appendChild(btn);
+    });
+    if (el.closetNone) el.closetNone.classList.toggle("on", state.wearIndex < 0);
+  }
+  function openCloset() {
+    if (!el.closet) return;
+    if (closetOpen()) {
+      closeCloset();
       return;
     }
-    const frames = [-1].concat(unlocked.map(function (c) { return c.frame; }));
-    let i = frames.indexOf(state.wearIndex);
-    if (i < 0) i = 0;
-    i = (i + 1) % frames.length;
-    state.wearIndex = frames[i];
+    paintCloset();
+    el.closet.classList.remove("hidden");
+    if (el.dpad) el.dpad.classList.add("hidden");
+  }
+  function closeCloset() {
+    if (el.closet) el.closet.classList.add("hidden");
+    if (el.dpad) el.dpad.classList.remove("hidden");
+  }
+  function pickWear(frame) {
+    if (frame >= 0) {
+      const c = COSMETICS.filter(function (x) { return x.frame === frame; })[0];
+      if (!c || !state.unlockedWear[c.id]) {
+        if (el.worldHint) el.worldHint.textContent = "Win a foe in " + saveWorldLabel(c && c.world) + " to earn this!";
+        return;
+      }
+      state.wearIndex = state.wearIndex === frame ? -1 : frame;
+    } else {
+      state.wearIndex = -1;
+    }
     applyWearArt();
     scheduleSave();
+    paintCloset();
     const named = COSMETICS.filter(function (c) { return c.frame === state.wearIndex; })[0];
     if (el.worldHint) el.worldHint.textContent = state.wearIndex < 0 ? "Look off" : (named ? named.name : "Look");
     if (state.scene === "overworld") drawWorld();
+    if (closetOpen()) paintCloset();
+  }
+  function cycleWear() {
+    openCloset();
   }
   function ensureHeroWear() {
     let n = document.getElementById("hero-wear");
@@ -2136,6 +2198,10 @@
     if (state.scene !== "overworld") return;
     if (!el.dialogue.classList.contains("hidden")) {
       closeDialogue();
+      return;
+    }
+    if (closetOpen()) {
+      closeCloset();
       return;
     }
     const f = facingTile();
@@ -2591,6 +2657,24 @@
       continueFromSave();
     });
   }
+  if (el.closetNone) {
+    el.closetNone.addEventListener("pointerdown", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      pickWear(-1);
+    });
+    el.closetNone.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); });
+  }
+  if (el.closetClose) {
+    el.closetClose.addEventListener("pointerdown", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      closeCloset();
+    });
+    el.closetClose.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); });
+  }
   el.btnFlee.addEventListener("click", () => {
     if (state.busy) return;
     endFightToOverworld();
@@ -2676,6 +2760,15 @@
   });
 
   window.addEventListener("keydown", (e) => {
+    if (state.scene === "overworld" && closetOpen()) {
+      if (e.key === "Escape" || e.key === "Enter" || e.key === "q" || e.key === "Q") {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        closeCloset();
+      }
+      return;
+    }
     if (state.scene === "overworld" && !el.dialogue.classList.contains("hidden")) {
       if (e.key === "Enter" || e.key === " " || e.key === "e" || e.key === "E") {
         e.preventDefault();

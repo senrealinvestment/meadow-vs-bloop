@@ -51,6 +51,16 @@
         <button type="button" class="btn-confirm btn-sm" id="btn-dialogue">OK</button>
       </div>
 
+      <div class="closet hidden" id="closet" role="dialog" aria-label="Closet">
+        <p class="closet-title">Closet</p>
+        <p class="closet-hint">Tap a look you earned. Tap again or None to take it off.</p>
+        <div class="closet-grid" id="closet-grid"></div>
+        <div class="closet-actions">
+          <button type="button" class="closet-none" id="closet-none">None</button>
+          <button type="button" class="closet-close" id="closet-close">OK</button>
+        </div>
+      </div>
+
       <div class="dpad-wrap" style="display:flex;align-items:flex-end;justify-content:center;gap:0.75rem;">
       <div class="dpad" id="dpad" aria-label="D-pad">
         <button type="button" class="dpad-btn" data-dir="up" aria-label="Up">▲</button>

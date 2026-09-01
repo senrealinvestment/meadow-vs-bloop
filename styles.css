@@ -141,11 +141,42 @@
 .btn-wear.locked{opacity:0.45;filter:grayscale(0.4);pointer-events:auto;}
 .btn-wear:active{transform:translateY(2px);box-shadow:0 2px 0 #5d4037;}
 .hero-wear{
-  position:absolute;left:50%;top:-2px;width:40px;height:36px;margin-left:-20px;
+  position:absolute;left:50%;top:-8px;width:52px;height:48px;margin-left:-26px;
   background-repeat:no-repeat;background-size:contain;background-position:center bottom;
   image-rendering:pixelated;pointer-events:none;z-index:5;
 }
 .hero-wear.hidden{display:none!important;}
+#view-overworld{position:relative;}
+.closet{
+  position:absolute;left:0.5rem;right:0.5rem;top:0.35rem;z-index:20;
+  background:#fff8e1;border:4px solid #5d4037;border-radius:16px;
+  padding:0.45rem 0.5rem 0.55rem;box-shadow:0 6px 0 #5d4037;
+}
+.closet.hidden{display:none!important;}
+.closet-title{margin:0;font-size:1.15rem;font-weight:900;text-align:center;color:#3e2723;}
+.closet-hint{margin:0.15rem 0 0.4rem;font-size:0.78rem;font-weight:700;text-align:center;color:#6d4c41;}
+.closet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.35rem;}
+.closet-slot{
+  display:flex;flex-direction:column;align-items:center;gap:0.15rem;
+  min-height:72px;padding:0.25rem;border:3px solid #8d6e63;border-radius:12px;
+  background:#fffde7;color:#3e2723;font-weight:800;cursor:pointer;touch-action:manipulation;
+}
+.closet-slot.on{border-color:#ef6c00;background:#ffe0b2;box-shadow:0 0 0 2px #ffcc80;}
+.closet-slot.locked{opacity:0.45;filter:grayscale(0.7);cursor:default;}
+.closet-thumb{
+  width:40px;height:40px;border-radius:8px;background:#efebe9 center/contain no-repeat;
+  image-rendering:pixelated;border:2px dashed #bcaaa4;
+}
+.closet-slot:not(.locked) .closet-thumb{border-style:solid;border-color:#8d6e63;background-color:#fff;}
+.closet-name{font-size:0.68rem;line-height:1.1;text-align:center;}
+.closet-actions{display:flex;gap:0.4rem;justify-content:center;margin-top:0.45rem;}
+.closet-none,.closet-close{
+  min-height:40px;padding:0.25rem 0.9rem;border:3px solid #5d4037;border-radius:12px;
+  font-weight:900;cursor:pointer;touch-action:manipulation;
+}
+.closet-none{background:#eceff1;color:#37474f;}
+.closet-none.on{background:#cfd8dc;border-color:#37474f;}
+.closet-close{background:#c8e6c9;color:#1b5e20;}
 #app.world-ember .world-wrap{background:#e65100;}
 #app.world-ember #world{background:#bf360c;}
 #app.world-ember .title{color:#bf360c;}
