@@ -656,7 +656,9 @@
     foes: { r: 141, g: 160, b: 116, tol: 48 },
     boss: { r: 132, g: 158, b: 95, tol: 42 },
     npcs: { r: 156, g: 196, b: 127, tol: 48 },
-    vfxMag: { r: 219, g: 24, b: 195, tol: 52 },
+    sheetGreen: { r: 106, g: 170, b: 90, tol: 52 }, /* #6aaa5a concept-sheet green */
+    olive: { r: 138, g: 154, b: 110, tol: 40 },
+    vfxMag: { r: 219, g: 24, b: 195, tol: 58 },
   };
 
   function loadImageDirect(url) {
@@ -749,6 +751,106 @@
   function keyChroma(img, rgb, tol) {
     return keySheet(img, { r: rgb[0], g: rgb[1], b: rgb[2], tol: tol || 36 });
   }
+  function keyColors(img, chromas, opts) {
+    if (!img || !(img.width || img.naturalWidth)) return null;
+    const c = document.createElement("canvas");
+    c.width = img.naturalWidth || img.width;
+    c.height = img.naturalHeight || img.height;
+    const g = c.getContext("2d");
+    g.drawImage(img, 0, 0);
+    let data;
+    try { data = g.getImageData(0, 0, c.width, c.height); } catch (eK) { return img; }
+    const d = data.data;
+    const cr = d[0], cg = d[1], cb = d[2], ca = d[3];
+    const cornerTol = (opts && opts.cornerTol) || 40;
+    const mag = !!(opts && opts.magenta);
+    const list = chromas || [];
+    for (let i = 0; i < d.length; i += 4) {
+      const r = d[i], gv = d[i + 1], b = d[i + 2], a = d[i + 3];
+      if (a < 8) continue;
+      let hit = false;
+      for (let k = 0; k < list.length; k++) {
+        const ch = list[k];
+        const tol = ch.tol || 40;
+        if (Math.abs(r - ch.r) <= tol && Math.abs(gv - ch.g) <= tol && Math.abs(b - ch.b) <= tol) {
+          hit = true;
+          break;
+        }
+      }
+      if (!hit && ca > 8 && Math.abs(r - cr) <= cornerTol && Math.abs(gv - cg) <= cornerTol && Math.abs(b - cb) <= cornerTol) {
+        hit = true;
+      }
+      if (!hit && mag && r > 140 && b > 110 && gv < 110 && r > gv + 30 && b > gv + 30) {
+        hit = true;
+      }
+      if (hit) d[i + 3] = 0;
+    }
+    g.putImageData(data, 0, 0);
+    return c;
+  }
+  function keyConceptGreen(img) {
+    return keyColors(img, [CHROMA.sheetGreen, CHROMA.olive, CHROMA.foes, CHROMA.boss]) || img;
+  }
+  function keyMagenta(img) {
+    return keyColors(img, [CHROMA.vfxMag, { r: 205, g: 35, b: 183, tol: 48 }], { magenta: true, cornerTol: 48 }) || img;
+  }
+  function canvasSlice(img, sx, sy, sw, sh) {
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, sw);
+    c.height = Math.max(1, sh);
+    const g = c.getContext("2d");
+    g.imageSmoothingEnabled = false;
+    g.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+    return c;
+  }
+  function splitVfxCombo(img) {
+    if (!img || !(img.width || img.naturalWidth)) return { ice: null, fire: null };
+    const keyed = keyMagenta(img);
+    const w = keyed.width || keyed.naturalWidth;
+    const h = keyed.height || keyed.naturalHeight;
+    const hw = Math.max(1, Math.floor(w / 2));
+    return {
+      ice: cropOpaqueSprite(canvasSlice(keyed, 0, 0, hw, h)),
+      fire: cropOpaqueSprite(canvasSlice(keyed, hw, 0, w - hw, h)),
+    };
+  }
+  function packFoeCells(col) {
+    if (!col) return null;
+    if (col._foeReady) return col;
+    const w = col.width || col.naturalWidth || 0;
+    const h = col.height || col.naturalHeight || 0;
+    if (w < 8 || h < 8) return col;
+    const mid = Math.max(1, Math.floor(h / 2));
+    const idle = cropOpaqueSprite(canvasSlice(col, 0, 0, w, mid));
+    const hit = cropOpaqueSprite(canvasSlice(col, 0, mid, w, h - mid));
+    const ow = Math.max(idle.width || 1, hit.width || 1);
+    const oh = Math.max(idle.height || 1, hit.height || 1);
+    const out = document.createElement("canvas");
+    out.width = ow;
+    out.height = oh * 2;
+    const g = out.getContext("2d");
+    g.imageSmoothingEnabled = false;
+    /* Bottom-align in each row so feet sit on the tile — no concept padding. */
+    g.drawImage(idle, Math.floor((ow - idle.width) / 2), oh - idle.height, idle.width, idle.height);
+    g.drawImage(hit, Math.floor((ow - hit.width) / 2), oh * 2 - hit.height, hit.width, hit.height);
+    out._foeReady = true;
+    out._fluffCrop = true;
+    out._bossCrop = true;
+    return out;
+  }
+  function prepareFoeSheet(img) {
+    if (!img) return null;
+    if (img._foeReady) return img;
+    return packFoeCells(cropFluffColumn(keyConceptGreen(img)));
+  }
+  function prepareBossSheet(img) {
+    if (!img) return null;
+    return cropOpaqueSprite(keyConceptGreen(img));
+  }
+  function prepareVfxFrame(img) {
+    if (!img) return null;
+    return cropOpaqueSprite(keyMagenta(img));
+  }
   function keyOutfitSheet(img) {
     /* Olive atlas only. Do not key cream — that erases white daisy petals. */
     return keyChroma(img, [140, 156, 117], 44) || img;
@@ -837,33 +939,39 @@
         loadImage(assetUrl("npcs/elder-kid-sheet.png")),
         loadImage(assetUrl("bosses/ice_howl.png")),
         loadImage(assetUrl("worlds/frost/tiles.png")),
-        loadImage(assetUrl("foes/frost-bloop-fluff-sheet.png")),
+        loadImage(assetUrl("foes/frost-foes.png")),
         loadImage(assetUrl("outfits/sheet.png")),
         (bootId !== "meadow" && bootId !== "frost") ? loadImage(assetUrl("worlds/" + bootId + "/tiles.png")) : Promise.resolve(null),
-        loadImage(assetUrl("foes/ember-bloop-fluff-sheet.png")),
+        loadImage(assetUrl("foes/ember-foes.png")),
         loadImage(assetUrl("powers/ice/vfx.png")),
         loadImage(assetUrl("powers/fire/vfx.png")),
         loadImage(assetUrl("bosses/ember_maw.png")),
+        loadImage(assetUrl("powers/ice-fire-vfx.png")),
       ]);
-      const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12], bootTiles = packed[13], emberFoesImg = packed[14], iceVfx = packed[15], fireVfx = packed[16], emberMawImg = packed[17];
+      const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12], bootTiles = packed[13], emberFoesImg = packed[14], iceVfx = packed[15], fireVfx = packed[16], emberMawImg = packed[17], vfxCombo = packed[18];
       ART.walk = walk ? keySheet(walk, CHROMA.walk) || walk : (ART.walk || null);
       ART.cast = cast ? keySheet(cast, CHROMA.cast) || cast : (ART.cast || null);
-      ART.foes = foes ? cropFluffColumn(keySheet(foes, CHROMA.foes) || foes) : (ART.foes || null);
-      ART.boss = boss ? cropOpaqueSprite(keySheet(boss, CHROMA.boss) || boss) : (ART.boss || null);
+      ART.foes = foes ? prepareFoeSheet(foes) : (ART.foes || null);
+      ART.boss = boss ? prepareBossSheet(boss) : (ART.boss || null);
       ART.meadowTiles = tiles && (tiles.naturalWidth || tiles.width) ? tiles : (ART.meadowTiles || null);
       /* ART.tiles is set per-world below — never park meadow under frost/ember. */
       ART.icons = icons && (icons.naturalWidth || icons.width) ? icons : null;
       ART.vfx = vfx && (vfx.naturalWidth || vfx.width) ? vfx : null;
       ART.panel = panel && (panel.naturalWidth || panel.width) ? panel : null;
       ART.npcs = npcs ? keySheet(npcs, CHROMA.npcs) || npcs : (ART.npcs || null);
-      ART.iceHowl = iceHowl ? cropOpaqueSprite(keySheet(iceHowl, CHROMA.boss) || iceHowl) : null;
+      ART.iceHowl = iceHowl ? prepareBossSheet(iceHowl) : null;
       ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : (ART.frostTiles || null);
-      ART.frostFoes = frostFoes ? cropFluffColumn(keySheet(frostFoes, CHROMA.foes) || frostFoes) : (ART.frostFoes || null);
+      ART.frostFoes = frostFoes ? prepareFoeSheet(frostFoes) : (ART.frostFoes || null);
       ART.outfits = outfitImg ? keyOutfitSheet(outfitImg) : (ART.outfits || null);
-      ART.emberFoes = emberFoesImg ? cropFluffColumn(keySheet(emberFoesImg, CHROMA.foes) || emberFoesImg) : (ART.emberFoes || null);
-      ART.vfxIce = iceVfx ? keySheet(iceVfx, CHROMA.vfxMag) || iceVfx : (ART.vfxIce || null);
-      ART.vfxFire = fireVfx ? keySheet(fireVfx, CHROMA.vfxMag) || fireVfx : (ART.vfxFire || null);
-      ART.emberMaw = emberMawImg ? cropOpaqueSprite(keySheet(emberMawImg, CHROMA.boss) || emberMawImg) : (ART.emberMaw || null);
+      ART.emberFoes = emberFoesImg ? prepareFoeSheet(emberFoesImg) : (ART.emberFoes || null);
+      ART.vfxIce = iceVfx ? prepareVfxFrame(iceVfx) : (ART.vfxIce || null);
+      ART.vfxFire = fireVfx ? prepareVfxFrame(fireVfx) : (ART.vfxFire || null);
+      ART.emberMaw = emberMawImg ? prepareBossSheet(emberMawImg) : (ART.emberMaw || null);
+      if (vfxCombo && (!ART.vfxIce || !ART.vfxFire)) {
+        const split = splitVfxCombo(vfxCombo);
+        if (!ART.vfxIce) ART.vfxIce = split.ice;
+        if (!ART.vfxFire) ART.vfxFire = split.fire;
+      }
       ART.worldTiles = ART.worldTiles || {};
       ART.worldFoes = ART.worldFoes || {};
       ART.worldBoss = ART.worldBoss || {};
@@ -1202,7 +1310,7 @@
       }
       sheet = ART.worldFoes[id] || ART.emberFoes || ART.frostFoes || null;
     }
-    if (sheet && (sheet.width || 0) > (sheet.height || 0)) sheet = cropFluffColumn(sheet);
+    if (sheet && !sheet._foeReady && (sheet.width || 0) > (sheet.height || 0)) sheet = prepareFoeSheet(sheet);
     return sheet;
   }
   function currentBossSheet(artKey) {
@@ -2530,7 +2638,9 @@
   saveReady = true;
   try {
     window.__MVB_KID = function () {
-      return { world: state.world, px: state.px, py: state.py, camX: state.camX, camY: state.camY, facing: state.facing, wearIndex: state.wearIndex, world2Open: !!state.world2Open, world3Open: !!state.world3Open, wearUnlocked: Object.keys(state.unlockedWear), bank0: currentBank()[0], bankN: currentBank().length, bankWord: currentBank()[0] };
+      const fs = currentFoeSheet();
+      const bs = currentBossSheet(worldDef().bossId);
+      return { world: state.world, px: state.px, py: state.py, camX: state.camX, camY: state.camY, facing: state.facing, wearIndex: state.wearIndex, world2Open: !!state.world2Open, world3Open: !!state.world3Open, wearUnlocked: Object.keys(state.unlockedWear), bank0: currentBank()[0], bankN: currentBank().length, bankWord: currentBank()[0], foeSheet: fs ? [fs.width, fs.height] : null, bossSheet: bs ? [bs.width, bs.height] : null, vfxIce: ART.vfxIce ? [ART.vfxIce.width, ART.vfxIce.height] : null, vfxFire: ART.vfxFire ? [ART.vfxFire.width, ART.vfxFire.height] : null };
     };
   } catch (eKid) {}
   function ensureWorldFromUrl() {

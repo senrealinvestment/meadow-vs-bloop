@@ -68,13 +68,19 @@
       delete window.MEADOW_ASSET_EMBED["foes/bloop-fluff-sheet.png"];
       delete window.MEADOW_ASSET_EMBED["foes/frost-bloop-fluff-sheet.png"];
       delete window.MEADOW_ASSET_EMBED["foes/ember-bloop-fluff-sheet.png"];
+      delete window.MEADOW_ASSET_EMBED["foes/frost-foes.png"];
+      delete window.MEADOW_ASSET_EMBED["foes/ember-foes.png"];
       delete window.MEADOW_ASSET_EMBED["bosses/ice_howl.png"];
       delete window.MEADOW_ASSET_EMBED["bosses/star_bloom.png"];
+      delete window.MEADOW_ASSET_EMBED["bosses/ember_maw.png"];
       delete window.MEADOW_ASSET_EMBED["assets/foes/bloop-fluff-sheet.png"];
       delete window.MEADOW_ASSET_EMBED["assets/foes/frost-bloop-fluff-sheet.png"];
       delete window.MEADOW_ASSET_EMBED["assets/foes/ember-bloop-fluff-sheet.png"];
+      delete window.MEADOW_ASSET_EMBED["assets/foes/frost-foes.png"];
+      delete window.MEADOW_ASSET_EMBED["assets/foes/ember-foes.png"];
       delete window.MEADOW_ASSET_EMBED["assets/bosses/ice_howl.png"];
       delete window.MEADOW_ASSET_EMBED["assets/bosses/star_bloom.png"];
+      delete window.MEADOW_ASSET_EMBED["assets/bosses/ember_maw.png"];
     }
   }catch(eEmbDel){}
 
