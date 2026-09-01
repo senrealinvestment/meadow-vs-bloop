@@ -579,6 +579,7 @@
     emberMaw: null,
     vfxIce: null,
     vfxFire: null,
+    wearIcons: [],
     worldTiles: {},
     worldFoes: {},
     worldBoss: {},
@@ -857,6 +858,37 @@
     /* Olive atlas only. Do not key cream — that erases white daisy petals. */
     return keyChroma(img, [140, 156, 117], 44) || img;
   }
+  function buildWearIcons(sheet) {
+    ART.wearIcons = [];
+    if (!sheet) return;
+    for (let i = 0; i < OUTFIT_FRAMES.length; i++) {
+      const of = OUTFIT_FRAMES[i];
+      const c = document.createElement("canvas");
+      c.width = of[2];
+      c.height = of[3];
+      const g = c.getContext("2d");
+      g.imageSmoothingEnabled = false;
+      g.drawImage(sheet, of[0], of[1], of[2], of[3], 0, 0, of[2], of[3]);
+      let data;
+      try { data = g.getImageData(0, 0, c.width, c.height); } catch (eW) { ART.wearIcons[i] = c; continue; }
+      const d = data.data;
+      const w = c.width, h = c.height;
+      for (let p = 0; p < d.length; p += 4) {
+        const r = d[p], gv = d[p + 1], b = d[p + 2], a = d[p + 3];
+        if (a < 12) continue;
+        const x = (p / 4) % w, y = Math.floor((p / 4) / w);
+        const olive = Math.abs(r - 140) <= 50 && Math.abs(gv - 156) <= 50 && Math.abs(b - 117) <= 50;
+        const cream = r >= 232 && gv >= 200 && b >= 165 && b <= 212 && Math.abs(r - gv) <= 42;
+        const edge = x < 10 || y < 10 || x >= w - 10 || y >= h - 10;
+        const frame = edge && r < 190 && gv < 170 && b < 130;
+        if (olive || cream || frame) d[p + 3] = 0;
+      }
+      g.putImageData(data, 0, 0);
+      const inset = 10;
+      const inner = canvasSlice(c, inset, inset, Math.max(8, w - inset * 2), Math.max(8, h - inset * 2));
+      ART.wearIcons[i] = cropOpaqueSprite(inner);
+    }
+  }
   function cropOpaqueSprite(img) {
     if (!img || img._bossCrop) return img;
     const w = img.naturalWidth || img.width || 0;
@@ -965,6 +997,7 @@
       ART.frostTiles = frostTiles && (frostTiles.naturalWidth || frostTiles.width) ? frostTiles : (ART.frostTiles || null);
       ART.frostFoes = frostFoes ? prepareFoeSheet(frostFoes) : (ART.frostFoes || null);
       ART.outfits = outfitImg ? keyOutfitSheet(outfitImg) : (ART.outfits || null);
+      if (ART.outfits) buildWearIcons(ART.outfits);
       ART.emberFoes = emberFoesImg ? prepareFoeSheet(emberFoesImg) : (ART.emberFoes || null);
       ART.vfxIce = iceVfx ? prepareVfxFrame(iceVfx) : (ART.vfxIce || null);
       ART.vfxFire = fireVfx ? prepareVfxFrame(fireVfx) : (ART.vfxFire || null);
@@ -1414,7 +1447,11 @@
     if (el.chipShine) el.chipShine.classList.toggle("locked", !state.powers.shine);
     if (el.chipMelody) el.chipMelody.classList.toggle("locked", !state.powers.melody);
     el.btnWear = document.getElementById("btn-wear") || el.btnWear;
-    if (el.btnWear) el.btnWear.classList.toggle("locked", !Object.keys(state.unlockedWear).length);
+    if (el.btnWear) {
+      const locked = !Object.keys(state.unlockedWear).length;
+      el.btnWear.classList.toggle("locked", locked);
+      el.btnWear.style.pointerEvents = "auto";
+    }
   }
 
   function setMode(mode) {
@@ -1739,18 +1776,12 @@
       const fr = WALK_FRAMES[face][0];
       drawSheetFrame(ART.walk, fr[0], fr[1], fr[2], fr[3], dx, dy, dw, dh);
     }
-    if (state.wearIndex >= 0 && ART.outfits) {
-      const of = OUTFIT_FRAMES[state.wearIndex];
-      if (of) {
-        const padX = 18;
-        const padY = 22;
-        const sx = of[0] + padX;
-        const sy = of[1] + padY;
-        const sw = Math.max(8, of[2] - padX * 2);
-        const sh = Math.max(8, of[3] - padY * 2);
+    if (state.wearIndex >= 0) {
+      const icon = ART.wearIcons && ART.wearIcons[state.wearIndex];
+      if (icon && (icon.width || 0) > 2) {
         const aw = 22;
-        const ah = 20;
-        drawSheetFrame(ART.outfits, sx, sy, sw, sh, dx + (dw - aw) / 2, dy - 8, aw, ah);
+        const ah = Math.max(14, Math.round(aw * ((icon.height || 1) / (icon.width || 1))));
+        drawSheetFrame(icon, 0, 0, icon.width, icon.height, dx + (dw - aw) / 2, dy - 9, aw, ah);
       }
     }
   }
@@ -2019,10 +2050,11 @@
     const c = COSMETICS.filter(function (x) { return x.world === wid; })[0];
     if (!c) return;
     state.unlockedWear[c.id] = true;
-    if (state.wearIndex < 0) state.wearIndex = c.frame;
+    state.wearIndex = c.frame;
     applyWearArt();
     updatePowerHud();
     scheduleSave();
+    if (state.scene === "overworld") drawWorld();
   }
   function cycleWear() {
     const unlocked = COSMETICS.filter(function (c) { return state.unlockedWear[c.id]; });
@@ -2030,18 +2062,44 @@
       if (el.worldHint) el.worldHint.textContent = "Clear a Bloop to unlock a look!";
       return;
     }
-    const frames = unlocked.map(function (c) { return c.frame; });
+    const frames = [-1].concat(unlocked.map(function (c) { return c.frame; }));
     let i = frames.indexOf(state.wearIndex);
+    if (i < 0) i = 0;
     i = (i + 1) % frames.length;
     state.wearIndex = frames[i];
     applyWearArt();
     scheduleSave();
+    const named = COSMETICS.filter(function (c) { return c.frame === state.wearIndex; })[0];
+    if (el.worldHint) el.worldHint.textContent = state.wearIndex < 0 ? "Look off" : (named ? named.name : "Look");
     if (state.scene === "overworld") drawWorld();
   }
+  function ensureHeroWear() {
+    let n = document.getElementById("hero-wear");
+    if (!n && el.hero) {
+      n = document.createElement("div");
+      n.id = "hero-wear";
+      n.className = "hero-wear hidden";
+      el.hero.appendChild(n);
+    }
+    return n;
+  }
   function applyWearArt() {
-    if (!el.hero || state.wearIndex < 0) return;
-    /* Fight keeps the walk sprite. Closet look is painted on the overworld cat, not a floating hat plate. */
+    if (!el.hero) return;
+    const node = ensureHeroWear();
+    if (state.wearIndex < 0) {
+      el.hero.classList.remove("wear-look");
+      if (node) {
+        node.classList.add("hidden");
+        node.style.backgroundImage = "";
+      }
+      return;
+    }
     el.hero.classList.add("art-sprite", "wear-look");
+    const icon = ART.wearIcons && ART.wearIcons[state.wearIndex];
+    if (!node || !icon) return;
+    const url = icon.toDataURL ? icon.toDataURL("image/png") : "";
+    node.classList.remove("hidden");
+    node.style.backgroundImage = url ? 'url("' + url + '")' : "";
   }
   function openW3Message() {
     el.dialogueName.textContent = "World 3";
@@ -2507,10 +2565,16 @@
   });
   el.btnInteract.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); });
   if (el.btnWear) {
+    el.btnWear.addEventListener("pointerdown", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      cycleWear();
+    });
     el.btnWear.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      cycleWear();
+      e.stopImmediatePropagation();
     });
   }
   if (el.btnNewgame) {
@@ -2568,10 +2632,16 @@
     el.btnInteract.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); });
   }
   if (el.btnWear) {
+    el.btnWear.addEventListener("pointerdown", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      cycleWear();
+    });
     el.btnWear.addEventListener("click", function (e) {
       e.preventDefault();
       e.stopPropagation();
-      cycleWear();
+      e.stopImmediatePropagation();
     });
   }
   el.dpad.querySelectorAll("[data-dir]").forEach((btn) => {

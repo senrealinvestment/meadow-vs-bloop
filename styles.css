@@ -136,10 +136,16 @@
 .btn-wear{
   min-width:92px;min-height:56px;padding:0.45rem 0.85rem;border:4px solid #5d4037;border-radius:16px;
   background:#f3e5ab;color:#3e2723;font-size:1.35rem;font-weight:900;letter-spacing:0.08em;
-  box-shadow:0 4px 0 #5d4037;cursor:pointer;
+  box-shadow:0 4px 0 #5d4037;cursor:pointer;pointer-events:auto;touch-action:manipulation;
 }
-.btn-wear.locked{opacity:0.45;filter:grayscale(0.4);}
+.btn-wear.locked{opacity:0.45;filter:grayscale(0.4);pointer-events:auto;}
 .btn-wear:active{transform:translateY(2px);box-shadow:0 2px 0 #5d4037;}
+.hero-wear{
+  position:absolute;left:50%;top:-2px;width:40px;height:36px;margin-left:-20px;
+  background-repeat:no-repeat;background-size:contain;background-position:center bottom;
+  image-rendering:pixelated;pointer-events:none;z-index:5;
+}
+.hero-wear.hidden{display:none!important;}
 #app.world-ember .world-wrap{background:#e65100;}
 #app.world-ember #world{background:#bf360c;}
 #app.world-ember .title{color:#bf360c;}
