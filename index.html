@@ -4,9 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Sparkelody — Worlds 1-9 (ladder preview)</title>
-  <!-- Branch preview uses same-origin. Main vis pin stays 3337fad7 until renderer PASS. Not GREEN. -->
-  <link rel="stylesheet" href="styles.css" />
-  <link rel="stylesheet" href="art-hotswap.css" />
+  <!-- Same-origin default so a Vercel deploy of THIS branch IS the game (no jsDelivr).
+       Sergio's production play pin is still 7179fc44 (old dual-renderer). This branch is the fix.
+       Optional: ?t=<sha> loads that commit from jsDelivr. Bad pins (7179fc44 / 3337fad7) stay local. Not GREEN. -->
+  <link rel="stylesheet" href="styles.css" id="css-main" />
+  <link rel="stylesheet" href="art-hotswap.css" id="css-art" />
 </head>
 <body>
   <div id="app">
@@ -178,7 +180,31 @@
     }
   })();
   </script>
-  <script>window.MEADOW_JS_BASE="./";window.MEADOW_ASSET_BASE="assets";</script>
-  <script src="app.js" data-base="./"></script>
+  <script>
+  (function(){
+    var t = (location.search.match(/[?&]t=([0-9a-f]{7,40})/i) || [])[1];
+    var bad = t && /^(7179fc44|3337fad7|abb35df|e67a272|ec1612a|f8cc728|602d866|fdb8141)/i.test(t);
+    if (t && !bad) {
+      var cdn = "https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@" + t + "/";
+      window.MEADOW_JS_BASE = cdn;
+      window.MEADOW_ASSET_BASE = cdn + "assets";
+      var m = document.getElementById("css-main");
+      var a = document.getElementById("css-art");
+      if (m) m.href = cdn + "styles.css";
+      if (a) a.href = cdn + "art-hotswap.css";
+      var s = document.createElement("script");
+      s.src = cdn + "app.js";
+      s.setAttribute("data-base", cdn);
+      document.body.appendChild(s);
+      return;
+    }
+    window.MEADOW_JS_BASE = "./";
+    window.MEADOW_ASSET_BASE = "assets";
+    var s2 = document.createElement("script");
+    s2.src = "app.js";
+    s2.setAttribute("data-base", "./");
+    document.body.appendChild(s2);
+  })();
+  </script>
 </body>
 </html>

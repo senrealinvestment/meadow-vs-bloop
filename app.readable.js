@@ -506,17 +506,32 @@
     btnFlee: document.getElementById("btn-flee"),
   };
 
-  /* Kill the bad path: clone #world so a leftover p-chain ctx paints a detached node. */
+  /* One live canvas. Steal #world back if a leftover IIFE swapped it. Never paint a detached node. */
+  let ctx = null;
+  function rebindLiveCanvas() {
+    var live = document.getElementById("world");
+    if (!live) return false;
+    el.canvas = live;
+    live.dataset.pixelLock = "1";
+    live.classList.remove("art-wait");
+    ctx = live.getContext("2d");
+    return !!ctx;
+  }
   (function lockPixelCanvas() {
     const old = el.canvas || document.getElementById("world");
-    if (!old || old.dataset.pixelLock === "1") return;
+    if (!old) return;
+    if (old.dataset.pixelLock === "1") {
+      rebindLiveCanvas();
+      return;
+    }
     const neu = old.cloneNode(false);
     neu.dataset.pixelLock = "1";
     neu.classList.add("art-wait");
     if (old.parentNode) old.parentNode.replaceChild(neu, old);
     el.canvas = neu;
+    ctx = neu.getContext("2d");
   })();
-  const ctx = el.canvas.getContext("2d");
+  if (!ctx) rebindLiveCanvas();
 
   /** Hot-swap pixel art — relative assets/ or CDN base via window.MEADOW_ASSET_BASE */
   const ASSET_BASE = (typeof window !== "undefined" && window.MEADOW_ASSET_BASE) || "assets";
@@ -1243,7 +1258,14 @@
     state.scene = name;
     el.viewOverworld.classList.toggle("hidden", name !== "overworld");
     el.viewFight.classList.toggle("hidden", name !== "fight");
-    if (name === "overworld" && ART.locked) drawWorld();
+    if (name === "overworld") {
+      rebindLiveCanvas();
+      updateCamera();
+      if (ART.walk && currentTiles() && (currentFoeSheet() || ART.foes)) {
+        ART.locked = true;
+        drawWorld();
+      }
+    }
   }
 
   function updateCamera() {
@@ -1368,6 +1390,7 @@
   }
 
   function drawWorld() {
+    if (!rebindLiveCanvas() || !ctx) return;
     updateCamera();
     syncWorldFromUrl();
     updateCamera();
@@ -2230,8 +2253,17 @@
     state.busy = false;
     state.won = false;
     state.encounter = null;
-    el.winOverlay.classList.add("hidden");
+    if (el.winOverlay) el.winOverlay.classList.add("hidden");
+    if (el.bloop) {
+      el.bloop.classList.remove("gone", "hit", "wiggle");
+      el.bloop.classList.add("art-sprite");
+    }
+    rebindLiveCanvas();
+    updateCamera();
+    /* Stay on the Pixel path. Never preload/eval a second IIFE after a fight. */
+    ART.locked = !!(ART.walk && currentTiles() && (currentFoeSheet() || ART.foes));
     showScene("overworld");
+    if (state.scene === "overworld") drawWorld();
     updatePowerHud();
     applyWearArt();
     scheduleSave();

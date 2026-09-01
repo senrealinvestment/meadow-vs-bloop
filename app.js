@@ -42,6 +42,10 @@
           continue;
         }
         if(window.__MVB_BOOTED && /app\.(q|p)\d/.test(url)) return true;
+        if(/__MEADOW_ART_BOOT/.test(t) && /createElement\(["']script["']\)/.test(t)){
+          console.error("meadow: blocked reboot IIFE", url);
+          return true;
+        }
         (0,eval)(t);
         return true;
       }catch(e){
@@ -54,8 +58,8 @@
     return false;
   }
 
-  /* Essential embeds only — skip a0–a26 and the 20-chunk q chain (that stall after q12 in real Chrome). */
-  var embeds=["embed-tiles.js","embed-npcs.js","embed-walk.js","embed-cast.js","asset-boss.js"];
+  /* Essential embeds only. Never asset-boss.js (that file injected a CDN second IIFE on old pins). */
+  var embeds=["embed-tiles.js","embed-npcs.js","embed-walk.js","embed-cast.js"];
   await Promise.all(embeds.map(function(f){ return tryLoad(base+f, 10000); }));
 
   try{

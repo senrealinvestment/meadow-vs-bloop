@@ -21,7 +21,7 @@ Literacy-first overworld + read-to-hit fights. CVC only.
 
 ## Branch ladder (not GREEN)
 
-`feat/full-ladder-cosmetics` — Worlds 1–9 playable with official banks. Same-origin `index.html` on this branch (not a production pin). Live vis pin on main stays `3337fad7`. GREEN hold remains `7179fc44`.
+`feat/full-ladder-cosmetics` — Worlds 1–9 playable with official banks. Same-origin `index.html` on this branch so a Vercel deploy of the branch **is** the game (no jsDelivr). Optional `?t=<sha>` loads that commit from jsDelivr. **Sergio's Vercel play pin is still `7179fc44` (old dual-renderer).** This branch is the fix. Live vis pin on main stays `3337fad7`. GREEN hold remains `7179fc44`. Do not treat this PR as GREEN.
 
 - W3 Ember Grove `?w3=1` — CVC mastery, Ember Maw, Fire
 - W4 Leaf Hollow `?w4=1` — 4-letter closed, Thorn Crown, Leaf
