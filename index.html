@@ -3,9 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Sparkelody — Meadow World 1 (Phase 3)</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@3337fad7092838be4eddd1f497c10abaec5e6594/styles.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@3337fad7092838be4eddd1f497c10abaec5e6594/art-hotswap.css" />
+  <title>Sparkelody — Worlds 1-9 (ladder preview)</title>
+  <!-- Same-origin default so a Vercel deploy of THIS branch IS the game (no jsDelivr).
+       Sergio's production play pin is still 7179fc44 (old dual-renderer). This branch is the fix.
+       Optional: ?t=<sha> loads that commit from jsDelivr. Bad pins (7179fc44 / 3337fad7) stay local. Not GREEN. -->
+  <link rel="stylesheet" href="styles.css" id="css-main" />
+  <link rel="stylesheet" href="art-hotswap.css" id="css-art" />
 </head>
 <body>
   <div id="app">
@@ -15,14 +18,24 @@
       <div class="hud-row">
         <div class="power-hud" id="power-hud" aria-label="Powers">
           <span class="power-chip star locked" id="chip-star" title="Star">⭐</span>
+          <span class="power-chip ice locked" id="chip-ice" title="Ice">❄️</span>
+          <span class="power-chip fire locked" id="chip-fire" title="Fire">🔥</span>
           <span class="power-chip leaf locked" id="chip-leaf" title="Leaf">🍃</span>
           <span class="power-chip wind locked" id="chip-wind" title="Wind">💨</span>
-          <span class="power-chip ice locked" id="chip-ice" title="Ice">❄️</span>
+          <span class="power-chip water locked" id="chip-water" title="Water">💧</span>
+          <span class="power-chip electric locked" id="chip-electric" title="Electric">⚡</span>
+          <span class="power-chip shine locked" id="chip-shine" title="Shine">✨</span>
+          <span class="power-chip melody locked" id="chip-melody" title="Melody">🎵</span>
         </div>
         <div class="mode-toggle" role="tablist" aria-label="Success mode">
           <button type="button" id="mode-confirm" class="mode-btn active" role="tab" aria-selected="true">Confirm</button>
           <button type="button" id="mode-match" class="mode-btn" role="tab" aria-selected="false">Pick word</button>
         </div>
+      </div>
+      <div class="save-hud" id="save-hud">
+        <span class="save-status hidden" id="save-status" aria-live="polite"></span>
+        <button type="button" class="btn-continue hidden" id="btn-continue">Continue</button>
+        <button type="button" class="btn-newgame" id="btn-newgame">New game</button>
       </div>
     </header>
 
@@ -38,6 +51,16 @@
         <button type="button" class="btn-confirm btn-sm" id="btn-dialogue">OK</button>
       </div>
 
+      <div class="closet hidden" id="closet" role="dialog" aria-label="Closet">
+        <p class="closet-title">Closet</p>
+        <p class="closet-hint">Tap a look you earned. Tap again or None to take it off.</p>
+        <div class="closet-grid" id="closet-grid"></div>
+        <div class="closet-actions">
+          <button type="button" class="closet-none" id="closet-none">None</button>
+          <button type="button" class="closet-close" id="closet-close">OK</button>
+        </div>
+      </div>
+
       <div class="dpad-wrap" style="display:flex;align-items:flex-end;justify-content:center;gap:0.75rem;">
       <div class="dpad" id="dpad" aria-label="D-pad">
         <button type="button" class="dpad-btn" data-dir="up" aria-label="Up">▲</button>
@@ -48,6 +71,7 @@
         <button type="button" class="dpad-btn" data-dir="down" aria-label="Down">▼</button>
       </div>
       <button type="button" class="dpad-btn dpad-interact" id="btn-interact" aria-label="Talk">💬</button>
+      <button type="button" class="btn-wear locked" id="btn-wear" aria-label="Wear">WEAR</button>
       </div>
     </main>
 
@@ -65,7 +89,7 @@
         </div>
 
         <div class="actors">
-          <div class="hero sparkelody" id="hero" title="Sparkelody">
+          <div class="hero sparkelody art-sprite" id="hero" title="Sparkelody">
             <div class="cat-ear left"></div>
             <div class="cat-ear right"></div>
             <div class="cat-head">
@@ -77,6 +101,7 @@
             <div class="cat-tail"></div>
             <div class="cat-collar"><span class="cat-charm"></span></div>
             <div class="hero-label">Sparkelody</div>
+            <div class="hero-wear hidden" id="hero-wear"></div>
           </div>
 
           <div class="chest hidden" id="chest" title="Treasure chest">
@@ -86,7 +111,7 @@
             <div class="chest-label">Chest</div>
           </div>
 
-          <div class="bloop art-sprite" id="bloop" title="Foe">
+          <div class="bloop art-sprite" id="bloop" title="Foe" style="background-color:transparent">
             <div class="bloop-body">
               <div class="bloop-eye left"></div>
               <div class="bloop-eye right"></div>
@@ -136,22 +161,65 @@
   </div>
   <script>
   (function(){
-    if (/[?&](w2|frost)=1/.test(location.search)) {
-      window.MEADOW_START_FROST=true;
+    var m = location.search.match(/[?&](w[2-9]|frost|ember|leaf|wind|tide|storm|harmony|story)=1/);
+    var worlds = {
+      w2:["world-frost","Loading Frost Path…","#90caf9","#0d47a1","Sparkelody · World 2 Frost Path"],
+      frost:["world-frost","Loading Frost Path…","#90caf9","#0d47a1","Sparkelody · World 2 Frost Path"],
+      w3:["world-ember","Loading Ember Grove…","#bf360c","#fff3e0","Sparkelody · World 3 Ember Grove"],
+      ember:["world-ember","Loading Ember Grove…","#bf360c","#fff3e0","Sparkelody · World 3 Ember Grove"],
+      w4:["world-leaf","Loading Leaf Hollow…","#2e7d32","#e8f5e9","Sparkelody · World 4 Leaf Hollow"],
+      leaf:["world-leaf","Loading Leaf Hollow…","#2e7d32","#e8f5e9","Sparkelody · World 4 Leaf Hollow"],
+      w5:["world-wind","Loading Windy Ridge…","#455a64","#eceff1","Sparkelody · World 5 Windy Ridge"],
+      wind:["world-wind","Loading Windy Ridge…","#455a64","#eceff1","Sparkelody · World 5 Windy Ridge"],
+      w6:["world-tide","Loading Tide Pools…","#0277bd","#e1f5fe","Sparkelody · World 6 Tide Pools"],
+      tide:["world-tide","Loading Tide Pools…","#0277bd","#e1f5fe","Sparkelody · World 6 Tide Pools"],
+      w7:["world-storm","Loading Storm Peak…","#311b92","#ede7f6","Sparkelody · World 7 Storm Peak"],
+      storm:["world-storm","Loading Storm Peak…","#311b92","#ede7f6","Sparkelody · World 7 Storm Peak"],
+      w8:["world-harmony","Loading Harmony Hill…","#f6c26b","#4a148c","Sparkelody · World 8 Harmony Hill"],
+      harmony:["world-harmony","Loading Harmony Hill…","#f6c26b","#4a148c","Sparkelody · World 8 Harmony Hill"],
+      w9:["world-story","Loading Story Gate…","#1a237e","#fff8e1","Sparkelody · World 9 Story Gate"],
+      story:["world-story","Loading Story Gate…","#1a237e","#fff8e1","Sparkelody · World 9 Story Gate"]
+    };
+    if (m && worlds[m[1]]) {
+      var w = worlds[m[1]];
+      if (m[1]==="w2" || m[1]==="frost") window.MEADOW_START_FROST=true;
+      window.MEADOW_START_WORLD = ({w2:"frost",frost:"frost",w3:"ember",ember:"ember",w4:"leaf",leaf:"leaf",w5:"wind",wind:"wind",w6:"tide",tide:"tide",w7:"storm",storm:"storm",w8:"harmony",harmony:"harmony",w9:"story",story:"story"})[m[1]] || "meadow";
       var app=document.getElementById("app");
-      if (app) app.classList.add("world-frost");
+      if (app) app.classList.add(w[0]);
       var n=document.getElementById("art-loader");
-      if (n) { n.textContent="Loading Frost Path…"; n.style.background="#90caf9"; n.style.color="#0d47a1"; }
+      if (n) { n.textContent=w[1]; n.style.background=w[2]; n.style.color=w[3]; }
       var title=document.querySelector(".title");
-      if (title) title.textContent="Sparkelody · World 2 Frost Path";
+      if (title) title.textContent=w[4];
       var wrap=document.querySelector(".world-wrap");
-      if (wrap) wrap.style.background="#90caf9";
-      var c=document.getElementById("world");
-      if (c) c.style.background="#bbdefb";
+      if (wrap) wrap.style.background=w[2];
     }
   })();
   </script>
-  <script>window.MEADOW_JS_BASE="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@3337fad7092838be4eddd1f497c10abaec5e6594/";window.MEADOW_ASSET_BASE="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@3337fad7092838be4eddd1f497c10abaec5e6594/";</script>
-  <script src="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@3337fad7092838be4eddd1f497c10abaec5e6594/app.js?v=3337fad7092838be4eddd1f497c10abaec5e6594" data-base="https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@3337fad7092838be4eddd1f497c10abaec5e6594/"></script>
+  <script>
+  (function(){
+    var t = (location.search.match(/[?&]t=([0-9a-f]{7,40})/i) || [])[1];
+    var bad = t && /^(7179fc44|3337fad7|abb35df|e67a272|ec1612a|f8cc728|602d866|fdb8141)/i.test(t);
+    if (t && !bad) {
+      var cdn = "https://cdn.jsdelivr.net/gh/senrealinvestment/meadow-vs-bloop@" + t + "/";
+      window.MEADOW_JS_BASE = cdn;
+      window.MEADOW_ASSET_BASE = cdn + "assets";
+      var m = document.getElementById("css-main");
+      var a = document.getElementById("css-art");
+      if (m) m.href = cdn + "styles.css";
+      if (a) a.href = cdn + "art-hotswap.css";
+      var s = document.createElement("script");
+      s.src = cdn + "app.js";
+      s.setAttribute("data-base", cdn);
+      document.body.appendChild(s);
+      return;
+    }
+    window.MEADOW_JS_BASE = "./";
+    window.MEADOW_ASSET_BASE = "assets";
+    var s2 = document.createElement("script");
+    s2.src = "app.js";
+    s2.setAttribute("data-base", "./");
+    document.body.appendChild(s2);
+  })();
+  </script>
 </body>
 </html>
