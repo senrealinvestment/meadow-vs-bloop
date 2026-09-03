@@ -132,8 +132,9 @@
 .btn-wear:not(.locked){opacity:1;filter:none;background:#ffe082;border-color:#ef6c00;pointer-events:auto;}
 .btn-wear.locked{pointer-events:auto;}
 .hero-wear{
-  position:absolute;left:50%;top:-8px;width:52px;height:48px;margin-left:-26px;
-  background-repeat:no-repeat;background-size:contain;background-position:center bottom;
+  position:absolute;left:50%;top:-14px;width:72px;height:68px;margin-left:-36px;
+  background-color:#fff8e1;background-repeat:no-repeat;background-size:contain;background-position:center bottom;
+  border:3px solid #3e2723;border-radius:12px;
   image-rendering:pixelated;pointer-events:none;z-index:5;
 }
 .hero-wear.hidden{display:none!important;}

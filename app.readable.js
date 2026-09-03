@@ -862,6 +862,50 @@
     /* Olive atlas only. Do not key cream — that erases white daisy petals. */
     return keyChroma(img, [140, 156, 117], 44) || img;
   }
+  function outlineWearIcon(src) {
+    if (!src) return src;
+    const pad = 2;
+    const sw = src.width || src.naturalWidth || 0;
+    const sh = src.height || src.naturalHeight || 0;
+    if (sw < 4 || sh < 4) return src;
+    const out = document.createElement("canvas");
+    out.width = sw + pad * 2;
+    out.height = sh + pad * 2;
+    const g = out.getContext("2d");
+    g.imageSmoothingEnabled = false;
+    g.drawImage(src, pad, pad);
+    let data;
+    try { data = g.getImageData(0, 0, out.width, out.height); } catch (eO) { return src; }
+    const d = data.data;
+    const ow = out.width, oh = out.height;
+    const mark = new Uint8Array(ow * oh);
+    for (let y = 0; y < oh; y++) {
+      for (let x = 0; x < ow; x++) {
+        if (d[(y * ow + x) * 4 + 3] > 12) mark[y * ow + x] = 1;
+      }
+    }
+    for (let y = 0; y < oh; y++) {
+      for (let x = 0; x < ow; x++) {
+        const i = y * ow + x;
+        if (mark[i]) continue;
+        let hit = false;
+        for (let dy = -pad; dy <= pad && !hit; dy++) {
+          for (let dx = -pad; dx <= pad; dx++) {
+            const nx = x + dx, ny = y + dy;
+            if (nx < 0 || ny < 0 || nx >= ow || ny >= oh) continue;
+            if (mark[ny * ow + nx]) { hit = true; break; }
+          }
+        }
+        if (hit) {
+          const p = i * 4;
+          d[p] = 62; d[p + 1] = 39; d[p + 2] = 35; d[p + 3] = 255;
+        }
+      }
+    }
+    g.putImageData(data, 0, 0);
+    out._bossCrop = true;
+    return out;
+  }
   function buildWearIcons(sheet) {
     ART.wearIcons = [];
     if (!sheet) return;
@@ -881,16 +925,16 @@
         const r = d[p], gv = d[p + 1], b = d[p + 2], a = d[p + 3];
         if (a < 12) continue;
         const x = (p / 4) % w, y = Math.floor((p / 4) / w);
+        /* Olive atlas + wood tray frame only. Keep cream so daisy petals / white scarf stay. */
         const olive = Math.abs(r - 140) <= 50 && Math.abs(gv - 156) <= 50 && Math.abs(b - 117) <= 50;
-        const cream = r >= 232 && gv >= 200 && b >= 165 && b <= 212 && Math.abs(r - gv) <= 42;
-        const edge = x < 10 || y < 10 || x >= w - 10 || y >= h - 10;
-        const frame = edge && r < 190 && gv < 170 && b < 130;
-        if (olive || cream || frame) d[p + 3] = 0;
+        const edge = x < 8 || y < 8 || x >= w - 8 || y >= h - 8;
+        const frame = edge && r < 160 && gv < 130 && b < 100;
+        if (olive || frame) d[p + 3] = 0;
       }
       g.putImageData(data, 0, 0);
-      const inset = 10;
+      const inset = 6;
       const inner = canvasSlice(c, inset, inset, Math.max(8, w - inset * 2), Math.max(8, h - inset * 2));
-      ART.wearIcons[i] = cropOpaqueSprite(inner);
+      ART.wearIcons[i] = outlineWearIcon(cropOpaqueSprite(inner));
     }
   }
   function cropOpaqueSprite(img) {
@@ -1783,9 +1827,12 @@
     if (state.wearIndex >= 0) {
       const icon = ART.wearIcons && ART.wearIcons[state.wearIndex];
       if (icon && (icon.width || 0) > 2) {
-        const aw = 28;
-        const ah = Math.max(20, Math.round(aw * ((icon.height || 1) / (icon.width || 1))));
-        drawSheetFrame(icon, 0, 0, icon.width, icon.height, dx + (dw - aw) / 2, dy - 14, aw, ah);
+        /* Kid-readable: bow/hat on the head, scarf on the neck. Cream plate stays in the icon. */
+        const aw = 36;
+        const ah = Math.max(30, Math.round(aw * ((icon.height || 1) / (icon.width || 1))));
+        const ax = dx + (dw - aw) / 2;
+        const ay = state.wearIndex === 1 ? dy + 2 : dy - 16;
+        drawSheetFrame(icon, 0, 0, icon.width, icon.height, ax, ay, aw, ah);
       }
     }
   }
@@ -2079,7 +2126,7 @@
       const thumb = document.createElement("span");
       thumb.className = "closet-thumb";
       const icon = ART.wearIcons && ART.wearIcons[c.frame];
-      if (earned && icon && icon.toDataURL) {
+      if (icon && icon.toDataURL) {
         thumb.style.backgroundImage = 'url("' + icon.toDataURL("image/png") + '")';
       }
       const lab = document.createElement("span");
