@@ -132,11 +132,12 @@
 .btn-wear:not(.locked){opacity:1;filter:none;background:#ffe082;border-color:#ef6c00;pointer-events:auto;}
 .btn-wear.locked{pointer-events:auto;}
 .hero-wear{
-  position:absolute;left:50%;top:-14px;width:72px;height:68px;margin-left:-36px;
-  background-color:#fff8e1;background-repeat:no-repeat;background-size:contain;background-position:center bottom;
-  border:3px solid #3e2723;border-radius:12px;
+  position:absolute;left:50%;top:-6px;width:24px;height:24px;margin-left:-12px;
+  background-color:transparent;background-repeat:no-repeat;background-size:contain;background-position:center bottom;
+  border:none;border-radius:0;
   image-rendering:pixelated;pointer-events:none;z-index:5;
 }
+.hero-wear.wear-neck{top:28px;}
 .hero-wear.hidden{display:none!important;}
 .save-hud{display:flex;align-items:center;justify-content:center;gap:0.4rem;margin:0.15rem 0 0;flex-wrap:wrap;}
 .save-status{font-size:0.85rem;font-weight:900;color:#1b5e20;background:#c8e6c9;border-radius:999px;padding:0.18rem 0.65rem;}

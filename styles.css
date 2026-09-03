@@ -141,11 +141,12 @@
 .btn-wear.locked{opacity:0.45;filter:grayscale(0.4);pointer-events:auto;}
 .btn-wear:active{transform:translateY(2px);box-shadow:0 2px 0 #5d4037;}
 .hero-wear{
-  position:absolute;left:50%;top:-14px;width:72px;height:68px;margin-left:-36px;
-  background-color:#fff8e1;background-repeat:no-repeat;background-size:contain;background-position:center bottom;
-  border:3px solid #3e2723;border-radius:12px;
+  position:absolute;left:50%;top:-6px;width:24px;height:24px;margin-left:-12px;
+  background-color:transparent;background-repeat:no-repeat;background-size:contain;background-position:center bottom;
+  border:none;border-radius:0;
   image-rendering:pixelated;pointer-events:none;z-index:5;
 }
+.hero-wear.wear-neck{top:28px;}
 .hero-wear.hidden{display:none!important;}
 #view-overworld{position:relative;}
 .closet{

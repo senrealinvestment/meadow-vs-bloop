@@ -862,6 +862,15 @@
     /* Olive atlas only. Do not key cream — that erases white daisy petals. */
     return keyChroma(img, [140, 156, 117], 44) || img;
   }
+  function isWearTray(r, gv, b, a, x, y, w, h) {
+    if (a < 12) return true;
+    if (Math.abs(r - 140) <= 50 && Math.abs(gv - 156) <= 50 && Math.abs(b - 117) <= 50) return true;
+    /* Warm cream/beige plate. Cooler white daisy petals (higher B) stay. */
+    if (r >= 220 && gv >= 185 && b >= 145 && b <= 205 && (r - b) >= 24 && Math.abs(r - gv) <= 45) return true;
+    const near = x < 10 || y < 10 || x >= w - 10 || y >= h - 10;
+    if (near && r < 180 && gv < 150 && b < 110) return true;
+    return false;
+  }
   function outlineWearIcon(src) {
     if (!src) return src;
     const pad = 2;
@@ -906,6 +915,75 @@
     out._bossCrop = true;
     return out;
   }
+  function floodKeyWearCell(c) {
+    const g = c.getContext("2d");
+    const w = c.width, h = c.height;
+    let data;
+    try { data = g.getImageData(0, 0, w, h); } catch (eF) { return c; }
+    const d = data.data;
+    const vis = new Uint8Array(w * h);
+    const q = [];
+    let qs = 0;
+    function push(x, y) {
+      if (x < 0 || y < 0 || x >= w || y >= h) return;
+      const i = y * w + x;
+      if (vis[i]) return;
+      const p = i * 4;
+      if (!isWearTray(d[p], d[p + 1], d[p + 2], d[p + 3], x, y, w, h)) return;
+      vis[i] = 1;
+      q.push(i);
+    }
+    for (let x = 0; x < w; x++) { push(x, 0); push(x, h - 1); }
+    for (let y = 0; y < h; y++) { push(0, y); push(w - 1, y); }
+    while (qs < q.length) {
+      const i = q[qs++];
+      const x = i % w, y = (i / w) | 0;
+      push(x + 1, y); push(x - 1, y); push(x, y + 1); push(x, y - 1);
+    }
+    const ring = 12;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = y * w + x;
+        if (vis[i] || x < ring || y < ring || x >= w - ring || y >= h - ring) d[i * 4 + 3] = 0;
+      }
+    }
+    g.putImageData(data, 0, 0);
+    return c;
+  }
+  function cropWearTight(img) {
+    if (!img) return img;
+    const w = img.width || 0, h = img.height || 0;
+    if (w < 4 || h < 4) return img;
+    const g = img.getContext("2d");
+    let data;
+    try { data = g.getImageData(0, 0, w, h); } catch (eT) { return img; }
+    const d = data.data;
+    let minx = w, miny = h, maxx = 0, maxy = 0;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        if (d[(y * w + x) * 4 + 3] > 12) {
+          if (x < minx) minx = x;
+          if (y < miny) miny = y;
+          if (x > maxx) maxx = x;
+          if (y > maxy) maxy = y;
+        }
+      }
+    }
+    if (maxx <= minx || maxy <= miny) return img;
+    const pad = 1;
+    minx = Math.max(0, minx - pad);
+    miny = Math.max(0, miny - pad);
+    maxx = Math.min(w - 1, maxx + pad);
+    maxy = Math.min(h - 1, maxy + pad);
+    const out = document.createElement("canvas");
+    out.width = maxx - minx + 1;
+    out.height = maxy - miny + 1;
+    const og = out.getContext("2d");
+    og.imageSmoothingEnabled = false;
+    og.drawImage(img, minx, miny, out.width, out.height, 0, 0, out.width, out.height);
+    out._bossCrop = true;
+    return out;
+  }
   function buildWearIcons(sheet) {
     ART.wearIcons = [];
     if (!sheet) return;
@@ -917,24 +995,8 @@
       const g = c.getContext("2d");
       g.imageSmoothingEnabled = false;
       g.drawImage(sheet, of[0], of[1], of[2], of[3], 0, 0, of[2], of[3]);
-      let data;
-      try { data = g.getImageData(0, 0, c.width, c.height); } catch (eW) { ART.wearIcons[i] = c; continue; }
-      const d = data.data;
-      const w = c.width, h = c.height;
-      for (let p = 0; p < d.length; p += 4) {
-        const r = d[p], gv = d[p + 1], b = d[p + 2], a = d[p + 3];
-        if (a < 12) continue;
-        const x = (p / 4) % w, y = Math.floor((p / 4) / w);
-        /* Olive atlas + wood tray frame only. Keep cream so daisy petals / white scarf stay. */
-        const olive = Math.abs(r - 140) <= 50 && Math.abs(gv - 156) <= 50 && Math.abs(b - 117) <= 50;
-        const edge = x < 8 || y < 8 || x >= w - 8 || y >= h - 8;
-        const frame = edge && r < 160 && gv < 130 && b < 100;
-        if (olive || frame) d[p + 3] = 0;
-      }
-      g.putImageData(data, 0, 0);
-      const inset = 6;
-      const inner = canvasSlice(c, inset, inset, Math.max(8, w - inset * 2), Math.max(8, h - inset * 2));
-      ART.wearIcons[i] = outlineWearIcon(cropOpaqueSprite(inner));
+      floodKeyWearCell(c);
+      ART.wearIcons[i] = outlineWearIcon(cropWearTight(c));
     }
   }
   function cropOpaqueSprite(img) {
@@ -1827,11 +1889,11 @@
     if (state.wearIndex >= 0) {
       const icon = ART.wearIcons && ART.wearIcons[state.wearIndex];
       if (icon && (icon.width || 0) > 2) {
-        /* Kid-readable: bow/hat on the head, scarf on the neck. Cream plate stays in the icon. */
-        const aw = 36;
-        const ah = Math.max(30, Math.round(aw * ((icon.height || 1) / (icon.width || 1))));
+        /* Small on the head only: max 16–18px, never a plate, never cover the body. */
+        const aw = Math.min(16, dw - 10);
+        const ah = Math.min(14, Math.max(10, Math.round(aw * ((icon.height || 1) / Math.max(1, icon.width)))));
         const ax = dx + (dw - aw) / 2;
-        const ay = state.wearIndex === 1 ? dy + 2 : dy - 16;
+        const ay = state.wearIndex === 1 ? dy + 14 : dy - ah + 4;
         drawSheetFrame(icon, 0, 0, icon.width, icon.height, ax, ay, aw, ah);
       }
     }
@@ -2208,6 +2270,7 @@
     if (!node || !icon) return;
     const url = icon.toDataURL ? icon.toDataURL("image/png") : "";
     node.classList.remove("hidden");
+    node.classList.toggle("wear-neck", state.wearIndex === 1);
     node.style.backgroundImage = url ? 'url("' + url + '")' : "";
   }
   function openW3Message() {
