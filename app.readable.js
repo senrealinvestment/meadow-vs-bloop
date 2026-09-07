@@ -1373,8 +1373,9 @@
   let saveTimer = 0;
   function visWorldFlag() {
     try {
-      var qs = (typeof location !== "undefined" && location.search) || "";
-      return /[?&](w2|frost|w3|ember|w4|leaf|w5|wind|w6|tide|w7|storm|w8|harmony|w9|story)=1/i.test(qs);
+      if (typeof window !== "undefined" && window.MEADOW_START_WORLD && window.MEADOW_START_WORLD !== "meadow") return true;
+      var qs = (typeof location !== "undefined" && (location.search || "") + (location.hash || "")) || "";
+      return /[?&#](w2|frost|w3|ember|w4|leaf|w5|wind|w6|tide|w7|storm|w8|harmony|w9|story)=1/i.test(qs);
     } catch (eVis) {
       return false;
     }
@@ -1407,11 +1408,11 @@
   const state = {
     scene: "overworld",
     mode: "confirm",
-    px: 16,
+    /* URL vis boots spawn west (2,14). Meadow kid spawn stays 16,14. Camera matches from frame 0. */
+    px: BOOT_WORLD && BOOT_WORLD !== "meadow" ? 2 : 16,
     py: 14,
     facing: "up",
-    /* Camera must match the hero from frame 0 — never start at 0,0 and snap on the first step. */
-    camX: Math.max(0, Math.min(COLS - VIEW_COLS, 16 - Math.floor(VIEW_COLS / 2))),
+    camX: Math.max(0, Math.min(COLS - VIEW_COLS, (BOOT_WORLD && BOOT_WORLD !== "meadow" ? 2 : 16) - Math.floor(VIEW_COLS / 2))),
     camY: Math.max(0, Math.min(ROWS - VIEW_ROWS, 14 - Math.floor(VIEW_ROWS / 2))),
     powers: { star: false, leaf: false, wind: false, ice: false, fire: false, water: false, electric: false, shine: false, melody: false },
     world: BOOT_WORLD || "meadow",
@@ -1672,7 +1673,7 @@
     return others[Math.floor(Math.random() * others.length)] || STRETCH_BANK[0];
   }
   function applyWorldChrome() {
-    const d = worldDef();
+    const d = (visWorldFlag() && BOOT_WORLD && WORLD_DEFS[BOOT_WORLD]) ? WORLD_DEFS[BOOT_WORLD] : worldDef();
     const app = document.getElementById("app");
     if (app) {
       app.className = (app.className || "").replace(/\bworld-\w+\b/g, "").replace(/\s+/g, " ").trim();
@@ -3084,29 +3085,36 @@
       resumed = true;
     }
   }
-  // Parse URL FIRST — before HUD/hints/showScene. Do not re-spawn over a resumed save.
-  var frostBoot = !resumed && BOOT_FROST;
-  if (frostBoot) {
+  function applyUrlWorldBoot(id) {
+    if (!id || id === "meadow") return;
+    const order = ["meadow", "frost", "ember", "leaf", "wind", "tide", "storm", "harmony", "story"];
+    const idx = order.indexOf(id);
+    for (let i = 0; i < idx; i++) {
+      const pd = WORLD_DEFS[order[i]];
+      if (pd && pd.power) state.powers[pd.power] = true;
+    }
+    state.world2Open = idx >= 1;
+    state.world3Open = idx >= 2;
+    if (id === "frost") {
+      state.powers.star = true;
+      enterFrost({ silent: true });
+    } else {
+      enterWorld(id, { silent: true, spawn: "west" });
+    }
+  }
+  // Vis-QA URL always wins over a kid save. Never paint Meadow over ?w3/?w4.
+  if (visWorldFlag() && BOOT_WORLD && BOOT_WORLD !== "meadow") {
+    resumed = false;
+    applyUrlWorldBoot(BOOT_WORLD);
+  } else if (!resumed && BOOT_FROST) {
     state.powers.star = true;
     state.world2Open = true;
     enterFrost({ silent: true });
+  } else if (!resumed && BOOT_WORLD && BOOT_WORLD !== "meadow") {
+    applyUrlWorldBoot(BOOT_WORLD);
   }
   try {
     const qs = new URLSearchParams(location.search);
-    const bootMap = { w3: "ember", ember: "ember", w4: "leaf", leaf: "leaf", w5: "wind", wind: "wind", w6: "tide", tide: "tide", w7: "storm", storm: "storm", w8: "harmony", harmony: "harmony", w9: "story", story: "story" };
-    let bootId = (BOOT_WORLD && BOOT_WORLD !== "meadow" && BOOT_WORLD !== "frost") ? BOOT_WORLD : null;
-    Object.keys(bootMap).forEach(function (k) { if (qs.get(k) === "1") bootId = bootMap[k]; });
-    if (!resumed && bootId && !frostBoot) {
-      const order = ["meadow", "frost", "ember", "leaf", "wind", "tide", "storm", "harmony", "story"];
-      const idx = order.indexOf(bootId);
-      for (let i = 0; i < idx; i++) {
-        const pd = WORLD_DEFS[order[i]];
-        if (pd && pd.power) state.powers[pd.power] = true;
-      }
-      state.world2Open = idx >= 1;
-      state.world3Open = idx >= 2;
-      enterWorld(bootId, { silent: true, spawn: "west" });
-    }
     if (qs.get("clearfoes") === "1") {
       currentSpots().forEach(function (s) {
         if (s.type === "foe") state.cleared[spotKey(s)] = true;
@@ -3125,6 +3133,7 @@
   setMode("confirm");
   showScene("overworld");
   applyWorldChrome();
+  ensureWorldFromUrl();
   saveReady = true;
   if (visWorldFlag()) {
     paintSaveHud("empty");
@@ -3150,13 +3159,9 @@
     };
   } catch (eKid) {}
   function ensureWorldFromUrl() {
-    /* Vis-QA URL flags may snap world. Kid save must not be yanked back to BOOT_WORLD on pageshow. */
-    if (visWorldFlag()) {
-      if ((BOOT_WORLD === "frost" || wantFrost()) && state.world !== "frost") {
-        enterFrost({ silent: true });
-      } else if (BOOT_WORLD && BOOT_WORLD !== "meadow" && state.world !== BOOT_WORLD) {
-        enterWorld(BOOT_WORLD, { silent: true, spawn: "west" });
-      }
+    /* Vis-QA URL flags snap world. Kid save must not yank vis boots back to Meadow. */
+    if (visWorldFlag() && BOOT_WORLD && BOOT_WORLD !== "meadow" && state.world !== BOOT_WORLD) {
+      applyUrlWorldBoot(BOOT_WORLD);
     }
     updateCamera();
     if (currentTiles() && (currentFoeSheet() || ART.foes) && ART.walk) {
