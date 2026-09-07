@@ -411,7 +411,20 @@
   const TIDE_SPOTS = FROST_SPOTS.map(function (s) { return s.type === "boss" ? { x: s.x, y: s.y, type: "boss", id: "tide_shell" } : { x: s.x, y: s.y, type: "foe", foe: s.foe }; });
   const STORM_SPOTS = FROST_SPOTS.map(function (s) { return s.type === "boss" ? { x: s.x, y: s.y, type: "boss", id: "storm_fang" } : { x: s.x, y: s.y, type: "foe", foe: s.foe }; });
   const HARMONY_SPOTS = ENCOUNTER_SPOTS.map(function (s) { return s.type === "boss" ? { x: s.x, y: s.y, type: "boss", id: "shine_bell" } : { x: s.x, y: s.y, type: "foe", foe: s.foe }; });
-  const STORY_SPOTS = ENCOUNTER_SPOTS.map(function (s) { return s.type === "boss" ? { x: s.x, y: s.y, type: "boss", id: "melody_gate" } : { x: s.x, y: s.y, type: "foe", foe: s.foe }; });
+  /* W9: sparse tale foes (not ENCOUNTER carpet). Boss still on east gate after clear. */
+  const STORY_SPOTS = [
+    { x: 8, y: 2, type: "foe", foe: 0 },
+    { x: 16, y: 2, type: "foe", foe: 1 },
+    { x: 4, y: 4, type: "foe", foe: 2 },
+    { x: 17, y: 4, type: "foe", foe: 3 },
+    { x: 6, y: 8, type: "foe", foe: 4 },
+    { x: 13, y: 8, type: "foe", foe: 5 },
+    { x: 1, y: 12, type: "foe", foe: 6 },
+    { x: 14, y: 12, type: "foe", foe: 7 },
+    { x: 18, y: 12, type: "foe", foe: 8 },
+    { x: 10, y: 6, type: "foe", foe: 9 },
+    { x: 18, y: 1, type: "boss", id: "melody_gate" },
+  ];
   const LEAF_NPCS = [
     { id: "leaf_guide", name: "Leaf Guide", x: 5, y: 13, color: "#66bb6a", talk: function (st) { return st.powers.leaf ? "Leaf is yours! East is Windy Ridge." : "Clear every leaf foe first. Then Thorn Crown stands on the east gate. Twenty reads — Leaf after you win."; } },
     { id: "bud_pup", name: "Bud Pup", x: 12, y: 9, color: "#a5d6a7", talk: function (st) { return st.powers.leaf ? "You beat Thorn Crown! The hollow is calm." : "All 24 foes, then Thorn Crown on the east gate. Twenty reads."; } },
@@ -460,14 +473,15 @@
   ];
   const WEAR_BTN_SRC = [575, 208, 177, 98];
   const LADDER_TILE_SRC = {
-    /* Ember: seamless dirt + pits only. Never the cave-door crop (that painted leftover W2 chips). */
-    ember: { size: 96, src: { 0: [22, 28], 1: [145, 28], 2: [266, 28], 3: [385, 28], 4: [640, 31], 5: [22, 274], 6: [22, 28] } },
-    leaf: { size: 96, src: { 0: [16, 16], 1: [1100, 480], 2: [1100, 560], 3: [16, 500], 4: [16, 850], 5: [400, 500], 6: [1000, 80] } },
-    wind: { size: 96, src: { 0: [16, 16], 1: [400, 400], 2: [500, 400], 3: [16, 200], 4: [700, 700], 5: [16, 700], 6: [1100, 80] } },
-    tide: { size: 96, src: { 0: [16, 16], 1: [200, 16], 2: [1100, 240], 3: [16, 200], 4: [400, 200], 5: [1200, 400], 6: [1100, 80] } },
-    storm: { size: 96, src: { 0: [16, 400], 1: [16, 520], 2: [1200, 500], 3: [400, 80], 4: [400, 16], 5: [700, 300], 6: [1100, 80] } },
-    harmony: { size: 96, src: { 0: [16, 300], 1: [200, 300], 2: [400, 300], 3: [16, 16], 4: [16, 880], 5: [16, 700], 6: [400, 16] } },
-    story: { size: 96, src: { 0: [900, 520], 1: [1050, 520], 2: [900, 640], 3: [200, 700], 4: [16, 800], 5: [700, 80], 6: [1100, 80] } },
+    /* Ladder sheets are 1536×1024 = 4× Meadow → 128px cells (not 96). Concept collages: sample flat fills, never gate columns. */
+    ember: { size: 128, src: { 0: [22, 28], 1: [145, 28], 2: [266, 28], 3: [385, 28], 4: [640, 31], 5: [22, 274], 6: [22, 28] } },
+    leaf: { size: 128, src: { 0: [16, 16], 1: [144, 16], 2: [272, 16], 3: [16, 500], 4: [16, 850], 5: [400, 500], 6: [16, 16] } },
+    wind: { size: 128, src: { 0: [16, 16], 1: [400, 400], 2: [500, 400], 3: [16, 200], 4: [700, 700], 5: [16, 700], 6: [16, 16] } },
+    tide: { size: 128, src: { 0: [16, 16], 1: [200, 16], 2: [144, 16], 3: [16, 200], 4: [400, 200], 5: [16, 200], 6: [16, 16] } },
+    storm: { size: 128, src: { 0: [16, 400], 1: [16, 520], 2: [144, 400], 3: [400, 80], 4: [400, 16], 5: [700, 300], 6: [16, 400] } },
+    harmony: { size: 128, src: { 0: [16, 300], 1: [200, 300], 2: [400, 300], 3: [16, 16], 4: [16, 880], 5: [16, 700], 6: [16, 300] } },
+    /* Story concept sheet: flat cream floor + starfield void. Never right-side gate/pillar crops (those painted picket-fence). */
+    story: { size: 128, src: { 0: [1216, 784], 1: [1184, 784], 2: [1248, 784], 3: [1200, 784], 4: [368, 888], 5: [1216, 784], 6: [368, 888] } },
   };
   const WORLD_DEFS = {
     meadow: { id: "meadow", num: 1, title: HERO_NAME + " · World 1 Meadow", hint: "Talk to Elder · clear all Bloops · Star Bloom on the east gate", map: MAP, spots: ENCOUNTER_SPOTS, npcs: NPCS, bank: WORLD1_BANK, skins: FOE_SKINS, prefix: "", next: "frost", prev: null, power: "star", bossId: "star_bloom", bossName: "Star Bloom", nextName: "Frost Path", appClass: "", foeTint: null },
@@ -1972,7 +1986,15 @@
     const id = worldDef().id;
     if (id === "frost") return { size: 64, src: FROST_TILE_SRC };
     if (id === "meadow") return { size: 32, src: TILE_SRC };
-    return LADDER_TILE_SRC[id] || LADDER_TILE_SRC.ember;
+    const base = LADDER_TILE_SRC[id] || LADDER_TILE_SRC.ember;
+    /* Stride from sheet width (1536→128). Wrong size paints the sheet as columns. */
+    let size = base.size || 128;
+    const sheet = currentTiles();
+    const sw = sheet && (sheet.naturalWidth || sheet.width) || 0;
+    if (sw >= 1400) size = 128;
+    else if (sw >= 700) size = 64;
+    else if (sw >= 300) size = 32;
+    return { size: size, src: base.src };
   }
   function keyedWorldTiles() {
     const id = worldDef().id;
@@ -2255,12 +2277,33 @@
         const src = srcMap[t];
         ctx.imageSmoothingEnabled = false;
         if (laterWorld()) {
-          /* Concept sheets sit on beige. Lay dirt first, then keyed overlay. GATE stays dirt. */
-          const dirt = srcMap[0] || src;
-          ctx.drawImage(tilesheet, dirt[0], dirt[1], srcSize, srcSize, sx, sy, TILE, TILE);
-          if (t !== T.GRASS && t !== T.GATE) {
-            const keyed = keyedWorldTiles() || tilesheet;
-            ctx.drawImage(keyed, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
+          const wid = worldDef().id;
+          /* Story/harmony/wind+ concept sheets are collages, not tile atlases.
+             Keying beige leaves gate/pillar columns → picket-fence. Blit flat UV only. */
+          const collage = wid === "story" || wid === "harmony" || wid === "wind" || wid === "tide" || wid === "storm" || wid === "leaf";
+          if (collage) {
+            ctx.drawImage(tilesheet, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
+            /* Story: cream floor alone is mushy at ~430px — tint path/gate for kid nav. */
+            if (wid === "story") {
+              if (t === T.PATH || t === T.BRIDGE) {
+                ctx.fillStyle = "rgba(40, 70, 140, 0.52)";
+                ctx.fillRect(sx + 4, sy + 4, TILE - 8, TILE - 8);
+              } else if (t === T.GATE) {
+                ctx.fillStyle = "rgba(212, 170, 70, 0.55)";
+                ctx.fillRect(sx + 3, sy + 3, TILE - 6, TILE - 6);
+              } else if (t === T.HILL || t === T.TALL) {
+                ctx.fillStyle = "rgba(90, 70, 40, 0.28)";
+                ctx.fillRect(sx, sy, TILE, TILE);
+              }
+            }
+          } else {
+            /* Ember: dirt base + keyed props OK when UVs are seamless dirt rows. */
+            const dirt = srcMap[0] || src;
+            ctx.drawImage(tilesheet, dirt[0], dirt[1], srcSize, srcSize, sx, sy, TILE, TILE);
+            if (t !== T.GRASS && t !== T.GATE) {
+              const keyed = keyedWorldTiles() || tilesheet;
+              ctx.drawImage(keyed, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
+            }
           }
         } else {
           ctx.drawImage(tilesheet, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
