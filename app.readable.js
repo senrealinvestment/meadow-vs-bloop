@@ -1159,12 +1159,12 @@
         loadImage(assetUrl("foes/frost-foes.png")),
         loadImage(assetUrl("outfits/sheet.png")),
         (bootId !== "meadow" && bootId !== "frost") ? loadImage(assetUrl("worlds/" + bootId + "/tiles.png")) : Promise.resolve(null),
-        loadImage(assetUrl("foes/ember-foes.png")),
+        loadImage(assetUrl("foes/ember-foes.png")), /* tiny contrast-pass charcoal+flame. Never ember-bloop-fluff-sheet. */
         loadImage(assetUrl("powers/ice/vfx.png")),
         loadImage(assetUrl("powers/fire/vfx.png")),
         loadImage(assetUrl("bosses/ember_maw.png")),
         loadImage(assetUrl("powers/ice-fire-vfx.png")),
-        loadImage(assetUrl("foes/thorn-foes.png")),
+        loadImage(assetUrl("foes/thorn-foes.png")), /* tiny cream/bark + leaf */
         loadImage(assetUrl("foes/rock-foes.png")),
       ]);
       const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12], bootTiles = packed[13], emberFoesImg = packed[14], iceVfx = packed[15], fireVfx = packed[16], emberMawImg = packed[17], vfxCombo = packed[18], thornFoesImg = packed[19], rockFoesImg = packed[20];
