@@ -2608,8 +2608,10 @@
       const thumb = document.createElement("span");
       thumb.className = "closet-thumb";
       const icon = ART.wearIcons && ART.wearIcons[c.frame];
-      if (icon && icon.toDataURL) {
-        thumb.style.backgroundImage = 'url("' + icon.toDataURL("image/png") + '")';
+      if (icon) {
+        var tu = "";
+        try { if (icon.toDataURL) tu = icon.toDataURL("image/png"); } catch (eTh) { tu = icon.src || ""; }
+        if (tu) thumb.style.backgroundImage = 'url("' + tu + '")';
       }
       const lab = document.createElement("span");
       lab.className = "closet-name";
@@ -3401,9 +3403,13 @@
         if (s.type === "foe") state.cleared[spotKey(s)] = true;
       });
     }
-    if (qs.get("wear") === "1") {
+    /* Preview/QA: ?wear=1|all or ?qa=wear unlocks bare (None) + all 9 baked looks. */
+    if (qs.get("wear") === "1" || qs.get("wear") === "all" || qs.get("qa") === "wear") {
       COSMETICS.forEach(function (c) { state.unlockedWear[c.id] = true; });
-      state.wearIndex = 0;
+      if (typeof state.wearIndex !== "number") state.wearIndex = -1;
+      try { applyWearArt(); } catch (eW) {}
+      updatePowerHud();
+      if (el.worldHint) el.worldHint.textContent = "QA wear unlock · all 9 looks + bare (None)";
     }
     if (qs.get("atgate") === "1") {
       placeHero(17, 1, "right");
