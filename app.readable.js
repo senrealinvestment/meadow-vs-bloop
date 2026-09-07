@@ -3186,7 +3186,8 @@
     void el.bloop.offsetWidth;
     el.bloop.classList.add("hit");
     setFoeArt(state.encounter.def.artKey, true);
-    await wait(320);
+    /* Match funVfxFly 2.1s — burst must linger so kids see the power at ~430px. */
+    await wait(usedFun ? 1920 : 700);
     el.hero.classList.remove("strike");
     setHeroFrame("idle");
     setFoeArt(state.encounter.def.artKey, false);

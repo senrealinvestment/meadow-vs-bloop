@@ -322,7 +322,7 @@
   background-repeat:no-repeat !important;
   box-shadow:none !important;filter:none !important;
   image-rendering:pixelated;overflow:hidden;
-  animation:funVfxFly 0.7s ease forwards !important;
+  animation:funVfxFly 2.1s ease-out forwards !important;
 }
 .spark.art-burst.fun-vfx:not(.fun-vfx-sheet),
 .spark.fun-vfx:not(.fun-vfx-sheet){
@@ -346,6 +346,10 @@
   box-shadow:none !important;
 }
 @keyframes funVfxFly{
+  /* Kid-readable: hold ~2–3× longer, slow fade (not a blink). */
   0%{left:18%;bottom:30%;opacity:1;transform:scale(0.85);}
+  15%{left:28%;bottom:29%;opacity:1;transform:scale(1.05);}
+  55%{left:42%;bottom:28%;opacity:1;transform:scale(1.35);}
+  80%{left:50%;bottom:27%;opacity:0.85;transform:scale(1.45);}
   100%{left:55%;bottom:26%;opacity:0;transform:scale(1.55);}
 }
