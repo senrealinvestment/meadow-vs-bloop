@@ -1571,21 +1571,19 @@
     if (sheet && !sheet._foeReady && (sheet.width || 0) > (sheet.height || 0)) sheet = prepareFoeSheet(sheet);
     return sheet;
   }
+  /* W1-W4 lock. Shine x soft = OK (later worlds). */
+  const TYPE_MATCH = {
+    star: { soft: "strong", frost: "ok", ember: "ok", thorn: "ok", rock: "ok" },
+    ice: { soft: "ok", frost: "soft", ember: "soft", thorn: "strong", rock: "ok" },
+    fire: { soft: "ok", frost: "strong", ember: "soft", thorn: "ok", rock: "ok" },
+    leaf: { soft: "strong", frost: "ok", ember: "soft", thorn: "soft", rock: "ok" },
+    shine: { soft: "ok" },
+  };
   function matchupTier(power, foeType) {
     if (!power || !foeType) return "ok";
-    if (power === "star" && foeType === "soft") return "strong";
-    if (power === "ice") {
-      if (foeType === "thorn") return "strong";
-      if (foeType === "ember" || foeType === "frost") return "soft";
-    }
-    if (power === "fire") {
-      if (foeType === "frost") return "strong";
-      if (foeType === "ember") return "soft";
-    }
-    if (power === "leaf") {
-      if (foeType === "ember" || foeType === "thorn") return "soft";
-    }
-    return "ok";
+    const row = TYPE_MATCH[power];
+    if (!row) return "ok";
+    return row[foeType] || "ok";
   }
   function matchupCost(power, foeType) {
     const t = matchupTier(power, foeType);
