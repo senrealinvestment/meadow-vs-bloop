@@ -473,15 +473,15 @@
   ];
   const WEAR_BTN_SRC = [575, 208, 177, 98];
   const LADDER_TILE_SRC = {
-    /* Ladder sheets are 1536×1024 = 4× Meadow → 128px cells (not 96). Concept collages: sample flat fills, never gate columns. */
+    /* Ember: seamless dirt + pits (Pixel overnight). 1536→128 cells. */
     ember: { size: 128, src: { 0: [22, 28], 1: [145, 28], 2: [266, 28], 3: [385, 28], 4: [640, 31], 5: [22, 274], 6: [22, 28] } },
     leaf: { size: 128, src: { 0: [16, 16], 1: [144, 16], 2: [272, 16], 3: [16, 500], 4: [16, 850], 5: [400, 500], 6: [16, 16] } },
-    wind: { size: 128, src: { 0: [16, 16], 1: [400, 400], 2: [500, 400], 3: [16, 200], 4: [700, 700], 5: [16, 700], 6: [16, 16] } },
-    tide: { size: 128, src: { 0: [16, 16], 1: [200, 16], 2: [144, 16], 3: [16, 200], 4: [400, 200], 5: [16, 200], 6: [16, 16] } },
-    storm: { size: 128, src: { 0: [16, 400], 1: [16, 520], 2: [144, 400], 3: [400, 80], 4: [400, 16], 5: [700, 300], 6: [16, 400] } },
-    harmony: { size: 128, src: { 0: [16, 300], 1: [200, 300], 2: [400, 300], 3: [16, 16], 4: [16, 880], 5: [16, 700], 6: [16, 300] } },
-    /* Story concept sheet: flat cream floor + starfield void. Never right-side gate/pillar crops (those painted picket-fence). */
-    story: { size: 128, src: { 0: [1216, 784], 1: [1184, 784], 2: [1248, 784], 3: [1200, 784], 4: [368, 888], 5: [1216, 784], 6: [368, 888] } },
+    /* Pixel modular 1536×1024 row0 contract — wind/tide/storm/harmony/story. Never collage crops. */
+    wind: { size: 128, src: { 0: [0, 0], 1: [128, 0], 2: [256, 0], 3: [384, 0], 4: [512, 0], 5: [640, 0], 6: [768, 0] } },
+    tide: { size: 128, src: { 0: [0, 0], 1: [128, 0], 2: [256, 0], 3: [384, 0], 4: [512, 0], 5: [640, 0], 6: [768, 0] } },
+    storm: { size: 128, src: { 0: [0, 0], 1: [128, 0], 2: [256, 0], 3: [384, 0], 4: [512, 0], 5: [640, 0], 6: [768, 0] } },
+    harmony: { size: 128, src: { 0: [0, 0], 1: [128, 0], 2: [256, 0], 3: [384, 0], 4: [512, 0], 5: [640, 0], 6: [768, 0] } },
+    story: { size: 128, src: { 0: [0, 0], 1: [128, 0], 2: [256, 0], 3: [384, 0], 4: [512, 0], 5: [640, 0], 6: [768, 0] } },
   };
   const WORLD_DEFS = {
     meadow: { id: "meadow", num: 1, title: HERO_NAME + " · World 1 Meadow", hint: "Talk to Elder · clear all Bloops · Star Bloom on the east gate", map: MAP, spots: ENCOUNTER_SPOTS, npcs: NPCS, bank: WORLD1_BANK, skins: FOE_SKINS, prefix: "", next: "frost", prev: null, power: "star", bossId: "star_bloom", bossName: "Star Bloom", nextName: "Frost Path", appClass: "", foeTint: null },
@@ -2283,19 +2283,6 @@
           const collage = wid === "story" || wid === "harmony" || wid === "wind" || wid === "tide" || wid === "storm" || wid === "leaf";
           if (collage) {
             ctx.drawImage(tilesheet, src[0], src[1], srcSize, srcSize, sx, sy, TILE, TILE);
-            /* Story: cream floor alone is mushy at ~430px — tint path/gate for kid nav. */
-            if (wid === "story") {
-              if (t === T.PATH || t === T.BRIDGE) {
-                ctx.fillStyle = "rgba(40, 70, 140, 0.52)";
-                ctx.fillRect(sx + 4, sy + 4, TILE - 8, TILE - 8);
-              } else if (t === T.GATE) {
-                ctx.fillStyle = "rgba(212, 170, 70, 0.55)";
-                ctx.fillRect(sx + 3, sy + 3, TILE - 6, TILE - 6);
-              } else if (t === T.HILL || t === T.TALL) {
-                ctx.fillStyle = "rgba(90, 70, 40, 0.28)";
-                ctx.fillRect(sx, sy, TILE, TILE);
-              }
-            }
           } else {
             /* Ember: dirt base + keyed props OK when UVs are seamless dirt rows. */
             const dirt = srcMap[0] || src;
