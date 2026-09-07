@@ -678,7 +678,7 @@
     5: "melody/melody-shell-clip.png",
     6: "melody/melody-bolt-bow.png",
     7: "melody/melody-shine-charm.png",
-    8: "melody/melody-book.png",
+    8: "melody/melody-melody-book.png",
   };
   function walkScale() {
     const sheet = ART.walk;
