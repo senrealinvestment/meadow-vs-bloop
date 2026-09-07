@@ -299,7 +299,7 @@
 }
 .power-pick-btn.match-soft{opacity:0.68;filter:saturate(0.7);}
 
-/* Pixel fun power icons (tight crops) + cast bursts */
+
 .power-chip.art-chip.fun-chip{
   background-size:contain !important;
   background-position:center !important;
@@ -307,10 +307,39 @@
   background-color:#1b2a14;
   font-size:0;color:transparent;
 }
-.spark.art-burst.fun-vfx{
-  width:56px;height:56px;border:none;border-radius:0;
-  background-color:transparent!important;
-  background-size:contain;background-position:center;background-repeat:no-repeat;
-  box-shadow:none;filter:none;transform:scale(1.35);
+
+/* Distinct per-power cast bursts (Pixel fun VFX) */
+.spark.art-burst.fun-vfx,
+.spark.fun-vfx{
+  width:72px !important;height:72px !important;border:none !important;border-radius:0 !important;
+  background-color:transparent !important;
+  background-repeat:no-repeat !important;
+  box-shadow:none !important;filter:none !important;
   image-rendering:pixelated;overflow:hidden;
+  animation:funVfxFly 0.7s ease forwards !important;
+}
+.spark.art-burst.fun-vfx:not(.fun-vfx-sheet),
+.spark.fun-vfx:not(.fun-vfx-sheet){
+  background-size:contain !important;
+  background-position:center !important;
+}
+.spark.fun-vfx-sheet{
+  background-size:768px 512px !important;
+}
+.spark.fire-fx.fun-vfx,
+.spark.ice-fx.fun-vfx,
+.spark.star-fx.fun-vfx,
+.spark.leaf-fx.fun-vfx,
+.spark.wind-fx.fun-vfx,
+.spark.water-fx.fun-vfx,
+.spark.electric-fx.fun-vfx,
+.spark.shine-fx.fun-vfx,
+.spark.melody-fx.fun-vfx{
+  background-color:transparent !important;
+  border:none !important;
+  box-shadow:none !important;
+}
+@keyframes funVfxFly{
+  0%{left:18%;bottom:30%;opacity:1;transform:scale(0.85);}
+  100%{left:55%;bottom:26%;opacity:0;transform:scale(1.55);}
 }

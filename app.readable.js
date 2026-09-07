@@ -1491,6 +1491,8 @@
     }
   }
   function prepareFunPowerVfx(img) {
+    /* Keep original CDN src for CSS sheet-position bursts (distinct Star→Melody). */
+    ART.funVfxSrc = (img && img.src) || ART.funVfxSrc || "";
     const keyed = keyMagenta(img) || img;
     ART.vfx = keyed;
     ART.funVfx = keyed;
@@ -1499,6 +1501,35 @@
       const cell = sliceFunPowerRow(keyed, i);
       if (cell) ART.powerVfx[FUN_POWER_IDS[i]] = cell;
     }
+  }
+  function applyPowerCastVfx(spark, pow) {
+    if (!pow || !spark) return false;
+    const idx = FUN_POWER_IDS.indexOf(pow);
+    const cropped = ART.powerVfx && ART.powerVfx[pow];
+    const uCrop = cropped ? funPowerSheetUrl(cropped) : "";
+    spark.classList.add("art-burst", "fun-vfx");
+    spark.classList.remove("fire-fx", "ice-fx", "star-fx");
+    if (uCrop && uCrop.indexOf("data:") === 0) {
+      spark.style.backgroundImage = 'url("' + uCrop + '")';
+      spark.style.backgroundSize = "contain";
+      spark.style.backgroundPosition = "center";
+      spark.style.backgroundRepeat = "no-repeat";
+      spark.dataset.powerVfx = pow;
+      return true;
+    }
+    /* Full 9-cell sheet: Star·Ice·Fire·Leaf·Wind·Water·Electric·Shine·Melody */
+    let u = ART.funVfxSrc || "";
+    if (!u && ART.funVfx) u = funPowerSheetUrl(ART.funVfx);
+    if (!u && ART.vfx && ART.vfx.src) u = ART.vfx.src;
+    if (!u || idx < 0) return false;
+    spark.classList.add("fun-vfx-sheet");
+    spark.style.backgroundImage = 'url("' + u + '")';
+    spark.style.backgroundSize = "768px 512px";
+    spark.style.backgroundRepeat = "no-repeat";
+    /* Icons/bursts sit mid-band ~y 200–310 on 768×512 */
+    spark.style.backgroundPosition = (-Math.round(idx * 768 / 9) - 8) + "px -205px";
+    spark.dataset.powerVfx = pow;
+    return true;
   }
 
   function applyDomArt() {
@@ -3047,22 +3078,19 @@
     el.fx.classList.add("flash");
 
     const spark = document.createElement("div");
-    spark.className = "spark" + (usingFire ? " fire-fx" : usingIce ? " ice-fx" : usingStar ? " star-fx" : (pow ? (" " + pow + "-fx") : ""));
-    const funBurst = pow && ART.powerVfx && ART.powerVfx[pow];
-    if (funBurst) {
-      spark.classList.add("art-burst", "fun-vfx");
-      spark.style.backgroundImage = 'url("' + funPowerSheetUrl(funBurst) + '")';
-    } else if (usingStar && ART.vfx) {
-      spark.classList.add("art-vfx");
-      spark.style.backgroundImage = 'url("' + (ART.vfx.toDataURL ? ART.vfx.toDataURL("image/png") : ART.vfx.src) + '")';
-    } else if (usingIce && ART.vfxIce) {
-      spark.classList.add("art-burst");
-      const iceUrl = ART.vfxIce.toDataURL ? ART.vfxIce.toDataURL("image/png") : ART.vfxIce.src;
-      spark.style.backgroundImage = 'url("' + iceUrl + '")';
-    } else if (usingFire && ART.vfxFire) {
-      spark.classList.add("art-burst");
-      const fireUrl = ART.vfxFire.toDataURL ? ART.vfxFire.toDataURL("image/png") : ART.vfxFire.src;
-      spark.style.backgroundImage = 'url("' + fireUrl + '")';
+    spark.className = "spark" + (pow ? (" " + pow + "-fx") : "");
+    const usedFun = pow ? applyPowerCastVfx(spark, pow) : false;
+    if (!usedFun) {
+      if (usingStar && ART.vfx) {
+        spark.classList.add("art-vfx", "star-fx");
+        spark.style.backgroundImage = 'url("' + funPowerSheetUrl(ART.vfx) + '")';
+      } else if (usingIce && ART.vfxIce) {
+        spark.classList.add("art-burst", "ice-fx");
+        spark.style.backgroundImage = 'url("' + funPowerSheetUrl(ART.vfxIce) + '")';
+      } else if (usingFire && ART.vfxFire) {
+        spark.classList.add("art-burst", "fire-fx");
+        spark.style.backgroundImage = 'url("' + funPowerSheetUrl(ART.vfxFire) + '")';
+      }
     }
     el.fx.appendChild(spark);
 
