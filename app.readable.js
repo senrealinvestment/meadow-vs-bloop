@@ -1547,38 +1547,38 @@
     });
   }
 
+  function fightFaceTowardFoe() {
+    /* Fight stage: hero left, foe right — always face the foe. */
+    return "right";
+  }
+  function heroSheetUrl(sheet) {
+    if (!sheet) return "";
+    try { if (sheet.toDataURL) return sheet.toDataURL("image/png"); } catch (eHS) {}
+    return sheet.src || "";
+  }
   function setHeroFrame(kind) {
-    // kind: idle | strike | cast
-    if (!ART.walk) return;
+    // kind: idle | strike | cast — wear sheet sticks; never swap to bare cast sheet while WEAR is on.
+    if (!ART.walk && !(kind === "cast" && ART.cast)) return;
+    syncWalkFromWear();
+    const inFight = state.scene === "fight";
+    const face = inFight
+      ? fightFaceTowardFoe()
+      : (state.facing === "up" ? "up" : state.facing === "left" ? "left" : state.facing === "right" ? "right" : "down");
     let fr;
-    if (kind === "strike") { syncWalkFromWear(); fr = strikeFrame(ART.walk); }
-    else if (kind === "cast" && ART.cast) {
-      const c = ART.cast;
-      el.hero.style.setProperty(
-        "--hero-sheet",
-        'url("' + (c.toDataURL ? c.toDataURL("image/png") : c.src) + '")'
-      );
-      if (c.width) {
-        el.hero.style.setProperty("--hero-sheet-w", c.width + "px");
-        el.hero.style.setProperty("--hero-sheet-h", c.height + "px");
+    let sheet = ART.walk;
+    if (kind === "strike" || kind === "cast") {
+      fr = strikeFrame(ART.walk) || faceFrame(ART.walk, face);
+      /* Only use dedicated cast sheet when no Melody WEAR is equipped. */
+      if (kind === "cast" && state.wearIndex < 0 && ART.cast) {
+        sheet = ART.cast;
+        fr = [10, 20, 74, 64];
       }
-      el.hero.style.setProperty("--hero-sx", "-10px");
-      el.hero.style.setProperty("--hero-sy", "-20px");
-      el.hero.style.setProperty("--hero-sw", "74px");
-      el.hero.style.setProperty("--hero-sh", "64px");
-      return;
     } else {
-      const face = state.facing === "up" ? "up" : state.facing === "left" ? "left" : state.facing === "right" ? "right" : "down";
-      syncWalkFromWear();
       fr = faceFrame(ART.walk, face);
-      if (ART.walk && ART.walk.toDataURL) {
-        el.hero.style.setProperty("--hero-sheet", 'url("' + ART.walk.toDataURL("image/png") + '")');
-      } else if (ART.walk && ART.walk.src) {
-        el.hero.style.setProperty("--hero-sheet", 'url("' + ART.walk.src + '")');
-      }
     }
-    if (kind === "strike") fr = strikeFrame(ART.walk);
-    const sheet = kind === "cast" && ART.cast ? ART.cast : ART.walk;
+    if (!fr || fr.length < 4) fr = faceFrame(ART.walk || sheet, face);
+    const u = heroSheetUrl(sheet);
+    if (u) el.hero.style.setProperty("--hero-sheet", 'url("' + u + '")');
     if (sheet) {
       const sw = sheet.naturalWidth || sheet.width || 256;
       const sh = sheet.naturalHeight || sheet.height || 200;
@@ -2584,7 +2584,8 @@
     const c = COSMETICS.filter(function (x) { return x.world === wid; })[0];
     if (!c) return;
     state.unlockedWear[c.id] = true;
-    state.wearIndex = c.frame;
+    /* Unlock only — do not auto-swap off the look the kid already equipped. */
+    if (state.wearIndex < 0) state.wearIndex = c.frame;
     applyWearArt();
     updatePowerHud();
     scheduleSave();
@@ -2808,7 +2809,10 @@
     el.bloop.style.backgroundSize = "";
     el.bloop.style.backgroundPosition = "";
     setFoeArt(enc.artKey, false);
-    setHeroFrame(enc.isBoss ? "idle" : state.powers.star ? "idle" : "idle");
+    /* Persist equipped WEAR into fight; face foe (right). Never reset wearIndex here. */
+    state.facing = fightFaceTowardFoe();
+    try { applyWearArt(); } catch (eEncWear) {}
+    setHeroFrame("idle");
     el.foeLabel.textContent = enc.foeType ? (enc.name + " · " + enc.foeType) : enc.name;
     el.chest.classList.toggle("hidden", !enc.chest);
     el.chest.classList.remove("open");
@@ -2821,6 +2825,9 @@
     setFlavor(enc.name + " appears!");
 
     showScene("fight");
+    /* Re-assert wear + face after scene flip (fightFaceTowardFoe reads state.scene). */
+    try { applyWearArt(); } catch (eFightWear) {}
+    setHeroFrame("idle");
     paintMatchupHud();
 
     // Never skip the reading panel. Cost is 1/2/3 after a power pick; basic read is OK=2.
@@ -3163,9 +3170,9 @@
     /* Stay on the Pixel path. Never preload/eval a second IIFE after a fight. */
     ART.locked = !!(ART.walk && currentTiles() && (currentFoeSheet() || ART.foes));
     showScene("overworld");
+    try { applyWearArt(); } catch (eEndWear) {}
     if (state.scene === "overworld") drawWorld();
     updatePowerHud();
-    applyWearArt();
     scheduleSave();
   }
 
