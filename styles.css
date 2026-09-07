@@ -298,3 +298,19 @@
   text-shadow:0 0 5px #ff8f00;pointer-events:none;
 }
 .power-pick-btn.match-soft{opacity:0.68;filter:saturate(0.7);}
+
+/* Pixel fun power icons (tight crops) + cast bursts */
+.power-chip.art-chip.fun-chip{
+  background-size:contain !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  background-color:#1b2a14;
+  font-size:0;color:transparent;
+}
+.spark.art-burst.fun-vfx{
+  width:56px;height:56px;border:none;border-radius:0;
+  background-color:transparent!important;
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  box-shadow:none;filter:none;transform:scale(1.35);
+  image-rendering:pixelated;overflow:hidden;
+}

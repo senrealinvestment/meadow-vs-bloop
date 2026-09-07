@@ -614,7 +614,7 @@
     vfxFire: null,
     wearIcons: [],
     melodyBare: null,
-    melodyWear: {}, /* frame index → full walk sheet (0 daisy, 1 frost) */
+    melodyWear: {}, /* COSMETICS.frame → full keyed walk sheet */
     walkRefW: 320,
     walkRefH: 213,
     worldTiles: {},
@@ -667,7 +667,8 @@
 
   const WALK_REF_W = 320;
   const WALK_REF_H = 213;
-  /* All nine Melody baked looks (Sergio GREENLIT). Frame = COSMETICS.frame. */
+  const MELODY_BARE_PATH = "melody/melody-bare.png";
+  /* All nine Melody baked looks. Frame = COSMETICS.frame. Full sheet-swap, no overlay. */
   const MELODY_WEAR_PATH = {
     0: "melody/melody-daisy-bow.png",
     1: "melody/melody-frost-scarf.png",
@@ -690,30 +691,150 @@
     if (sc === 1) return fr;
     return [Math.round(fr[0] * sc), Math.round(fr[1] * sc), Math.round(fr[2] * sc), Math.round(fr[3] * sc)];
   }
-
+  function floodKeyMelody(img) {
+    if (!img) return null;
+    const w = img.naturalWidth || img.width || 0;
+    const h = img.naturalHeight || img.height || 0;
+    if (w < 8 || h < 8) return null;
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    const g = c.getContext("2d");
+    g.imageSmoothingEnabled = false;
+    g.drawImage(img, 0, 0);
+    let data;
+    try { data = g.getImageData(0, 0, w, h); } catch (eF) { return c; }
+    const d = data.data;
+    const cr = d[0], cg = d[1], cb = d[2];
+    const tol = 42;
+    const vis = new Uint8Array(w * h);
+    const q = [];
+    function isBg(x, y) {
+      const p = (y * w + x) * 4;
+      if (d[p + 3] < 8) return true;
+      return Math.abs(d[p] - cr) <= tol && Math.abs(d[p + 1] - cg) <= tol && Math.abs(d[p + 2] - cb) <= tol;
+    }
+    function push(x, y) {
+      if (x < 0 || y < 0 || x >= w || y >= h) return;
+      const i = y * w + x;
+      if (vis[i]) return;
+      if (!isBg(x, y)) return;
+      vis[i] = 1;
+      q.push(i);
+    }
+    for (let x = 0; x < w; x++) { push(x, 0); push(x, h - 1); }
+    for (let y = 0; y < h; y++) { push(0, y); push(w - 1, y); }
+    let qs = 0;
+    while (qs < q.length) {
+      const i = q[qs++];
+      const x = i % w, y = (i / w) | 0;
+      push(x + 1, y); push(x - 1, y); push(x, y + 1); push(x, y - 1);
+    }
+    for (let i = 0; i < w * h; i++) if (vis[i]) d[i * 4 + 3] = 0;
+    g.putImageData(data, 0, 0);
+    return c;
+  }
+  function detectWalkFrames(sheet) {
+    const w = sheet.width || 0, h = sheet.height || 0;
+    if (w < 8 || h < 8) return null;
+    const g = sheet.getContext("2d");
+    let data;
+    try { data = g.getImageData(0, 0, w, h); } catch (eD) { return null; }
+    const d = data.data;
+    const seen = new Uint8Array(w * h);
+    const comps = [];
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i0 = y * w + x;
+        if (seen[i0] || d[i0 * 4 + 3] < 12) continue;
+        const q = [i0];
+        seen[i0] = 1;
+        let minx = x, maxx = x, miny = y, maxy = y, n = 0, qs = 0;
+        while (qs < q.length) {
+          const i = q[qs++];
+          const cx = i % w, cy = (i / w) | 0;
+          n++;
+          if (cx < minx) minx = cx;
+          if (cx > maxx) maxx = cx;
+          if (cy < miny) miny = cy;
+          if (cy > maxy) maxy = cy;
+          const nbr = [i + 1, i - 1, i + w, i - w];
+          const ok = [cx + 1 < w, cx > 0, cy + 1 < h, cy > 0];
+          for (let k = 0; k < 4; k++) {
+            if (!ok[k]) continue;
+            const j = nbr[k];
+            if (seen[j] || d[j * 4 + 3] < 12) continue;
+            seen[j] = 1;
+            q.push(j);
+          }
+        }
+        if (n >= 400) comps.push({ n: n, x: minx, y: miny, w: maxx - minx + 1, h: maxy - miny + 1 });
+      }
+    }
+    if (comps.length < 4) return null;
+    comps.sort(function (a, b) { return a.y - b.y || a.x - b.x; });
+    const rows = [];
+    const ytol = 24;
+    comps.forEach(function (c) {
+      if (!rows.length || Math.abs(c.y - rows[rows.length - 1][0].y) > ytol) rows.push([c]);
+      else rows[rows.length - 1].push(c);
+    });
+    rows.forEach(function (r) { r.sort(function (a, b) { return a.x - b.x; }); });
+    const fat = rows.filter(function (r) { return r.length >= 3; });
+    if (fat.length < 4) return null;
+    const faces = ["down", "up", "left", "right"];
+    const out = { down: [], up: [], left: [], right: [] };
+    for (let i = 0; i < 4; i++) {
+      out[faces[i]] = fat[i].slice(0, 4).map(function (c) { return [c.x, c.y, c.w, c.h]; });
+    }
+    const extras = [];
+    fat.forEach(function (r) {
+      if (r.length > 4) extras.push.apply(extras, r.slice(4));
+    });
+    if (extras.length) {
+      extras.sort(function (a, b) { return b.w * b.h - a.w * a.h; });
+      const s = extras[0];
+      out.strike = [s.x, s.y, s.w, s.h];
+    }
+    return out;
+  }
+  function prepareMelodySheet(img) {
+    const keyed = floodKeyMelody(img);
+    if (!keyed) return null;
+    keyed._walkFrames = detectWalkFrames(keyed);
+    return keyed;
+  }
+  function walkFramesOf(sheet) {
+    return (sheet && sheet._walkFrames) || WALK_FRAMES;
+  }
+  function faceFrame(sheet, face) {
+    const wf = walkFramesOf(sheet);
+    const row = wf[face] || wf.down;
+    if (row && row[0] && row[0].length >= 4) return row[0];
+    return WALK_FRAMES.down[0];
+  }
+  function strikeFrame(sheet) {
+    const wf = walkFramesOf(sheet);
+    if (wf.strike && wf.strike.length >= 4) return wf.strike;
+    return faceFrame(sheet, "down");
+  }
   function refreshMelodyWearThumbs() {
     /* Closet thumb = front idle crop from each baked Melody sheet. */
+    ART.wearIcons = [];
     if (!ART.melodyWear) return;
-    ART.wearIcons = ART.wearIcons || [];
     Object.keys(ART.melodyWear).forEach(function (k) {
       const frame = +k;
       const sheet = ART.melodyWear[frame];
       if (!sheet) return;
-      const fr = scaledWalkFrameForSheet(sheet, WALK_FRAMES.down[0]);
+      const fr = faceFrame(sheet, "down");
       const c = document.createElement("canvas");
       c.width = Math.max(8, fr[2]);
       c.height = Math.max(8, fr[3]);
       const g = c.getContext("2d");
       g.imageSmoothingEnabled = false;
       g.drawImage(sheet, fr[0], fr[1], fr[2], fr[3], 0, 0, c.width, c.height);
-      ART.wearIcons[frame] = c;
+      ART.wearIcons[frame] = outlineWearIcon(c);
     });
-  }
-  function scaledWalkFrameForSheet(sheet, fr) {
-    const sw = (sheet && (sheet.naturalWidth || sheet.width)) || WALK_REF_W;
-    const sc = sw / WALK_REF_W;
-    if (sc === 1) return fr;
-    return [Math.round(fr[0] * sc), Math.round(fr[1] * sc), Math.round(fr[2] * sc), Math.round(fr[3] * sc)];
   }
   function wearWalkSheet() {
     if (state.wearIndex >= 0 && ART.melodyWear && ART.melodyWear[state.wearIndex]) {
@@ -1218,8 +1339,8 @@
         loadImage(assetUrl("foes/bloop-fluff-sheet.png")),
         loadImage(assetUrl("bosses/star_bloom.png")),
         loadImage(assetUrl("worlds/meadow/tiles.png")),
-        loadImage(assetUrl("powers/icons-sheet.png")),
-        loadImage(assetUrl("powers/vfx-sheet.png")),
+        loadImage(assetUrl("powers/powers-fun-icons.png")), /* Pixel fun icons: Star·Ice·Fire·Leaf·Wind·Water·Electric·Shine·Melody */
+        loadImage(assetUrl("powers/powers-fun-vfx.png")), /* matching cast bursts */
         loadImage(assetUrl("ui/cvc-panel.png")),
         loadImage(assetUrl("npcs/elder-kid-sheet.png")),
         loadImage(assetUrl("bosses/ice_howl.png")),
@@ -1234,16 +1355,6 @@
         loadImage(assetUrl("powers/ice-fire-vfx.png")),
         loadImage(assetUrl("foes/thorn-foes.png")), /* tiny cream/bark + leaf */
         loadImage(assetUrl("foes/rock-foes.png")),
-        loadImage(assetUrl("melody/melody-bare.png")),
-        loadImage(assetUrl("melody/melody-daisy-bow.png")),
-        loadImage(assetUrl("melody/melody-frost-scarf.png")),
-        loadImage(assetUrl("melody/melody-spark-hat.png")),
-        loadImage(assetUrl("melody/melody-clover-pin.png")),
-        loadImage(assetUrl("melody/melody-wind-ribbon.png")),
-        loadImage(assetUrl("melody/melody-shell-clip.png")),
-        loadImage(assetUrl("melody/melody-bolt-bow.png")),
-        loadImage(assetUrl("melody/melody-shine-charm.png")),
-        loadImage(assetUrl("melody/melody-book.png")),
       ]);
       const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12], bootTiles = packed[13], emberFoesImg = packed[14], iceVfx = packed[15], fireVfx = packed[16], emberMawImg = packed[17], vfxCombo = packed[18], thornFoesImg = packed[19], rockFoesImg = packed[20];
       ART.walk = walk ? keySheet(walk, CHROMA.walk) || walk : (ART.walk || null);
@@ -1254,6 +1365,8 @@
       /* ART.tiles is set per-world below — never park meadow under frost/ember. */
       ART.icons = icons && (icons.naturalWidth || icons.width) ? icons : null;
       ART.vfx = vfx && (vfx.naturalWidth || vfx.width) ? vfx : null;
+      if (ART.icons) prepareFunPowerIcons(ART.icons);
+      if (ART.vfx) prepareFunPowerVfx(ART.vfx);
       ART.panel = panel && (panel.naturalWidth || panel.width) ? panel : null;
       ART.npcs = npcs ? keySheet(npcs, CHROMA.npcs) || npcs : (ART.npcs || null);
       ART.iceHowl = iceHowl ? prepareBossSheet(iceHowl) : null;
@@ -1264,27 +1377,6 @@
       ART.emberFoes = emberFoesImg ? prepareFoeSheet(emberFoesImg) : (ART.emberFoes || null);
       ART.thornFoes = thornFoesImg ? outlineFoeSheet(prepareFoeSheet(thornFoesImg)) : (ART.thornFoes || null);
       ART.rockFoes = rockFoesImg ? outlineFoeSheet(prepareFoeSheet(rockFoesImg)) : (ART.rockFoes || null);
-
-      /* Melody WEAR: bare + all nine baked looks (320×213). No overlay. */
-      const keyMel = function (img) {
-        if (!img) return null;
-        return keySheet(img, CHROMA.sheetGreen) || keySheet(img, CHROMA.walk) || keySheet(img, CHROMA.olive) || img;
-      };
-      const melStart = packed.length - 10;
-      const melodyBareImg = packed[melStart];
-      ART.melodyBare = keyMel(melodyBareImg) || ART.melodyBare;
-      ART.melodyWear = ART.melodyWear || {};
-      const wearOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-      for (let wi = 0; wi < wearOrder.length; wi++) {
-        const img = packed[melStart + 1 + wi];
-        if (img) ART.melodyWear[wearOrder[wi]] = keyMel(img);
-      }
-      if (ART.melodyBare) {
-        ART.walk = ART.melodyBare;
-        ART.walkRefW = ART.melodyBare.naturalWidth || ART.melodyBare.width || WALK_REF_W;
-        ART.walkRefH = ART.melodyBare.naturalHeight || ART.melodyBare.height || WALK_REF_H;
-      }
-      refreshMelodyWearThumbs();
 
       ART.vfxIce = iceVfx ? prepareVfxFrame(iceVfx) : (ART.vfxIce || null);
       ART.vfxFire = fireVfx ? prepareVfxFrame(fireVfx) : (ART.vfxFire || null);
@@ -1302,6 +1394,25 @@
         if (bootId === "ember") ART.emberTiles = bootTiles;
       }
     }
+    if (!ART.melodyBare) {
+      const wearKeys = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+      const melImgs = await Promise.all(
+        [loadImage(assetUrl(MELODY_BARE_PATH))].concat(
+          wearKeys.map(function (i) { return loadImage(assetUrl(MELODY_WEAR_PATH[i])); })
+        )
+      );
+      ART.melodyBare = prepareMelodySheet(melImgs[0]) || ART.melodyBare;
+      ART.melodyWear = ART.melodyWear || {};
+      for (let wi = 0; wi < wearKeys.length; wi++) {
+        if (melImgs[wi + 1]) ART.melodyWear[wearKeys[wi]] = prepareMelodySheet(melImgs[wi + 1]);
+      }
+      refreshMelodyWearThumbs();
+    }
+    syncWalkFromWear();
+    if (ART.walk) {
+      ART.walkRefW = ART.walk.naturalWidth || ART.walk.width || WALK_REF_W;
+      ART.walkRefH = ART.walk.naturalHeight || ART.walk.height || WALK_REF_H;
+    }
     syncWorldFromUrl();
     if (BOOT_WORLD === "frost" || BOOT_FROST || wantFrost()) {
       ART.tiles = ART.frostTiles || null;
@@ -1315,7 +1426,7 @@
     }
     ART.locked = !!ART.ready;
     if (ART.ready) artEverLocked = true;
-    if (ART.walk) applyDomArt();
+    if (ART.walk) applyWearArt();
     if (ART.ready) {
       if (state.scene === "overworld") drawWorld();
       showArtLoader(false);
@@ -1340,6 +1451,49 @@
     }
   }
 
+
+  const FUN_POWER_IDS = ["star", "ice", "fire", "leaf", "wind", "water", "electric", "shine", "melody"];
+  function funPowerSheetUrl(img) {
+    if (!img) return "";
+    return img.toDataURL ? img.toDataURL("image/png") : (img.src || "");
+  }
+  function sliceFunPowerRow(keyed, index) {
+    if (!keyed) return null;
+    const W = keyed.naturalWidth || keyed.width || 0;
+    const H = keyed.naturalHeight || keyed.height || 0;
+    if (W < 9 || H < 8) return null;
+    const x0 = Math.round((index * W) / 9);
+    const x1 = Math.round(((index + 1) * W) / 9);
+    const cw = Math.max(1, x1 - x0);
+    const c = document.createElement("canvas");
+    c.width = cw;
+    c.height = H;
+    const g = c.getContext("2d");
+    g.imageSmoothingEnabled = false;
+    g.drawImage(keyed, x0, 0, cw, H, 0, 0, cw, H);
+    return cropOpaqueSprite(c) || c;
+  }
+  function prepareFunPowerIcons(img) {
+    /* Olive tray #537013 — keep icon pixels; chips use tight crops. */
+    const keyed = keyChroma(img, [83, 112, 19], 55) || img;
+    ART.icons = keyed;
+    ART.powerIcons = ART.powerIcons || {};
+    for (let i = 0; i < FUN_POWER_IDS.length; i++) {
+      const cell = sliceFunPowerRow(keyed, i);
+      if (cell) ART.powerIcons[FUN_POWER_IDS[i]] = cell;
+    }
+  }
+  function prepareFunPowerVfx(img) {
+    const keyed = keyMagenta(img) || img;
+    ART.vfx = keyed;
+    ART.funVfx = keyed;
+    ART.powerVfx = ART.powerVfx || {};
+    for (let i = 0; i < FUN_POWER_IDS.length; i++) {
+      const cell = sliceFunPowerRow(keyed, i);
+      if (cell) ART.powerVfx[FUN_POWER_IDS[i]] = cell;
+    }
+  }
+
   function applyDomArt() {
     // Hero: sheet sprite via CSS background (keyed canvas → data URL if needed)
     if (ART.walk) {
@@ -1353,22 +1507,38 @@
       el.readPanel.classList.remove("art-panel");
       el.readPanel.style.backgroundImage = "";
     }
-    if (ART.icons) {
-      const u = ART.icons.src;
-      el.chipStar.classList.add("art-chip");
-      el.chipLeaf.classList.add("art-chip");
-      el.chipWind.classList.add("art-chip");
-      el.chipStar.style.backgroundImage = 'url("' + u + '")';
-      el.chipLeaf.style.backgroundImage = 'url("' + u + '")';
-      el.chipWind.style.backgroundImage = 'url("' + u + '")';
-    }
+    const chipMap = [
+      ["star", el.chipStar],
+      ["ice", el.chipIce],
+      ["fire", el.chipFire],
+      ["leaf", el.chipLeaf],
+      ["wind", el.chipWind],
+      ["water", el.chipWater],
+      ["electric", el.chipElectric],
+      ["shine", el.chipShine],
+      ["melody", el.chipMelody],
+    ];
+    chipMap.forEach(function (row) {
+      const id = row[0], node = row[1];
+      if (!node) return;
+      const icon = ART.powerIcons && ART.powerIcons[id];
+      if (!icon) return;
+      const u = funPowerSheetUrl(icon);
+      if (!u) return;
+      node.classList.add("art-chip", "fun-chip");
+      node.style.backgroundImage = 'url("' + u + '")';
+      node.style.backgroundSize = "contain";
+      node.style.backgroundPosition = "center";
+      node.style.backgroundRepeat = "no-repeat";
+      node.textContent = "";
+    });
   }
 
   function setHeroFrame(kind) {
     // kind: idle | strike | cast
     if (!ART.walk) return;
     let fr;
-    if (kind === "strike") { syncWalkFromWear(); fr = scaledWalkFrame(WALK_FRAMES.strike); }
+    if (kind === "strike") { syncWalkFromWear(); fr = strikeFrame(ART.walk); }
     else if (kind === "cast" && ART.cast) {
       const c = ART.cast;
       el.hero.style.setProperty(
@@ -1387,14 +1557,14 @@
     } else {
       const face = state.facing === "up" ? "up" : state.facing === "left" ? "left" : state.facing === "right" ? "right" : "down";
       syncWalkFromWear();
-      fr = scaledWalkFrame(WALK_FRAMES[face][0]);
+      fr = faceFrame(ART.walk, face);
       if (ART.walk && ART.walk.toDataURL) {
         el.hero.style.setProperty("--hero-sheet", 'url("' + ART.walk.toDataURL("image/png") + '")');
       } else if (ART.walk && ART.walk.src) {
         el.hero.style.setProperty("--hero-sheet", 'url("' + ART.walk.src + '")');
       }
     }
-    if (kind === "strike") fr = scaledWalkFrame(WALK_FRAMES.strike);
+    if (kind === "strike") fr = strikeFrame(ART.walk);
     const sheet = kind === "cast" && ART.cast ? ART.cast : ART.walk;
     if (sheet) {
       const sw = sheet.naturalWidth || sheet.width || 256;
@@ -2131,7 +2301,7 @@
             : "right";
     syncWalkFromWear();
     if (ART.walk) {
-      const fr = scaledWalkFrame(WALK_FRAMES[face][0]);
+      const fr = faceFrame(ART.walk, face);
       drawSheetFrame(ART.walk, fr[0], fr[1], fr[2], fr[3], dx, dy, dw, dh);
     }
   }
@@ -2855,10 +3025,14 @@
     el.fx.classList.add("flash");
 
     const spark = document.createElement("div");
-    spark.className = "spark" + (usingFire ? " fire-fx" : usingIce ? " ice-fx" : usingStar ? " star-fx" : "");
-    if (usingStar && ART.vfx) {
+    spark.className = "spark" + (usingFire ? " fire-fx" : usingIce ? " ice-fx" : usingStar ? " star-fx" : (pow ? (" " + pow + "-fx") : ""));
+    const funBurst = pow && ART.powerVfx && ART.powerVfx[pow];
+    if (funBurst) {
+      spark.classList.add("art-burst", "fun-vfx");
+      spark.style.backgroundImage = 'url("' + funPowerSheetUrl(funBurst) + '")';
+    } else if (usingStar && ART.vfx) {
       spark.classList.add("art-vfx");
-      spark.style.backgroundImage = 'url("' + ART.vfx.src + '")';
+      spark.style.backgroundImage = 'url("' + (ART.vfx.toDataURL ? ART.vfx.toDataURL("image/png") : ART.vfx.src) + '")';
     } else if (usingIce && ART.vfxIce) {
       spark.classList.add("art-burst");
       const iceUrl = ART.vfxIce.toDataURL ? ART.vfxIce.toDataURL("image/png") : ART.vfxIce.src;
