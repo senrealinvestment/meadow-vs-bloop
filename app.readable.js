@@ -887,6 +887,8 @@
   function loadImageDirect(url) {
     return new Promise((resolve) => {
       const img = new Image();
+      /* jsDelivr CDN pins need this or getImageData/toDataURL taint and abort paint. */
+      try { img.crossOrigin = "anonymous"; } catch (eX) {}
       img.decoding = "async";
       img.onload = () => resolve(img);
       img.onerror = () => resolve(null);
@@ -1426,7 +1428,7 @@
     }
     ART.locked = !!ART.ready;
     if (ART.ready) artEverLocked = true;
-    if (ART.walk) applyWearArt();
+    try { if (ART.walk) applyWearArt(); } catch (eWear) { /* chips/wear must not block meadow paint */ }
     if (ART.ready) {
       if (state.scene === "overworld") drawWorld();
       showArtLoader(false);
@@ -1455,7 +1457,11 @@
   const FUN_POWER_IDS = ["star", "ice", "fire", "leaf", "wind", "water", "electric", "shine", "melody"];
   function funPowerSheetUrl(img) {
     if (!img) return "";
-    return img.toDataURL ? img.toDataURL("image/png") : (img.src || "");
+    if (img.src && !img.toDataURL) return img.src;
+    if (typeof img.toDataURL === "function") {
+      try { return img.toDataURL("image/png"); } catch (eU) { return img.src || ""; }
+    }
+    return img.src || "";
   }
   function sliceFunPowerRow(keyed, index) {
     if (!keyed) return null;
@@ -1470,7 +1476,8 @@
     c.height = H;
     const g = c.getContext("2d");
     g.imageSmoothingEnabled = false;
-    g.drawImage(keyed, x0, 0, cw, H, 0, 0, cw, H);
+    try { g.drawImage(keyed, x0, 0, cw, H, 0, 0, cw, H); } catch (eD) { return null; }
+    try { g.getImageData(0, 0, 1, 1); } catch (eT) { return null; /* tainted — caller uses sheet bg-position */ }
     return cropOpaqueSprite(c) || c;
   }
   function prepareFunPowerIcons(img) {
@@ -1518,19 +1525,25 @@
       ["shine", el.chipShine],
       ["melody", el.chipMelody],
     ];
-    chipMap.forEach(function (row) {
+    chipMap.forEach(function (row, idx) {
       const id = row[0], node = row[1];
       if (!node) return;
       const icon = ART.powerIcons && ART.powerIcons[id];
-      if (!icon) return;
-      const u = funPowerSheetUrl(icon);
+      let u = icon ? funPowerSheetUrl(icon) : "";
+      if (!u && ART.icons) u = funPowerSheetUrl(ART.icons) || (ART.icons.src || "");
       if (!u) return;
       node.classList.add("art-chip", "fun-chip");
       node.style.backgroundImage = 'url("' + u + '")';
-      node.style.backgroundSize = "contain";
-      node.style.backgroundPosition = "center";
       node.style.backgroundRepeat = "no-repeat";
       node.textContent = "";
+      if (icon && u.indexOf("data:") === 0) {
+        node.style.backgroundSize = "contain";
+        node.style.backgroundPosition = "center";
+      } else {
+        /* Full 768×512 fun sheet: 9 equal cells, icons live mid-band ~y 205–305. */
+        node.style.backgroundSize = "768px 512px";
+        node.style.backgroundPosition = (-Math.round(idx * 768 / 9) - 26) + "px -220px";
+      }
     });
   }
 
