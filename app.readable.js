@@ -613,6 +613,10 @@
     vfxIce: null,
     vfxFire: null,
     wearIcons: [],
+    melodyBare: null,
+    melodyWear: {}, /* frame index → full walk sheet (0 daisy, 1 frost) */
+    walkRefW: 320,
+    walkRefH: 213,
     worldTiles: {},
     worldFoes: {},
     worldBoss: {},
@@ -659,6 +663,68 @@
     ],
     strike: [217, 100, 86, 32],
   };
+
+
+  const WALK_REF_W = 320;
+  const WALK_REF_H = 213;
+  /* All nine Melody baked looks (Sergio GREENLIT). Frame = COSMETICS.frame. */
+  const MELODY_WEAR_PATH = {
+    0: "melody/melody-daisy-bow.png",
+    1: "melody/melody-frost-scarf.png",
+    2: "melody/melody-spark-hat.png",
+    3: "melody/melody-clover-pin.png",
+    4: "melody/melody-wind-ribbon.png",
+    5: "melody/melody-shell-clip.png",
+    6: "melody/melody-bolt-bow.png",
+    7: "melody/melody-shine-charm.png",
+    8: "melody/melody-book.png",
+  };
+  function walkScale() {
+    const sheet = ART.walk;
+    if (!sheet) return 1;
+    const sw = sheet.naturalWidth || sheet.width || WALK_REF_W;
+    return sw / WALK_REF_W;
+  }
+  function scaledWalkFrame(fr) {
+    const sc = walkScale();
+    if (sc === 1) return fr;
+    return [Math.round(fr[0] * sc), Math.round(fr[1] * sc), Math.round(fr[2] * sc), Math.round(fr[3] * sc)];
+  }
+
+  function refreshMelodyWearThumbs() {
+    /* Closet thumb = front idle crop from each baked Melody sheet. */
+    if (!ART.melodyWear) return;
+    ART.wearIcons = ART.wearIcons || [];
+    Object.keys(ART.melodyWear).forEach(function (k) {
+      const frame = +k;
+      const sheet = ART.melodyWear[frame];
+      if (!sheet) return;
+      const fr = scaledWalkFrameForSheet(sheet, WALK_FRAMES.down[0]);
+      const c = document.createElement("canvas");
+      c.width = Math.max(8, fr[2]);
+      c.height = Math.max(8, fr[3]);
+      const g = c.getContext("2d");
+      g.imageSmoothingEnabled = false;
+      g.drawImage(sheet, fr[0], fr[1], fr[2], fr[3], 0, 0, c.width, c.height);
+      ART.wearIcons[frame] = c;
+    });
+  }
+  function scaledWalkFrameForSheet(sheet, fr) {
+    const sw = (sheet && (sheet.naturalWidth || sheet.width)) || WALK_REF_W;
+    const sc = sw / WALK_REF_W;
+    if (sc === 1) return fr;
+    return [Math.round(fr[0] * sc), Math.round(fr[1] * sc), Math.round(fr[2] * sc), Math.round(fr[3] * sc)];
+  }
+  function wearWalkSheet() {
+    if (state.wearIndex >= 0 && ART.melodyWear && ART.melodyWear[state.wearIndex]) {
+      return ART.melodyWear[state.wearIndex];
+    }
+    return ART.melodyBare || ART.walk;
+  }
+  function syncWalkFromWear() {
+    const sheet = wearWalkSheet();
+    if (sheet) ART.walk = sheet;
+  }
 
   const FOE_CELLS = {
     bloop: { idle: [0, 0], hit: [0, 1] },
@@ -1168,6 +1234,16 @@
         loadImage(assetUrl("powers/ice-fire-vfx.png")),
         loadImage(assetUrl("foes/thorn-foes.png")), /* tiny cream/bark + leaf */
         loadImage(assetUrl("foes/rock-foes.png")),
+        loadImage(assetUrl("melody/melody-bare.png")),
+        loadImage(assetUrl("melody/melody-daisy-bow.png")),
+        loadImage(assetUrl("melody/melody-frost-scarf.png")),
+        loadImage(assetUrl("melody/melody-spark-hat.png")),
+        loadImage(assetUrl("melody/melody-clover-pin.png")),
+        loadImage(assetUrl("melody/melody-wind-ribbon.png")),
+        loadImage(assetUrl("melody/melody-shell-clip.png")),
+        loadImage(assetUrl("melody/melody-bolt-bow.png")),
+        loadImage(assetUrl("melody/melody-shine-charm.png")),
+        loadImage(assetUrl("melody/melody-book.png")),
       ]);
       const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12], bootTiles = packed[13], emberFoesImg = packed[14], iceVfx = packed[15], fireVfx = packed[16], emberMawImg = packed[17], vfxCombo = packed[18], thornFoesImg = packed[19], rockFoesImg = packed[20];
       ART.walk = walk ? keySheet(walk, CHROMA.walk) || walk : (ART.walk || null);
@@ -1188,6 +1264,28 @@
       ART.emberFoes = emberFoesImg ? prepareFoeSheet(emberFoesImg) : (ART.emberFoes || null);
       ART.thornFoes = thornFoesImg ? outlineFoeSheet(prepareFoeSheet(thornFoesImg)) : (ART.thornFoes || null);
       ART.rockFoes = rockFoesImg ? outlineFoeSheet(prepareFoeSheet(rockFoesImg)) : (ART.rockFoes || null);
+
+      /* Melody WEAR: bare + all nine baked looks (320×213). No overlay. */
+      const keyMel = function (img) {
+        if (!img) return null;
+        return keySheet(img, CHROMA.sheetGreen) || keySheet(img, CHROMA.walk) || keySheet(img, CHROMA.olive) || img;
+      };
+      const melStart = packed.length - 10;
+      const melodyBareImg = packed[melStart];
+      ART.melodyBare = keyMel(melodyBareImg) || ART.melodyBare;
+      ART.melodyWear = ART.melodyWear || {};
+      const wearOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+      for (let wi = 0; wi < wearOrder.length; wi++) {
+        const img = packed[melStart + 1 + wi];
+        if (img) ART.melodyWear[wearOrder[wi]] = keyMel(img);
+      }
+      if (ART.melodyBare) {
+        ART.walk = ART.melodyBare;
+        ART.walkRefW = ART.melodyBare.naturalWidth || ART.melodyBare.width || WALK_REF_W;
+        ART.walkRefH = ART.melodyBare.naturalHeight || ART.melodyBare.height || WALK_REF_H;
+      }
+      refreshMelodyWearThumbs();
+
       ART.vfxIce = iceVfx ? prepareVfxFrame(iceVfx) : (ART.vfxIce || null);
       ART.vfxFire = fireVfx ? prepareVfxFrame(fireVfx) : (ART.vfxFire || null);
       ART.emberMaw = emberMawImg ? prepareBossSheet(emberMawImg) : (ART.emberMaw || null);
@@ -1270,7 +1368,7 @@
     // kind: idle | strike | cast
     if (!ART.walk) return;
     let fr;
-    if (kind === "strike") fr = WALK_FRAMES.strike;
+    if (kind === "strike") { syncWalkFromWear(); fr = scaledWalkFrame(WALK_FRAMES.strike); }
     else if (kind === "cast" && ART.cast) {
       const c = ART.cast;
       el.hero.style.setProperty(
@@ -1288,11 +1386,15 @@
       return;
     } else {
       const face = state.facing === "up" ? "up" : state.facing === "left" ? "left" : state.facing === "right" ? "right" : "down";
-      fr = WALK_FRAMES[face][0];
-      if (ART.walk.toDataURL) {
+      syncWalkFromWear();
+      fr = scaledWalkFrame(WALK_FRAMES[face][0]);
+      if (ART.walk && ART.walk.toDataURL) {
         el.hero.style.setProperty("--hero-sheet", 'url("' + ART.walk.toDataURL("image/png") + '")');
+      } else if (ART.walk && ART.walk.src) {
+        el.hero.style.setProperty("--hero-sheet", 'url("' + ART.walk.src + '")');
       }
     }
+    if (kind === "strike") fr = scaledWalkFrame(WALK_FRAMES.strike);
     const sheet = kind === "cast" && ART.cast ? ART.cast : ART.walk;
     if (sheet) {
       const sw = sheet.naturalWidth || sheet.width || 256;
@@ -1304,7 +1406,6 @@
     el.hero.style.setProperty("--hero-sy", -fr[1] + "px");
     el.hero.style.setProperty("--hero-sw", fr[2] + "px");
     el.hero.style.setProperty("--hero-sh", fr[3] + "px");
-    if (state.wearIndex >= 0) applyWearArt();
   }
 
   function clearFoeArtBg() {
@@ -2028,20 +2129,10 @@
           : state.facing === "left"
             ? "left"
             : "right";
+    syncWalkFromWear();
     if (ART.walk) {
-      const fr = WALK_FRAMES[face][0];
+      const fr = scaledWalkFrame(WALK_FRAMES[face][0]);
       drawSheetFrame(ART.walk, fr[0], fr[1], fr[2], fr[3], dx, dy, dw, dh);
-    }
-    if (state.wearIndex >= 0) {
-      const icon = ART.wearIcons && ART.wearIcons[state.wearIndex];
-      if (icon && (icon.width || 0) > 2) {
-        /* Small on the head only: max 16–18px, never a plate, never cover the body. */
-        const aw = Math.min(16, dw - 10);
-        const ah = Math.min(14, Math.max(10, Math.round(aw * ((icon.height || 1) / Math.max(1, icon.width)))));
-        const ax = dx + (dw - aw) / 2;
-        const ay = state.wearIndex === 1 ? dy + 14 : dy - ah + 4;
-        drawSheetFrame(icon, 0, 0, icon.width, icon.height, ax, ay, aw, ah);
-      }
     }
   }
 
@@ -2402,22 +2493,19 @@
   }
   function applyWearArt() {
     if (!el.hero) return;
+    /* Full Melody sheet-swap for all nine looks. No .hero-wear overlay. */
     const node = ensureHeroWear();
-    if (state.wearIndex < 0) {
-      el.hero.classList.remove("wear-look");
-      if (node) {
-        node.classList.add("hidden");
-        node.style.backgroundImage = "";
-      }
-      return;
+    if (node) {
+      node.classList.add("hidden");
+      node.style.backgroundImage = "";
     }
-    el.hero.classList.add("art-sprite", "wear-look");
-    const icon = ART.wearIcons && ART.wearIcons[state.wearIndex];
-    if (!node || !icon) return;
-    const url = icon.toDataURL ? icon.toDataURL("image/png") : "";
-    node.classList.remove("hidden");
-    node.classList.toggle("wear-neck", state.wearIndex === 1);
-    node.style.backgroundImage = url ? 'url("' + url + '")' : "";
+    el.hero.classList.remove("wear-look");
+    syncWalkFromWear();
+    if (state.wearIndex >= 0 && ART.melodyWear && ART.melodyWear[state.wearIndex]) {
+      el.hero.classList.add("art-sprite");
+    }
+    if (ART.walk) applyDomArt();
+    if (state.scene === "overworld") drawWorld();
   }
   function openW3Message() {
     el.dialogueName.textContent = "World 3";
