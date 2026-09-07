@@ -379,6 +379,31 @@
   const STORM_FOE_SKINS = makeSkins("Storm", 24);
   const HARMONY_FOE_SKINS = makeSkins("Song", 20);
   const STORY_FOE_SKINS = makeSkins("Tale", 20);
+  /* Type ids: soft | frost | ember | thorn | rock. No metal/electric before W4. */
+  function paintFoeTypes(skins, types, rename) {
+    rename = rename || {};
+    for (let i = 0; i < skins.length; i++) {
+      if (types && types[i]) skins[i].type = types[i];
+      if (rename[i]) skins[i].name = rename[i];
+    }
+  }
+  FOE_SKINS.forEach(function (s) { s.type = "soft"; });
+  paintFoeTypes(FROST_FOE_SKINS, [
+    "frost", "frost", "frost", "frost", "frost", "frost", "frost", "rock",
+    "frost", "frost", "frost", "soft", "frost", "frost", "frost", "frost",
+    "frost", "frost", "frost", "frost", "soft", "frost", "rock", "frost",
+  ], { 7: "Pebble Bloop", 11: "Meadow Bloop", 20: "Soft Fluff", 22: "Rock Pup" });
+  paintFoeTypes(EMBER_FOE_SKINS, [
+    "ember", "ember", "ember", "ember", "ember", "ember", "ember", "ember",
+    "ember", "ember", "ember", "ember", "ember", "ember", "ember", "ember",
+    "ember", "ember", "ember", "ember", "frost", "frost", "soft", "soft",
+    "thorn", "thorn", "frost", "soft",
+  ], { 20: "Ice Bloop", 21: "Frost Fluff", 22: "Soft Fluff", 23: "Meadow Bloop", 24: "Thorn Bloop", 25: "Bramble Fluff", 26: "Snow Pup", 27: "Puff Bloop" });
+  paintFoeTypes(LEAF_FOE_SKINS, [
+    "thorn", "thorn", "thorn", "thorn", "thorn", "thorn", "thorn", "thorn",
+    "thorn", "thorn", "thorn", "thorn", "thorn", "thorn", "rock", "rock",
+    "rock", "rock", "soft", "soft", "soft", "soft", "frost", "frost",
+  ], { 0: "Thorn Bloop", 1: "Bramble Fluff", 14: "Pebble Bloop", 15: "Rock Pup", 16: "Stone Fluff", 17: "Boulder Bun", 18: "Soft Fluff", 19: "Meadow Bloop", 20: "Puff Bloop", 21: "Cozy Fluff", 22: "Frost Fluff", 23: "Snow Pup" });
   const LEAF_SPOTS = FROST_SPOTS.map(function (s) { return s.type === "boss" ? { x: s.x, y: s.y, type: "boss", id: "thorn_crown" } : { x: s.x, y: s.y, type: "foe", foe: s.foe }; });
   const WIND_SPOTS = FROST_SPOTS.map(function (s) { return s.type === "boss" ? { x: s.x, y: s.y, type: "boss", id: "gale_whisk" } : { x: s.x, y: s.y, type: "foe", foe: s.foe }; });
   const TIDE_SPOTS = FROST_SPOTS.map(function (s) { return s.type === "boss" ? { x: s.x, y: s.y, type: "boss", id: "tide_shell" } : { x: s.x, y: s.y, type: "foe", foe: s.foe }; });
@@ -580,6 +605,8 @@
     frostFoes: null,
     emberTiles: null,
     emberFoes: null,
+    thornFoes: null,
+    rockFoes: null,
     emberMaw: null,
     vfxIce: null,
     vfxFire: null,
@@ -850,6 +877,52 @@
     if (img._foeReady) return img;
     return packFoeCells(cropFluffColumn(keyConceptGreen(img)));
   }
+  function outlineFoeSheet(src) {
+    if (!src) return src;
+    const pad = 1;
+    const sw = src.width || src.naturalWidth || 0;
+    const sh = src.height || src.naturalHeight || 0;
+    if (sw < 4 || sh < 4) return src;
+    const out = document.createElement("canvas");
+    out.width = sw + pad * 2;
+    out.height = sh + pad * 2;
+    const g = out.getContext("2d");
+    g.imageSmoothingEnabled = false;
+    g.drawImage(src, pad, pad);
+    let data;
+    try { data = g.getImageData(0, 0, out.width, out.height); } catch (eOf) { return src; }
+    const d = data.data;
+    const ow = out.width, oh = out.height;
+    const mark = new Uint8Array(ow * oh);
+    for (let y = 0; y < oh; y++) {
+      for (let x = 0; x < ow; x++) {
+        if (d[(y * ow + x) * 4 + 3] > 12) mark[y * ow + x] = 1;
+      }
+    }
+    for (let y = 0; y < oh; y++) {
+      for (let x = 0; x < ow; x++) {
+        const i = y * ow + x;
+        if (mark[i]) continue;
+        let hit = false;
+        for (let dy = -pad; dy <= pad && !hit; dy++) {
+          for (let dx = -pad; dx <= pad; dx++) {
+            const nx = x + dx, ny = y + dy;
+            if (nx < 0 || ny < 0 || nx >= ow || ny >= oh) continue;
+            if (mark[ny * ow + nx]) { hit = true; break; }
+          }
+        }
+        if (hit) {
+          const p = i * 4;
+          d[p] = 26; d[p + 1] = 20; d[p + 2] = 12; d[p + 3] = 255;
+        }
+      }
+    }
+    g.putImageData(data, 0, 0);
+    out._foeReady = true;
+    out._fluffCrop = true;
+    out._bossCrop = true;
+    return out;
+  }
   function prepareBossSheet(img) {
     if (!img) return null;
     return cropOpaqueSprite(keyConceptGreen(img));
@@ -1091,8 +1164,10 @@
         loadImage(assetUrl("powers/fire/vfx.png")),
         loadImage(assetUrl("bosses/ember_maw.png")),
         loadImage(assetUrl("powers/ice-fire-vfx.png")),
+        loadImage(assetUrl("foes/thorn-foes.png")),
+        loadImage(assetUrl("foes/rock-foes.png")),
       ]);
-      const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12], bootTiles = packed[13], emberFoesImg = packed[14], iceVfx = packed[15], fireVfx = packed[16], emberMawImg = packed[17], vfxCombo = packed[18];
+      const walk = packed[0], cast = packed[1], foes = packed[2], boss = packed[3], tiles = packed[4], icons = packed[5], vfx = packed[6], panel = packed[7], npcs = packed[8], iceHowl = packed[9], frostTiles = packed[10], frostFoes = packed[11], outfitImg = packed[12], bootTiles = packed[13], emberFoesImg = packed[14], iceVfx = packed[15], fireVfx = packed[16], emberMawImg = packed[17], vfxCombo = packed[18], thornFoesImg = packed[19], rockFoesImg = packed[20];
       ART.walk = walk ? keySheet(walk, CHROMA.walk) || walk : (ART.walk || null);
       ART.cast = cast ? keySheet(cast, CHROMA.cast) || cast : (ART.cast || null);
       ART.foes = foes ? prepareFoeSheet(foes) : (ART.foes || null);
@@ -1109,6 +1184,8 @@
       ART.outfits = outfitImg ? keyOutfitSheet(outfitImg) : (ART.outfits || null);
       if (ART.outfits) buildWearIcons(ART.outfits);
       ART.emberFoes = emberFoesImg ? prepareFoeSheet(emberFoesImg) : (ART.emberFoes || null);
+      ART.thornFoes = thornFoesImg ? outlineFoeSheet(prepareFoeSheet(thornFoesImg)) : (ART.thornFoes || null);
+      ART.rockFoes = rockFoesImg ? outlineFoeSheet(prepareFoeSheet(rockFoesImg)) : (ART.rockFoes || null);
       ART.vfxIce = iceVfx ? prepareVfxFrame(iceVfx) : (ART.vfxIce || null);
       ART.vfxFire = fireVfx ? prepareVfxFrame(fireVfx) : (ART.vfxFire || null);
       ART.emberMaw = emberMawImg ? prepareBossSheet(emberMawImg) : (ART.emberMaw || null);
@@ -1238,6 +1315,9 @@
   function setFoeArt(artKey, hit) {
     // Only add art-sprite AFTER we have a sheet — otherwise procedural body stays visible
     el.bloop.classList.remove("boss-art");
+    const encType = state.encounter && state.encounter.def && !state.encounter.def.isBoss
+      ? state.encounter.def.foeType
+      : null;
     if (BOSS_IDS[artKey]) {
       const sheet = currentBossSheet(artKey);
       if (!sheet) {
@@ -1256,7 +1336,7 @@
       el.bloop.style.setProperty("height", "96px", "important");
       return;
     }
-    const foeSheet = currentFoeSheet();
+    const foeSheet = foeSheetForType(encType) || currentFoeSheet();
     if (!foeSheet || !(foeSheet.naturalWidth || foeSheet.width)) {
       el.bloop.classList.add("art-sprite");
       clearFoeArtBg();
@@ -1491,6 +1571,65 @@
     if (sheet && !sheet._foeReady && (sheet.width || 0) > (sheet.height || 0)) sheet = prepareFoeSheet(sheet);
     return sheet;
   }
+  function matchupTier(power, foeType) {
+    if (!power || !foeType) return "ok";
+    if (power === "star" && foeType === "soft") return "strong";
+    if (power === "ice") {
+      if (foeType === "thorn") return "strong";
+      if (foeType === "ember" || foeType === "frost") return "soft";
+    }
+    if (power === "fire") {
+      if (foeType === "frost") return "strong";
+      if (foeType === "ember") return "soft";
+    }
+    if (power === "leaf") {
+      if (foeType === "ember" || foeType === "thorn") return "soft";
+    }
+    return "ok";
+  }
+  function matchupCost(power, foeType) {
+    const t = matchupTier(power, foeType);
+    return t === "strong" ? 1 : t === "soft" ? 3 : 2;
+  }
+  function foeSheetForType(type) {
+    if (type === "thorn" && ART.thornFoes) return ART.thornFoes;
+    if (type === "rock" && ART.rockFoes) return ART.rockFoes;
+    if (type === "frost" && ART.frostFoes) return ART.frostFoes;
+    if (type === "ember" && ART.emberFoes) return ART.emberFoes;
+    if (type === "soft" && ART.foes) return ART.foes;
+    return null;
+  }
+  function foeTypeOfSpot(spot) {
+    if (!spot || spot.type !== "foe") return null;
+    const skins = currentSkins();
+    const skin = skins[spot.foe] || skins[0];
+    return (skin && skin.type) || null;
+  }
+  function foeSheetForSpot(spot) {
+    return foeSheetForType(foeTypeOfSpot(spot)) || currentFoeSheet();
+  }
+  function paintMatchupHud() {
+    const chips = [
+      ["star", el.chipStar],
+      ["ice", el.chipIce],
+      ["fire", el.chipFire],
+      ["leaf", el.chipLeaf],
+      ["wind", el.chipWind],
+      ["water", el.chipWater],
+      ["electric", el.chipElectric],
+      ["shine", el.chipShine],
+      ["melody", el.chipMelody],
+    ];
+    const enc = state.encounter && state.encounter.def;
+    const live = state.scene === "fight" && enc && !enc.isBoss && enc.foeType;
+    chips.forEach(function (row) {
+      const node = row[1];
+      if (!node) return;
+      node.classList.remove("match-strong", "match-soft", "match-ok");
+      if (!live || !state.powers[row[0]]) return;
+      node.classList.add("match-" + matchupTier(row[0], enc.foeType));
+    });
+  }
   function currentBossSheet(artKey) {
     if (artKey === "star_bloom") return ART.boss;
     if (artKey === "ice_howl") return ART.iceHowl;
@@ -1556,6 +1695,7 @@
     if (el.chipElectric) el.chipElectric.classList.toggle("locked", !state.powers.electric);
     if (el.chipShine) el.chipShine.classList.toggle("locked", !state.powers.shine);
     if (el.chipMelody) el.chipMelody.classList.toggle("locked", !state.powers.melody);
+    paintMatchupHud();
     el.btnWear = document.getElementById("btn-wear") || el.btnWear;
     if (el.btnWear) {
       const locked = !Object.keys(state.unlockedWear).length;
@@ -1609,6 +1749,7 @@
         drawWorld();
       }
     }
+    paintMatchupHud();
   }
 
   function updateCamera() {
@@ -1840,8 +1981,8 @@
         const aspect = (bossSheet.width || 1) / (bossSheet.height || 1);
         const bw = Math.max(48, Math.min(64, Math.round(bh * aspect)));
         drawSheetFrame(bossSheet, 0, 0, bossSheet.width, bossSheet.height, cx - bw / 2, cy + TILE / 2 - bh - 2, bw, bh);
-      } else if (spot.type === "foe" && currentFoeSheet()) {
-        const fs = currentFoeSheet();
+      } else if (spot.type === "foe" && (foeSheetForSpot(spot) || currentFoeSheet())) {
+        const fs = foeSheetForSpot(spot) || currentFoeSheet();
         /* Cropped fluff column: full width × top half = idle fluff. Never slime. */
         const fw = fs.width;
         const fh = Math.max(1, Math.floor(fs.height / 2));
@@ -2359,12 +2500,13 @@
     }
     const skins = currentSkins();
     const skin = skins[spot.foe] || skins[0];
-    const hits = skin.artKey === "fluff_lite" ? 2 : 1;
+    const foeType = (skin && skin.type) || null;
     return {
       id: "foe_" + spot.foe,
       artKey: skin.artKey,
       name: skin.name,
-      hits: hits,
+      foeType: foeType,
+      hits: 2,
       bank: "foe",
       chest: false,
       isBoss: false,
@@ -2389,7 +2531,7 @@
     el.bloop.style.backgroundPosition = "";
     setFoeArt(enc.artKey, false);
     setHeroFrame(enc.isBoss ? "idle" : state.powers.star ? "idle" : "idle");
-    el.foeLabel.textContent = enc.name;
+    el.foeLabel.textContent = enc.foeType ? (enc.name + " · " + enc.foeType) : enc.name;
     el.chest.classList.toggle("hidden", !enc.chest);
     el.chest.classList.remove("open");
     el.winOverlay.classList.add("hidden");
@@ -2401,12 +2543,18 @@
     setFlavor(enc.name + " appears!");
 
     showScene("fight");
+    paintMatchupHud();
 
-    // Before Star: basic read-to-hit (no power picker). After Star: optional Star picker.
+    // Never skip the reading panel. Cost is 1/2/3 after a power pick; basic read is OK=2.
     if (!enc.isBoss && hasAnyPower()) {
       showPowerPicker();
     } else {
       state.selectedPower = null;
+      if (!enc.isBoss) {
+        state.hitsNeeded = 2;
+        enc.hits = 2;
+        buildPips(2);
+      }
       el.powerPicker.classList.add("hidden");
       el.readPanel.classList.remove("hidden");
       nextWord();
@@ -2449,30 +2597,43 @@
       ["shine", "shine", "Shine"],
       ["melody", "melody", "Melody"],
     ];
+    const foeType = state.encounter && state.encounter.def && state.encounter.def.foeType;
     catalog.forEach(function (row) {
       const id = row[0];
       if (!state.powers[id]) return;
+      const tier = matchupTier(id, foeType);
+      const cost = matchupCost(id, foeType);
       const btn = document.createElement("button");
       btn.type = "button";
-      btn.className = "power-pick-btn " + row[1];
+      btn.className = "power-pick-btn " + row[1] + " match-" + tier;
       btn.textContent = row[2];
+      btn.title = row[2] + " · " + tier + " · " + cost + " read" + (cost === 1 ? "" : "s");
       btn.addEventListener("click", function () { pickPower(id); });
       el.powerChoices.appendChild(btn);
     });
     const basic = document.createElement("button");
     basic.type = "button";
-    basic.className = "power-pick-btn basic";
+    basic.className = "power-pick-btn basic match-ok";
     basic.textContent = "Read";
+    basic.title = "Read · ok · 2 reads";
     basic.addEventListener("click", () => pickPower(null));
     el.powerChoices.appendChild(basic);
 
     el.powerPicker.classList.remove("hidden");
     el.readPanel.classList.add("hidden");
-    el.prompt.textContent = "Pick a power or basic read";
+    el.prompt.textContent = "Pick a power — sparkle is Strong (1 read). Dim is Soft (3).";
   }
 
   function pickPower(id) {
     state.selectedPower = id;
+    const enc = state.encounter && state.encounter.def;
+    if (enc && !enc.isBoss) {
+      const cost = matchupCost(id, enc.foeType);
+      state.hitsNeeded = cost;
+      enc.hits = cost;
+      buildPips(cost);
+      updatePips();
+    }
     el.powerPicker.classList.add("hidden");
     el.readPanel.classList.remove("hidden");
     nextWord();
@@ -2518,16 +2679,12 @@
     const enc = state.encounter.def;
     if (enc.isBoss) {
       setFlavor(enc.name + " — read " + (state.hits + 1) + "/" + state.hitsNeeded + "!");
-    } else if (state.selectedPower === "star") {
-      setFlavor("Star cast — sound it out!");
-    } else if (state.selectedPower === "ice") {
-      setFlavor("Ice cast — sound it out!");
-    } else if (state.selectedPower === "fire") {
-      setFlavor("Fire cast — sound it out!");
-    } else if (/\s/.test(state.current.word)) {
-      setFlavor("Read the whole line!");
     } else {
-      setFlavor("Your turn — read to hit!");
+      const pow = state.selectedPower;
+      const tier = matchupTier(pow, enc.foeType);
+      const label = pow ? pow.charAt(0).toUpperCase() + pow.slice(1) : "Read";
+      const hint = tier === "strong" ? "Strong · 1 read" : tier === "soft" ? "Soft · 3 reads" : "OK · 2 reads";
+      setFlavor(label + " is " + hint + " — sound it out! (" + (state.hits + 1) + "/" + state.hitsNeeded + ")");
     }
   }
 
@@ -2985,7 +3142,13 @@
     window.__MVB_KID = function () {
       const fs = currentFoeSheet();
       const bs = currentBossSheet(worldDef().bossId);
-      return { world: state.world, px: state.px, py: state.py, camX: state.camX, camY: state.camY, facing: state.facing, wearIndex: state.wearIndex, world2Open: !!state.world2Open, world3Open: !!state.world3Open, wearUnlocked: Object.keys(state.unlockedWear), bank0: currentBank()[0], bankN: currentBank().length, bankWord: currentBank()[0], foeSheet: fs ? [fs.width, fs.height] : null, bossSheet: bs ? [bs.width, bs.height] : null, vfxIce: ART.vfxIce ? [ART.vfxIce.width, ART.vfxIce.height] : null, vfxFire: ART.vfxFire ? [ART.vfxFire.width, ART.vfxFire.height] : null, saved: !!(function(){try{return localStorage.getItem(SAVE_KEY)}catch(e){return null}})(), saveHud: (el.saveStatus && el.saveStatus.textContent) || "" };
+      const mix = {};
+      currentSkins().forEach(function (s) {
+        const t = s.type || "none";
+        mix[t] = (mix[t] || 0) + 1;
+      });
+      const enc = state.encounter && state.encounter.def;
+      return { world: state.world, px: state.px, py: state.py, camX: state.camX, camY: state.camY, facing: state.facing, wearIndex: state.wearIndex, world2Open: !!state.world2Open, world3Open: !!state.world3Open, wearUnlocked: Object.keys(state.unlockedWear), bank0: currentBank()[0], bankN: currentBank().length, bankWord: currentBank()[0], foeSheet: fs ? [fs.width, fs.height] : null, bossSheet: bs ? [bs.width, bs.height] : null, vfxIce: ART.vfxIce ? [ART.vfxIce.width, ART.vfxIce.height] : null, vfxFire: ART.vfxFire ? [ART.vfxFire.width, ART.vfxFire.height] : null, saved: !!(function(){try{return localStorage.getItem(SAVE_KEY)}catch(e){return null}})(), saveHud: (el.saveStatus && el.saveStatus.textContent) || "", typeMix: mix, foeType: enc ? enc.foeType || null : null, hitsNeeded: state.hitsNeeded, selectedPower: state.selectedPower, matchup: enc && !enc.isBoss ? matchupTier(state.selectedPower, enc.foeType) : null, thornSheet: ART.thornFoes ? [ART.thornFoes.width, ART.thornFoes.height] : null, rockSheet: ART.rockFoes ? [ART.rockFoes.width, ART.rockFoes.height] : null };
     };
   } catch (eKid) {}
   function ensureWorldFromUrl() {

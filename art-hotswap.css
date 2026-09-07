@@ -205,3 +205,22 @@
 /* Pixel-only overworld: CSS slime/cat never paint over the canvas. */
 .hero .cat-ear,.hero .cat-head,.hero .cat-body,.hero .cat-tail,.hero .cat-collar,.hero .cat-nose,.hero .cat-eye,.hero .cat-charm{display:none!important;opacity:0!important;visibility:hidden!important}
 .bloop-body,.bloop-eye,.bloop-smile{display:none!important;opacity:0!important;visibility:hidden!important}
+.power-chip.match-strong:not(.locked){
+  position:relative;opacity:1;filter:none;
+  box-shadow:0 0 0 3px #fff176,0 0 10px #ffd54f,0 0 4px #fff inset;
+}
+.power-chip.match-strong:not(.locked)::after{
+  content:"✦";position:absolute;top:-7px;right:-6px;font-size:0.7rem;line-height:1;
+  color:#fff59d;text-shadow:0 0 5px #ff8f00,0 0 2px #fff;
+  pointer-events:none;
+}
+.power-chip.match-soft:not(.locked){opacity:0.58;filter:saturate(0.65) brightness(0.92);}
+.power-pick-btn.match-strong{
+  box-shadow:0 0 0 3px #fff176,0 3px 0 rgba(0,0,0,0.2);
+  position:relative;
+}
+.power-pick-btn.match-strong::after{
+  content:"✦";position:absolute;top:-8px;right:-4px;font-size:0.85rem;color:#fff59d;
+  text-shadow:0 0 5px #ff8f00;pointer-events:none;
+}
+.power-pick-btn.match-soft{opacity:0.68;filter:saturate(0.7);}
