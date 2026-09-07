@@ -1411,18 +1411,14 @@
       }
     }
     if (!ART.melodyBare) {
-      const wearKeys = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-      const melImgs = await Promise.all(
-        [loadImage(assetUrl(MELODY_BARE_PATH))].concat(
-          wearKeys.map(function (i) { return loadImage(assetUrl(MELODY_WEAR_PATH[i])); })
-        )
-      );
-      ART.melodyBare = prepareMelodySheet(melImgs[0]) || ART.melodyBare;
+      /* Perf: bare first. Other WEAR sheets lazy on closet / equip (not ×10 at boot). */
+      const bareImg = await loadImage(assetUrl(MELODY_BARE_PATH));
+      ART.melodyBare = prepareMelodySheet(bareImg) || ART.melodyBare;
       ART.melodyWear = ART.melodyWear || {};
-      for (let wi = 0; wi < wearKeys.length; wi++) {
-        if (melImgs[wi + 1]) ART.melodyWear[wearKeys[wi]] = prepareMelodySheet(melImgs[wi + 1]);
+      if (state.wearIndex >= 0 && MELODY_WEAR_PATH[state.wearIndex]) {
+        const one = await loadImage(assetUrl(MELODY_WEAR_PATH[state.wearIndex]));
+        if (one) ART.melodyWear[state.wearIndex] = prepareMelodySheet(one);
       }
-      refreshMelodyWearThumbs();
     }
     syncWalkFromWear();
     if (ART.walk) {
@@ -1449,31 +1445,70 @@
     } else {
       showArtLoader(true);
     }
-    if (!ART.ladderLoaded) {
-      const worldImgs = await Promise.all(ART_WORLD_IDS.map(function (id) {
-        return loadImage(assetUrl("worlds/" + id + "/tiles.png"));
-      }));
-      ART.worldTiles = ART.worldTiles || {};
-      ART_WORLD_IDS.forEach(function (id, i) {
-        const im = worldImgs[i];
-        ART.worldTiles[id] = im && (im.naturalWidth || im.width) ? im : ART.worldTiles[id] || null;
-      });
-      ART.emberTiles = ART.worldTiles.ember || ART.emberTiles;
-      ART.ladderLoaded = true;
-      if (laterWorld() && currentTiles() && state.scene === "overworld") drawWorld();
-    }
+    /* Perf: do NOT fetch all 7×1536 sheets at boot — ensureWorldTiles on enter. */
+    ART.ladderLoaded = true;
     } finally {
       artLoadInFlight = false;
     }
   }
 
+  var worldTileLoads = {};
+  async function ensureWorldTiles(id) {
+    if (!id || id === "meadow" || id === "frost") return currentTiles();
+    ART.worldTiles = ART.worldTiles || {};
+    if (ART.worldTiles[id] && (ART.worldTiles[id].naturalWidth || ART.worldTiles[id].width)) {
+      return ART.worldTiles[id];
+    }
+    if (worldTileLoads[id]) return worldTileLoads[id];
+    worldTileLoads[id] = (async function () {
+      const im = await loadImage(assetUrl("worlds/" + id + "/tiles.png"));
+      if (im && (im.naturalWidth || im.width)) {
+        ART.worldTiles[id] = im;
+        if (id === "ember") ART.emberTiles = im;
+      }
+      return ART.worldTiles[id] || null;
+    })();
+    return worldTileLoads[id];
+  }
+
+  var melodyWearLoad = null;
+  async function ensureMelodyWearAll() {
+    ART.melodyWear = ART.melodyWear || {};
+    const need = [];
+    for (let i = 0; i < 9; i++) {
+      if (!ART.melodyWear[i]) need.push(i);
+    }
+    if (!need.length) return;
+    if (melodyWearLoad) return melodyWearLoad;
+    melodyWearLoad = (async function () {
+      const imgs = await Promise.all(need.map(function (i) {
+        return loadImage(assetUrl(MELODY_WEAR_PATH[i]));
+      }));
+      for (let n = 0; n < need.length; n++) {
+        if (imgs[n]) ART.melodyWear[need[n]] = prepareMelodySheet(imgs[n]);
+      }
+      refreshMelodyWearThumbs();
+      melodyWearLoad = null;
+    })();
+    return melodyWearLoad;
+  }
+
+  var drawRaf = 0;
+  function requestDraw() {
+    if (drawRaf) return;
+    drawRaf = requestAnimationFrame(function () {
+      drawRaf = 0;
+      drawWorld();
+    });
+  }
 
   const FUN_POWER_IDS = ["star", "ice", "fire", "leaf", "wind", "water", "electric", "shine", "melody"];
   function funPowerSheetUrl(img) {
     if (!img) return "";
-    if (img.src && !img.toDataURL) return img.src;
+    if (img._dataUrl) return img._dataUrl;
+    if (img.src && !img.toDataURL) { img._dataUrl = img.src; return img._dataUrl; }
     if (typeof img.toDataURL === "function") {
-      try { return img.toDataURL("image/png"); } catch (eU) { return img.src || ""; }
+      try { img._dataUrl = img.toDataURL("image/png"); return img._dataUrl; } catch (eU) { return img.src || ""; }
     }
     return img.src || "";
   }
@@ -1549,7 +1584,7 @@
   function applyDomArt() {
     // Hero: sheet sprite via CSS background (keyed canvas → data URL if needed)
     if (ART.walk) {
-      const url = ART.walk.toDataURL ? ART.walk.toDataURL("image/png") : ART.walk.src;
+      const url = heroSheetUrl(ART.walk);
       el.hero.classList.add("art-sprite");
       el.hero.style.setProperty("--hero-sheet", 'url("' + url + '")');
       setHeroFrame("idle");
@@ -1598,7 +1633,13 @@
   }
   function heroSheetUrl(sheet) {
     if (!sheet) return "";
-    try { if (sheet.toDataURL) return sheet.toDataURL("image/png"); } catch (eHS) {}
+    if (sheet._dataUrl) return sheet._dataUrl;
+    try {
+      if (sheet.toDataURL) {
+        sheet._dataUrl = sheet.toDataURL("image/png");
+        return sheet._dataUrl;
+      }
+    } catch (eHS) {}
     return sheet.src || "";
   }
   function setHeroFrame(kind) {
@@ -1656,7 +1697,7 @@
         clearFoeArtBg();
         return;
       }
-      const url = sheet.toDataURL ? sheet.toDataURL("image/png") : sheet.src;
+      const url = heroSheetUrl(sheet) || sheet.src || "";
       el.bloop.classList.add("art-sprite", "boss-art");
       el.bloop.style.backgroundColor = "transparent";
       el.bloop.style.backgroundImage = 'url("' + url + '")';
@@ -1675,7 +1716,7 @@
     }
     const cell = FOE_CELLS.fluff_lite;
     const [cx, cy] = hit ? cell.hit : cell.idle;
-    const url = foeSheet.toDataURL ? foeSheet.toDataURL("image/png") : foeSheet.src;
+    const url = heroSheetUrl(foeSheet) || foeSheet.src || "";
     const dispH = 64;
     const dispW = 64;
     el.bloop.classList.add("art-sprite");
@@ -2237,8 +2278,6 @@
   function drawWorld() {
     if (!rebindLiveCanvas() || !ctx) return;
     updateCamera();
-    syncWorldFromUrl();
-    updateCamera();
     const w = VIEW_COLS * TILE;
     const h = VIEW_ROWS * TILE;
     const tilesheetReady = currentTiles();
@@ -2472,7 +2511,7 @@
     applyWorldChrome();
     closeDialogueQuiet();
     scheduleSave();
-    drawWorld();
+    requestDraw();
   }
   function closeDialogueQuiet() {
     if (!el.dialogue) return;
@@ -2552,7 +2591,12 @@
     scheduleSave();
     const silent = !!(opts && opts.silent);
     if (silent) {
-      if (currentTiles() && state.scene === "overworld") drawWorld();
+      if (!currentTiles()) {
+        showArtLoader(true);
+        ensureWorldTiles("ember").then(function () {
+          if (state.world === "ember" && state.scene === "overworld") drawWorld();
+        });
+      } else if (state.scene === "overworld") drawWorld();
       return;
     }
     if (currentTiles()) {
@@ -2560,6 +2604,9 @@
       drawWorld();
     } else {
       showArtLoader(true);
+      ensureWorldTiles("ember").then(function () {
+        if (state.world === "ember") { showArtLoader(false); drawWorld(); }
+      });
       preloadArt();
     }
   }
@@ -2594,21 +2641,22 @@
     closeDialogueQuiet();
     scheduleSave();
     const silent = !!(opts && opts.silent);
-    if (silent) {
-      if (currentTiles() && state.scene === "overworld") drawWorld();
-      else if (!currentTiles()) {
+    function paintNow() {
+      if (state.world !== id) return;
+      if (currentTiles()) {
+        showArtLoader(false);
+        if (state.scene === "overworld") drawWorld();
+      } else {
         showArtLoader(true);
-        preloadArt();
       }
+    }
+    if (id !== "meadow" && id !== "frost" && !currentTiles()) {
+      showArtLoader(true);
+      ensureWorldTiles(id).then(paintNow);
+      if (!silent) preloadArt(); /* boot shared sheets if needed */
       return;
     }
-    if (currentTiles()) {
-      showArtLoader(false);
-      drawWorld();
-    } else {
-      showArtLoader(true);
-      preloadArt();
-    }
+    paintNow();
   }
   function handleLadderGate(nx, ny) {
     const d = worldDef();
@@ -2657,6 +2705,12 @@
     return !!(el.closet && !el.closet.classList.contains("hidden"));
   }
   function paintCloset() {
+    ensureMelodyWearAll().then(function () {
+      if (closetOpen()) paintClosetInner();
+    });
+    paintClosetInner();
+  }
+  function paintClosetInner() {
     const grid = el.closetGrid || document.getElementById("closet-grid");
     if (!grid) return;
     grid.innerHTML = "";
@@ -2672,7 +2726,7 @@
       const icon = ART.wearIcons && ART.wearIcons[c.frame];
       if (icon) {
         var tu = "";
-        try { if (icon.toDataURL) tu = icon.toDataURL("image/png"); } catch (eTh) { tu = icon.src || ""; }
+        tu = heroSheetUrl(icon) || "";
         if (tu) thumb.style.backgroundImage = 'url("' + tu + '")';
       }
       const lab = document.createElement("span");
@@ -2752,7 +2806,7 @@
       el.hero.classList.add("art-sprite");
     }
     if (ART.walk) applyDomArt();
-    if (state.scene === "overworld") drawWorld();
+    if (state.scene === "overworld") requestDraw();
   }
   function openW3Message() {
     el.dialogueName.textContent = "World 3";
@@ -3474,6 +3528,7 @@
       COSMETICS.forEach(function (c) { state.unlockedWear[c.id] = true; });
       if (typeof state.wearIndex !== "number") state.wearIndex = -1;
       try { applyWearArt(); } catch (eW) {}
+      ensureMelodyWearAll(); /* background — closet ready without blocking boot */
       updatePowerHud();
       if (el.worldHint) el.worldHint.textContent = "QA wear unlock · all 9 looks + bare (None)";
     }
