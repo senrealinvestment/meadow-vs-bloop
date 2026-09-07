@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Sparkelody — Worlds 1-9 (ladder preview)</title>
+  <title>Melody — Worlds 1-9 (ladder preview)</title>
   <!-- Same-origin default so a Vercel deploy of THIS branch IS the game (no jsDelivr).
        Sergio's production play pin is still 7179fc44 (old dual-renderer). This branch is the fix.
        Optional: ?t=<sha> loads that commit from jsDelivr. Bad pins (7179fc44 / 3337fad7) stay local. Not GREEN. -->
@@ -14,7 +14,7 @@
   <div id="app">
     <div id="art-loader" style="position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:#6aaa5a;font-weight:800;font-family:sans-serif;">Loading Meadow…</div>
     <header class="top-bar">
-      <h1 class="title">Sparkelody · World 1 Meadow</h1>
+      <h1 class="title">Melody · World 1 Meadow</h1>
       <div class="hud-row">
         <div class="power-hud" id="power-hud" aria-label="Powers">
           <span class="power-chip star locked" id="chip-star" title="Star">⭐</span>
@@ -89,7 +89,7 @@
         </div>
 
         <div class="actors">
-          <div class="hero sparkelody art-sprite" id="hero" title="Sparkelody">
+          <div class="hero sparkelody art-sprite" id="hero" title="Melody">
             <div class="cat-ear left"></div>
             <div class="cat-ear right"></div>
             <div class="cat-head">
@@ -100,7 +100,7 @@
             <div class="cat-body"></div>
             <div class="cat-tail"></div>
             <div class="cat-collar"><span class="cat-charm"></span></div>
-            <div class="hero-label">Sparkelody</div>
+            <div class="hero-label">Melody</div>
             <div class="hero-wear hidden" id="hero-wear"></div>
           </div>
 
@@ -163,22 +163,22 @@
   (function(){
     var m = location.search.match(/[?&](w[2-9]|frost|ember|leaf|wind|tide|storm|harmony|story)=1/);
     var worlds = {
-      w2:["world-frost","Loading Frost Path…","#90caf9","#0d47a1","Sparkelody · World 2 Frost Path"],
-      frost:["world-frost","Loading Frost Path…","#90caf9","#0d47a1","Sparkelody · World 2 Frost Path"],
-      w3:["world-ember","Loading Ember Grove…","#bf360c","#fff3e0","Sparkelody · World 3 Ember Grove"],
-      ember:["world-ember","Loading Ember Grove…","#bf360c","#fff3e0","Sparkelody · World 3 Ember Grove"],
-      w4:["world-leaf","Loading Leaf Hollow…","#2e7d32","#e8f5e9","Sparkelody · World 4 Leaf Hollow"],
-      leaf:["world-leaf","Loading Leaf Hollow…","#2e7d32","#e8f5e9","Sparkelody · World 4 Leaf Hollow"],
-      w5:["world-wind","Loading Windy Ridge…","#455a64","#eceff1","Sparkelody · World 5 Windy Ridge"],
-      wind:["world-wind","Loading Windy Ridge…","#455a64","#eceff1","Sparkelody · World 5 Windy Ridge"],
-      w6:["world-tide","Loading Tide Pools…","#0277bd","#e1f5fe","Sparkelody · World 6 Tide Pools"],
-      tide:["world-tide","Loading Tide Pools…","#0277bd","#e1f5fe","Sparkelody · World 6 Tide Pools"],
-      w7:["world-storm","Loading Storm Peak…","#311b92","#ede7f6","Sparkelody · World 7 Storm Peak"],
-      storm:["world-storm","Loading Storm Peak…","#311b92","#ede7f6","Sparkelody · World 7 Storm Peak"],
-      w8:["world-harmony","Loading Harmony Hill…","#f6c26b","#4a148c","Sparkelody · World 8 Harmony Hill"],
-      harmony:["world-harmony","Loading Harmony Hill…","#f6c26b","#4a148c","Sparkelody · World 8 Harmony Hill"],
-      w9:["world-story","Loading Story Gate…","#1a237e","#fff8e1","Sparkelody · World 9 Story Gate"],
-      story:["world-story","Loading Story Gate…","#1a237e","#fff8e1","Sparkelody · World 9 Story Gate"]
+      w2:["world-frost","Loading Frost Path…","#90caf9","#0d47a1","Melody · World 2 Frost Path"],
+      frost:["world-frost","Loading Frost Path…","#90caf9","#0d47a1","Melody · World 2 Frost Path"],
+      w3:["world-ember","Loading Ember Grove…","#bf360c","#fff3e0","Melody · World 3 Ember Grove"],
+      ember:["world-ember","Loading Ember Grove…","#bf360c","#fff3e0","Melody · World 3 Ember Grove"],
+      w4:["world-leaf","Loading Leaf Hollow…","#2e7d32","#e8f5e9","Melody · World 4 Leaf Hollow"],
+      leaf:["world-leaf","Loading Leaf Hollow…","#2e7d32","#e8f5e9","Melody · World 4 Leaf Hollow"],
+      w5:["world-wind","Loading Windy Ridge…","#455a64","#eceff1","Melody · World 5 Windy Ridge"],
+      wind:["world-wind","Loading Windy Ridge…","#455a64","#eceff1","Melody · World 5 Windy Ridge"],
+      w6:["world-tide","Loading Tide Pools…","#0277bd","#e1f5fe","Melody · World 6 Tide Pools"],
+      tide:["world-tide","Loading Tide Pools…","#0277bd","#e1f5fe","Melody · World 6 Tide Pools"],
+      w7:["world-storm","Loading Storm Peak…","#311b92","#ede7f6","Melody · World 7 Storm Peak"],
+      storm:["world-storm","Loading Storm Peak…","#311b92","#ede7f6","Melody · World 7 Storm Peak"],
+      w8:["world-harmony","Loading Harmony Hill…","#f6c26b","#4a148c","Melody · World 8 Harmony Hill"],
+      harmony:["world-harmony","Loading Harmony Hill…","#f6c26b","#4a148c","Melody · World 8 Harmony Hill"],
+      w9:["world-story","Loading Story Gate…","#1a237e","#fff8e1","Melody · World 9 Story Gate"],
+      story:["world-story","Loading Story Gate…","#1a237e","#fff8e1","Melody · World 9 Story Gate"]
     };
     if (m && worlds[m[1]]) {
       var w = worlds[m[1]];

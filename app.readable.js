@@ -1,5 +1,5 @@
 /**
- * Sparkelody Phase 3 — Worlds 1-9 ladder + closet (Pixel-only).
+ * Melody Phase 3 — Worlds 1-9 ladder + closet (Pixel-only).
  * Official literacy banks W1-W9. One Pixel fluff foe path. Do not GREEN.
  */
 (function () {
@@ -32,6 +32,8 @@
   // Flip/leave true at ship time; q files are NOT rebuilt from this file.
   window.MEADOW_W3_STUB = true;
 
+  const HERO_NAME = "Melody";
+  const displayName = HERO_NAME;
   const TILE = 32;
   const COLS = 20;
   const ROWS = 16;
@@ -468,15 +470,15 @@
     story: { size: 96, src: { 0: [900, 520], 1: [1050, 520], 2: [900, 640], 3: [200, 700], 4: [16, 800], 5: [700, 80], 6: [1100, 80] } },
   };
   const WORLD_DEFS = {
-    meadow: { id: "meadow", num: 1, title: "Sparkelody · World 1 Meadow", hint: "Talk to Elder · clear all Bloops · Star Bloom on the east gate", map: MAP, spots: ENCOUNTER_SPOTS, npcs: NPCS, bank: WORLD1_BANK, skins: FOE_SKINS, prefix: "", next: "frost", prev: null, power: "star", bossId: "star_bloom", bossName: "Star Bloom", nextName: "Frost Path", appClass: "", foeTint: null },
-    frost: { id: "frost", num: 2, title: "Sparkelody · World 2 Frost Path", hint: "Frost Path · clear all foes, then Ice Howl on the east gate", map: FROST_MAP, spots: FROST_SPOTS, npcs: FROST_NPCS, bank: WORLD2_BANK, skins: FROST_FOE_SKINS, prefix: "f:", next: "ember", prev: "meadow", power: "ice", bossId: "ice_howl", bossName: "Ice Howl", nextName: "Ember Grove", appClass: "world-frost", foeTint: null },
-    ember: { id: "ember", num: 3, title: "Sparkelody · World 3 Ember Grove", hint: "Ember Grove · clear all foes, then Ember Maw on the east gate", map: EMBER_MAP, spots: EMBER_SPOTS, npcs: EMBER_NPCS, bank: WORLD3_BANK, skins: EMBER_FOE_SKINS, prefix: "e:", next: "leaf", prev: "frost", power: "fire", bossId: "ember_maw", bossName: "Ember Maw", nextName: "Leaf Hollow", appClass: "world-ember", foeTint: [220, 90, 40] },
-    leaf: { id: "leaf", num: 4, title: "Sparkelody · World 4 Leaf Hollow", hint: "Leaf Hollow · clear all foes, then Thorn Crown on the east gate", map: LEAF_MAP, spots: LEAF_SPOTS, npcs: LEAF_NPCS, bank: WORLD4_BANK, skins: LEAF_FOE_SKINS, prefix: "l:", next: "wind", prev: "ember", power: "leaf", bossId: "thorn_crown", bossName: "Thorn Crown", nextName: "Windy Ridge", appClass: "world-leaf", foeTint: [70, 140, 60] },
-    wind: { id: "wind", num: 5, title: "Sparkelody · World 5 Windy Ridge", hint: "Windy Ridge · two words · Gale Whisk on the east gate", map: WIND_MAP, spots: WIND_SPOTS, npcs: WIND_NPCS, bank: WORLD5_BANK, skins: WIND_FOE_SKINS, prefix: "n:", next: "tide", prev: "leaf", power: "wind", bossId: "gale_whisk", bossName: "Gale Whisk", nextName: "Tide Pools", appClass: "world-wind", foeTint: [120, 180, 190] },
-    tide: { id: "tide", num: 6, title: "Sparkelody · World 6 Tide Pools", hint: "Tide Pools · mix words · Tide Shell on the east gate", map: TIDE_MAP, spots: TIDE_SPOTS, npcs: TIDE_NPCS, bank: WORLD6_BANK, skins: TIDE_FOE_SKINS, prefix: "t:", next: "storm", prev: "wind", power: "water", bossId: "tide_shell", bossName: "Tide Shell", nextName: "Storm Peak", appClass: "world-tide", foeTint: [40, 120, 170] },
-    storm: { id: "storm", num: 7, title: "Sparkelody · World 7 Storm Peak", hint: "Storm Peak · three words · Storm Fang on the east gate", map: STORM_MAP, spots: STORM_SPOTS, npcs: STORM_NPCS, bank: WORLD7_BANK, skins: STORM_FOE_SKINS, prefix: "s:", next: "harmony", prev: "tide", power: "electric", bossId: "storm_fang", bossName: "Storm Fang", nextName: "Harmony Hill", appClass: "world-storm", foeTint: [90, 60, 150] },
-    harmony: { id: "harmony", num: 8, title: "Sparkelody · World 8 Harmony Hill", hint: "Harmony Hill · four-word lines · Shine Bell on the east gate", map: HARMONY_MAP, spots: HARMONY_SPOTS, npcs: HARMONY_NPCS, bank: WORLD8_BANK, skins: HARMONY_FOE_SKINS, prefix: "h:", next: "story", prev: "storm", power: "shine", bossId: "shine_bell", bossName: "Shine Bell", nextName: "Story Gate", appClass: "world-harmony", foeTint: [210, 170, 80] },
-    story: { id: "story", num: 9, title: "Sparkelody · World 9 Story Gate", hint: "Story Gate · 5-6 word lines · Melody Gate on the east", map: STORY_MAP, spots: STORY_SPOTS, npcs: STORY_NPCS, bank: WORLD9_BANK, skins: STORY_FOE_SKINS, prefix: "y:", next: null, prev: "harmony", power: "melody", bossId: "melody_gate", bossName: "Melody Gate", nextName: null, appClass: "world-story", foeTint: [80, 90, 140] },
+    meadow: { id: "meadow", num: 1, title: HERO_NAME + " · World 1 Meadow", hint: "Talk to Elder · clear all Bloops · Star Bloom on the east gate", map: MAP, spots: ENCOUNTER_SPOTS, npcs: NPCS, bank: WORLD1_BANK, skins: FOE_SKINS, prefix: "", next: "frost", prev: null, power: "star", bossId: "star_bloom", bossName: "Star Bloom", nextName: "Frost Path", appClass: "", foeTint: null },
+    frost: { id: "frost", num: 2, title: HERO_NAME + " · World 2 Frost Path", hint: "Frost Path · clear all foes, then Ice Howl on the east gate", map: FROST_MAP, spots: FROST_SPOTS, npcs: FROST_NPCS, bank: WORLD2_BANK, skins: FROST_FOE_SKINS, prefix: "f:", next: "ember", prev: "meadow", power: "ice", bossId: "ice_howl", bossName: "Ice Howl", nextName: "Ember Grove", appClass: "world-frost", foeTint: null },
+    ember: { id: "ember", num: 3, title: HERO_NAME + " · World 3 Ember Grove", hint: "Ember Grove · clear all foes, then Ember Maw on the east gate", map: EMBER_MAP, spots: EMBER_SPOTS, npcs: EMBER_NPCS, bank: WORLD3_BANK, skins: EMBER_FOE_SKINS, prefix: "e:", next: "leaf", prev: "frost", power: "fire", bossId: "ember_maw", bossName: "Ember Maw", nextName: "Leaf Hollow", appClass: "world-ember", foeTint: [220, 90, 40] },
+    leaf: { id: "leaf", num: 4, title: HERO_NAME + " · World 4 Leaf Hollow", hint: "Leaf Hollow · clear all foes, then Thorn Crown on the east gate", map: LEAF_MAP, spots: LEAF_SPOTS, npcs: LEAF_NPCS, bank: WORLD4_BANK, skins: LEAF_FOE_SKINS, prefix: "l:", next: "wind", prev: "ember", power: "leaf", bossId: "thorn_crown", bossName: "Thorn Crown", nextName: "Windy Ridge", appClass: "world-leaf", foeTint: [70, 140, 60] },
+    wind: { id: "wind", num: 5, title: HERO_NAME + " · World 5 Windy Ridge", hint: "Windy Ridge · two words · Gale Whisk on the east gate", map: WIND_MAP, spots: WIND_SPOTS, npcs: WIND_NPCS, bank: WORLD5_BANK, skins: WIND_FOE_SKINS, prefix: "n:", next: "tide", prev: "leaf", power: "wind", bossId: "gale_whisk", bossName: "Gale Whisk", nextName: "Tide Pools", appClass: "world-wind", foeTint: [120, 180, 190] },
+    tide: { id: "tide", num: 6, title: HERO_NAME + " · World 6 Tide Pools", hint: "Tide Pools · mix words · Tide Shell on the east gate", map: TIDE_MAP, spots: TIDE_SPOTS, npcs: TIDE_NPCS, bank: WORLD6_BANK, skins: TIDE_FOE_SKINS, prefix: "t:", next: "storm", prev: "wind", power: "water", bossId: "tide_shell", bossName: "Tide Shell", nextName: "Storm Peak", appClass: "world-tide", foeTint: [40, 120, 170] },
+    storm: { id: "storm", num: 7, title: HERO_NAME + " · World 7 Storm Peak", hint: "Storm Peak · three words · Storm Fang on the east gate", map: STORM_MAP, spots: STORM_SPOTS, npcs: STORM_NPCS, bank: WORLD7_BANK, skins: STORM_FOE_SKINS, prefix: "s:", next: "harmony", prev: "tide", power: "electric", bossId: "storm_fang", bossName: "Storm Fang", nextName: "Harmony Hill", appClass: "world-storm", foeTint: [90, 60, 150] },
+    harmony: { id: "harmony", num: 8, title: HERO_NAME + " · World 8 Harmony Hill", hint: "Harmony Hill · four-word lines · Shine Bell on the east gate", map: HARMONY_MAP, spots: HARMONY_SPOTS, npcs: HARMONY_NPCS, bank: WORLD8_BANK, skins: HARMONY_FOE_SKINS, prefix: "h:", next: "story", prev: "storm", power: "shine", bossId: "shine_bell", bossName: "Shine Bell", nextName: "Story Gate", appClass: "world-harmony", foeTint: [210, 170, 80] },
+    story: { id: "story", num: 9, title: HERO_NAME + " · World 9 Story Gate", hint: "Story Gate · 5-6 word lines · Melody Gate on the east", map: STORY_MAP, spots: STORY_SPOTS, npcs: STORY_NPCS, bank: WORLD9_BANK, skins: STORY_FOE_SKINS, prefix: "y:", next: null, prev: "harmony", power: "melody", bossId: "melody_gate", bossName: "Melody Gate", nextName: null, appClass: "world-story", foeTint: [80, 90, 140] },
   };
   const BOSS_IDS = { star_bloom: 1, ice_howl: 1, ember_maw: 1, thorn_crown: 1, gale_whisk: 1, tide_shell: 1, storm_fang: 1, shine_bell: 1, melody_gate: 1 };
 
@@ -1682,6 +1684,10 @@
     const title = document.querySelector(".title");
     if (title) title.textContent = d.title;
     if (el.worldHint) el.worldHint.textContent = d.hint;
+    const hero = document.getElementById("hero");
+    if (hero) hero.title = displayName;
+    const heroLabel = document.querySelector(".hero-label");
+    if (heroLabel) heroLabel.textContent = displayName;
   }
 
   function updatePowerHud() {
@@ -1870,7 +1876,7 @@
         wrap.appendChild(n);
       }
       if (n) {
-        n.textContent = "Loading " + (worldDef().title.replace("Sparkelody · ", "")) + "…";
+        n.textContent = "Loading " + (worldDef().title.replace(HERO_NAME + " · ", "")) + "…";
         if (wantEmber()) {
           n.style.background = "#bf360c";
           n.style.color = "#fff3e0";
@@ -2204,7 +2210,7 @@
       app.classList.add("world-ember");
     }
     const title = document.querySelector(".title");
-    if (title) title.textContent = "Sparkelody · World 3 Ember Grove";
+    if (title) title.textContent = HERO_NAME + " · World 3 Ember Grove";
     if (el.worldHint) el.worldHint.textContent = "Ember Grove · clear all foes, then Ember Maw on the east gate";
     applyWorldChrome();
     closeDialogueQuiet();

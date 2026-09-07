@@ -1,4 +1,4 @@
-# Meadow vs Bloop — Sparkelody Phase 3 World 1
+# Meadow vs Bloop — Melody Phase 3 World 1
 
 Literacy-first overworld + read-to-hit fights. CVC only.
 
@@ -8,7 +8,7 @@ Literacy-first overworld + read-to-hit fights. CVC only.
 - WORLD1 CVC bank (~79 words), ≤2/10 repeat picker
 - Star unlocks **only** after Star Bloom
 - World 2 Frost Path gate placeholder (locked until boss)
-- Pixel art hot-swap: Sparkelody / foes / boss / tiles / power icons / VFX
+- Pixel art hot-swap: Melody / foes / boss / tiles / power icons / VFX
 
 ## Files
 - `app.readable.js` — source
