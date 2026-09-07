@@ -131,7 +131,7 @@
 .power-pick-btn.water{background:#e1f5fe;border-color:#0288d1;color:#01579b;}
 .power-pick-btn.electric{background:#ede7f6;border-color:#7e57c2;color:#4527a0;}
 .power-pick-btn.shine{background:#fff8e1;border-color:#fbc02d;color:#f57f17;}
-.cvc-word.phrase{letter-spacing:0.06em;text-indent:0;font-size:clamp(1.35rem,7vw,2.4rem);-webkit-text-stroke-width:2px;}
+.cvc-word.phrase{letter-spacing:0.02em;text-indent:0;font-size:clamp(1.35rem,7vw,2.4rem);word-spacing:0.45em;-webkit-text-stroke-width:2px;}
 .word-tile{letter-spacing:0.06em;text-indent:0;font-size:clamp(0.95rem,4.2vw,1.35rem);}
 .btn-wear{
   min-width:92px;min-height:56px;padding:0.45rem 0.85rem;border:4px solid #5d4037;border-radius:16px;
@@ -234,11 +234,17 @@
   width:144px !important;height:96px !important;bottom:12% !important;
 }
 .cvc-word.phrase{
-  letter-spacing:0.03em;text-indent:0;font-size:clamp(1.05rem,5.2vw,1.85rem);
+  /* Literacy: wide gaps BETWEEN words (~0.45em), not letter-tracking. One outlined line. */
+  letter-spacing:0.02em;text-indent:0;font-size:clamp(1.05rem,5.2vw,1.85rem);
   max-width:430px;margin:0 auto;-webkit-text-stroke:0;paint-order:normal;text-shadow:none;
-  line-height:1.25;word-spacing:0.12em;white-space:normal;display:inline-block;
-  padding:0.22em 0.5em 0.28em;border:4px solid #0d1333;border-radius:0.7rem;background:#fffde7;color:#1a237e;
+  line-height:1.3;word-spacing:0.45em;white-space:nowrap;display:inline-block;
+  padding:0.22em 0.55em 0.28em;border:4px solid #0d1333;border-radius:0.7rem;background:#fffde7;color:#1a237e;
 }
+.cvc-word.phrase > span{
+  display:inline-block;margin:0 0.22em; /* ~extra gap on top of word-spacing for kid/phone */
+}
+.cvc-word.phrase > span:first-child{margin-left:0;}
+.cvc-word.phrase > span:last-child{margin-right:0;}
 .cvc-word.phrase .stall-hi{color:#e65100;background:rgba(255,213,79,0.7);border-radius:0.25em;-webkit-text-stroke:0;padding:0 0.08em}
 .power-chip.melody:not(.locked){background:#f3e5f5;border-color:#8e24aa;box-shadow:0 0 6px rgba(142,36,170,0.5);}
 .power-pick-btn.melody{background:#f3e5f5;border-color:#8e24aa;color:#4a148c;}

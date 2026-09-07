@@ -3018,10 +3018,11 @@
       el.cvcWord.textContent = raw.toUpperCase();
       return;
     }
+    /* Literacy: one outlined line; wide gaps between word spans; stall highlights one span. */
     el.cvcWord.innerHTML = words.map(function (w, i) {
       const cls = i === hi ? ' class="stall-hi"' : "";
       return "<span" + cls + ">" + w.toUpperCase() + "</span>";
-    }).join(" ");
+    }).join("");
   }
   function armStall() {
     clearStall();
