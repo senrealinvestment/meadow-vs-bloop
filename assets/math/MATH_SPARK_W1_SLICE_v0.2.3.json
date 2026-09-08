@@ -1,16 +1,28 @@
 {
-  "plugin_version": "0.2.3.2",
+  "plugin_version": "0.2.4",
   "slice": "w1_light_math_spark_m1_only",
   "rules": {
-    "intermingled": true,
-    "rate": "10%_after_gate_cut_to_5%_if_hunts_spark",
-    "cap_sparks_per_session": 1,
-    "never_back_to_back": true,
-    "items_per_spark": 1,
-    "bank": "M1",
-    "trigger": "after_successful_reading_foe_clear",
-    "prefer_eligibility_after": "8_plus_foe_clears_or_star_bloom_once",
-    "literacy_soft_note": "PASS preview; first Spark after ≥8 foes or star_bloom; cut to ~5% if hunts Spark"
+    "w1": {
+      "trigger": "after_successful_reading_foe_clear",
+      "prefer_eligibility_after": "5_plus_foe_clears_or_star_bloom_once",
+      "rate": 0.25,
+      "cap_sparks_per_session": 2,
+      "never_back_to_back": true,
+      "items_per_spark": 1,
+      "bank": "M1"
+    },
+    "w2": {
+      "mid_world_spark_rate": 0.15,
+      "forge_unlock": "after_ice_howl_boss_clear"
+    },
+    "w3_plus": {
+      "rate": 0.25,
+      "cap_sparks_per_session": 2,
+      "never_back_to_back": true,
+      "bank": "M1"
+    },
+    "never_on_boss_x20": true,
+    "never_replace_reading_panel": true
   },
   "never_on_boss_x20": true,
   "never_replace_reading_panel": true,
