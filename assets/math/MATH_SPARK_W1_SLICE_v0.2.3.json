@@ -1,0 +1,420 @@
+{
+  "plugin_version": "0.2.3.2",
+  "slice": "w1_light_math_spark_m1_only",
+  "rules": {
+    "intermingled": true,
+    "rate": "10%_after_gate_cut_to_5%_if_hunts_spark",
+    "cap_sparks_per_session": 1,
+    "never_back_to_back": true,
+    "items_per_spark": 1,
+    "bank": "M1",
+    "trigger": "after_successful_reading_foe_clear",
+    "prefer_eligibility_after": "8_plus_foe_clears_or_star_bloom_once",
+    "literacy_soft_note": "PASS preview; first Spark after ≥8 foes or star_bloom; cut to ~5% if hunts Spark"
+  },
+  "never_on_boss_x20": true,
+  "never_replace_reading_panel": true,
+  "ui": {
+    "fullscreen": true,
+    "phone_px": 430,
+    "no_cvc_confirm_twin": true,
+    "stimulus": "dots_two_groups"
+  },
+  "m1_bank": [
+    {
+      "id": "m1-01",
+      "band": "M1",
+      "op": "add",
+      "a": 1,
+      "b": 1,
+      "sum": 2,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        2,
+        1,
+        3
+      ],
+      "correct": 2,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-02",
+      "band": "M1",
+      "op": "add",
+      "a": 2,
+      "b": 1,
+      "sum": 3,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        3,
+        2,
+        4,
+        1
+      ],
+      "correct": 3,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-03",
+      "band": "M1",
+      "op": "add",
+      "a": 1,
+      "b": 2,
+      "sum": 3,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        3,
+        1,
+        4,
+        2
+      ],
+      "correct": 3,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-04",
+      "band": "M1",
+      "op": "add",
+      "a": 3,
+      "b": 1,
+      "sum": 4,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        4,
+        3,
+        5,
+        2
+      ],
+      "correct": 4,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-05",
+      "band": "M1",
+      "op": "add",
+      "a": 1,
+      "b": 3,
+      "sum": 4,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        4,
+        1,
+        5,
+        3
+      ],
+      "correct": 4,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-06",
+      "band": "M1",
+      "op": "add",
+      "a": 2,
+      "b": 2,
+      "sum": 4,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        4,
+        2,
+        5,
+        3
+      ],
+      "correct": 4,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-07",
+      "band": "M1",
+      "op": "add",
+      "a": 4,
+      "b": 1,
+      "sum": 5,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        5,
+        4,
+        3,
+        2
+      ],
+      "correct": 5,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-08",
+      "band": "M1",
+      "op": "add",
+      "a": 1,
+      "b": 4,
+      "sum": 5,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        5,
+        1,
+        4,
+        3
+      ],
+      "correct": 5,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-09",
+      "band": "M1",
+      "op": "add",
+      "a": 3,
+      "b": 2,
+      "sum": 5,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        5,
+        3,
+        4,
+        2
+      ],
+      "correct": 5,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-10",
+      "band": "M1",
+      "op": "add",
+      "a": 2,
+      "b": 3,
+      "sum": 5,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        5,
+        2,
+        4,
+        3
+      ],
+      "correct": 5,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-13",
+      "band": "M1",
+      "op": "add",
+      "a": 2,
+      "b": 1,
+      "sum": 3,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        3,
+        5,
+        2,
+        1
+      ],
+      "correct": 3,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-14",
+      "band": "M1",
+      "op": "add",
+      "a": 1,
+      "b": 1,
+      "sum": 2,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        2,
+        3,
+        4,
+        1
+      ],
+      "correct": 2,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-15",
+      "band": "M1",
+      "op": "add",
+      "a": 4,
+      "b": 1,
+      "sum": 5,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        5,
+        4,
+        1,
+        3
+      ],
+      "correct": 5,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-16",
+      "band": "M1",
+      "op": "add",
+      "a": 3,
+      "b": 2,
+      "sum": 5,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        5,
+        4,
+        2,
+        1
+      ],
+      "correct": 5,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-17",
+      "band": "M1",
+      "op": "add",
+      "a": 2,
+      "b": 2,
+      "sum": 4,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        4,
+        3,
+        5,
+        1
+      ],
+      "correct": 4,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-18",
+      "band": "M1",
+      "op": "add",
+      "a": 1,
+      "b": 2,
+      "sum": 3,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        3,
+        4,
+        2,
+        5
+      ],
+      "correct": 3,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-19",
+      "band": "M1",
+      "op": "add",
+      "a": 3,
+      "b": 1,
+      "sum": 4,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        4,
+        5,
+        2,
+        3
+      ],
+      "correct": 4,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-20",
+      "band": "M1",
+      "op": "add",
+      "a": 2,
+      "b": 3,
+      "sum": 5,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        5,
+        3,
+        1,
+        4
+      ],
+      "correct": 5,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-21",
+      "band": "M1",
+      "op": "add",
+      "a": 1,
+      "b": 3,
+      "sum": 4,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        4,
+        3,
+        1,
+        5
+      ],
+      "correct": 4,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-22",
+      "band": "M1",
+      "op": "add",
+      "a": 1,
+      "b": 4,
+      "sum": 5,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        5,
+        2,
+        4,
+        1
+      ],
+      "correct": 5,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-23",
+      "band": "M1",
+      "op": "add",
+      "a": 2,
+      "b": 1,
+      "sum": 3,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        3,
+        1,
+        2,
+        4
+      ],
+      "correct": 3,
+      "prompt": "How many sparks?"
+    },
+    {
+      "id": "m1-24",
+      "band": "M1",
+      "op": "add",
+      "a": 3,
+      "b": 2,
+      "sum": 5,
+      "stimulus": "dots",
+      "layout": "two_groups",
+      "tiles": [
+        5,
+        2,
+        3,
+        4
+      ],
+      "correct": 5,
+      "prompt": "How many sparks?"
+    }
+  ]
+}
