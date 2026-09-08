@@ -3229,6 +3229,145 @@
     armStall();
   }
 
+
+  /* --- W1 Math Spark M1 (v0.2.3.2) — post reading foe clear only; never boss; cap 1/session --- */
+  const MATH_SPARK_M1_BANK = [{"id":"m1-01","band":"M1","op":"add","a":1,"b":1,"sum":2,"stimulus":"dots","layout":"two_groups","tiles":[2,1,3],"correct":2,"prompt":"How many sparks?"},{"id":"m1-02","band":"M1","op":"add","a":2,"b":1,"sum":3,"stimulus":"dots","layout":"two_groups","tiles":[3,2,4,1],"correct":3,"prompt":"How many sparks?"},{"id":"m1-03","band":"M1","op":"add","a":1,"b":2,"sum":3,"stimulus":"dots","layout":"two_groups","tiles":[3,1,4,2],"correct":3,"prompt":"How many sparks?"},{"id":"m1-04","band":"M1","op":"add","a":3,"b":1,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,3,5,2],"correct":4,"prompt":"How many sparks?"},{"id":"m1-05","band":"M1","op":"add","a":1,"b":3,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,1,5,3],"correct":4,"prompt":"How many sparks?"},{"id":"m1-06","band":"M1","op":"add","a":2,"b":2,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,2,5,3],"correct":4,"prompt":"How many sparks?"},{"id":"m1-07","band":"M1","op":"add","a":4,"b":1,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,4,3,2],"correct":5,"prompt":"How many sparks?"},{"id":"m1-08","band":"M1","op":"add","a":1,"b":4,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,1,4,3],"correct":5,"prompt":"How many sparks?"},{"id":"m1-09","band":"M1","op":"add","a":3,"b":2,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,3,4,2],"correct":5,"prompt":"How many sparks?"},{"id":"m1-10","band":"M1","op":"add","a":2,"b":3,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,2,4,3],"correct":5,"prompt":"How many sparks?"},{"id":"m1-13","band":"M1","op":"add","a":2,"b":1,"sum":3,"stimulus":"dots","layout":"two_groups","tiles":[3,5,2,1],"correct":3,"prompt":"How many sparks?"},{"id":"m1-14","band":"M1","op":"add","a":1,"b":1,"sum":2,"stimulus":"dots","layout":"two_groups","tiles":[2,3,4,1],"correct":2,"prompt":"How many sparks?"},{"id":"m1-15","band":"M1","op":"add","a":4,"b":1,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,4,1,3],"correct":5,"prompt":"How many sparks?"},{"id":"m1-16","band":"M1","op":"add","a":3,"b":2,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,4,2,1],"correct":5,"prompt":"How many sparks?"},{"id":"m1-17","band":"M1","op":"add","a":2,"b":2,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,3,5,1],"correct":4,"prompt":"How many sparks?"},{"id":"m1-18","band":"M1","op":"add","a":1,"b":2,"sum":3,"stimulus":"dots","layout":"two_groups","tiles":[3,4,2,5],"correct":3,"prompt":"How many sparks?"},{"id":"m1-19","band":"M1","op":"add","a":3,"b":1,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,5,2,3],"correct":4,"prompt":"How many sparks?"},{"id":"m1-20","band":"M1","op":"add","a":2,"b":3,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,3,1,4],"correct":5,"prompt":"How many sparks?"},{"id":"m1-21","band":"M1","op":"add","a":1,"b":3,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,3,1,5],"correct":4,"prompt":"How many sparks?"},{"id":"m1-22","band":"M1","op":"add","a":1,"b":4,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,2,4,1],"correct":5,"prompt":"How many sparks?"},{"id":"m1-23","band":"M1","op":"add","a":2,"b":1,"sum":3,"stimulus":"dots","layout":"two_groups","tiles":[3,1,2,4],"correct":3,"prompt":"How many sparks?"},{"id":"m1-24","band":"M1","op":"add","a":3,"b":2,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,2,3,4],"correct":5,"prompt":"How many sparks?"}];
+  var sparkSessionUsed = 0;
+  var sparkJustClosed = false;
+  var sparkItem = null;
+  var sparkPicked = null;
+
+  function meadowFoeClears() {
+    var n = 0;
+    ENCOUNTER_SPOTS.forEach(function (s) {
+      if (s.type === "foe" && state.cleared[spotKey(s)]) n++;
+    });
+    return n;
+  }
+
+  function sparkEligible(enc) {
+    if (!enc || enc.isBoss) return false;
+    if (state.world !== "meadow") return false;
+    if (sparkSessionUsed >= 1) return false;
+    if (sparkJustClosed) return false;
+    var clears = meadowFoeClears();
+    var bloom = !!state.powers.star || !!state.cleared["boss:star_bloom"] || !!state.cleared[spotKey({ x: 18, y: 1, type: "boss", id: "star_bloom" })];
+    /* LC soft: first Spark after ≥8 foe clears or star_bloom once */
+    if (clears < 8 && !bloom && !state.world2Open) return false;
+    var rate = 0.10;
+    return Math.random() < rate;
+  }
+
+  function ensureSparkDom() {
+    var ov = document.getElementById("spark-overlay");
+    if (ov) return ov;
+    ov = document.createElement("div");
+    ov.id = "spark-overlay";
+    ov.className = "spark-overlay hidden";
+    ov.innerHTML = [
+      '<div class="spark-card" role="dialog" aria-label="Math Spark">',
+      '  <p class="spark-badge">Math Spark</p>',
+      '  <p class="spark-prompt" id="spark-prompt">How many sparks?</p>',
+      '  <div class="spark-dots" id="spark-dots" aria-hidden="true"></div>',
+      '  <div class="spark-tiles" id="spark-tiles"></div>',
+      '  <p class="spark-feedback" id="spark-feedback"></p>',
+      '  <button type="button" class="spark-confirm" id="spark-confirm">Check ✓</button>',
+      '</div>'
+    ].join("");
+    document.getElementById("app").appendChild(ov);
+    document.getElementById("spark-confirm").addEventListener("click", onSparkConfirm);
+    return ov;
+  }
+
+  function paintSparkDots(item) {
+    var box = document.getElementById("spark-dots");
+    if (!box) return;
+    box.innerHTML = "";
+    function group(n, cls) {
+      var g = document.createElement("div");
+      g.className = "spark-group " + cls;
+      for (var i = 0; i < n; i++) {
+        var d = document.createElement("span");
+        d.className = "spark-dot";
+        d.textContent = "✦";
+        g.appendChild(d);
+      }
+      return g;
+    }
+    box.appendChild(group(item.a, "left"));
+    var plus = document.createElement("span");
+    plus.className = "spark-plus";
+    plus.textContent = "+";
+    box.appendChild(plus);
+    box.appendChild(group(item.b, "right"));
+  }
+
+  function openMathSpark() {
+    var bank = MATH_SPARK_M1_BANK.slice();
+    sparkItem = bank[Math.floor(Math.random() * bank.length)];
+    sparkPicked = null;
+    var ov = ensureSparkDom();
+    document.getElementById("spark-prompt").textContent = sparkItem.prompt || "How many sparks?";
+    document.getElementById("spark-feedback").textContent = "";
+    document.getElementById("spark-feedback").className = "spark-feedback";
+    paintSparkDots(sparkItem);
+    var tiles = document.getElementById("spark-tiles");
+    tiles.innerHTML = "";
+    (sparkItem.tiles || []).forEach(function (n) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "spark-tile";
+      b.textContent = String(n);
+      b.addEventListener("click", function () {
+        sparkPicked = n;
+        Array.prototype.forEach.call(tiles.children, function (c) { c.classList.remove("on"); });
+        b.classList.add("on");
+      });
+      tiles.appendChild(b);
+    });
+    if (el.winOverlay) el.winOverlay.classList.add("hidden");
+    ov.classList.remove("hidden");
+  }
+
+  function closeMathSpark() {
+    var ov = document.getElementById("spark-overlay");
+    if (ov) ov.classList.add("hidden");
+    sparkJustClosed = true;
+    sparkItem = null;
+    sparkPicked = null;
+    endFightToOverworld();
+    setTimeout(function () { sparkJustClosed = false; }, 800);
+  }
+
+  function onSparkConfirm() {
+    if (!sparkItem) return;
+    var fb = document.getElementById("spark-feedback");
+    if (sparkPicked == null) {
+      fb.textContent = "Pick a number!";
+      fb.className = "spark-feedback soft";
+      return;
+    }
+    if (sparkPicked === sparkItem.correct || sparkPicked === sparkItem.sum) {
+      sparkSessionUsed = 1;
+      fb.textContent = "Sparkle!";
+      fb.className = "spark-feedback good";
+      setTimeout(closeMathSpark, 700);
+    } else {
+      /* Miss = Almost; same item, no re-roll */
+      fb.textContent = "Almost! Try again";
+      fb.className = "spark-feedback soft";
+      sparkPicked = null;
+      var tiles = document.getElementById("spark-tiles");
+      if (tiles) Array.prototype.forEach.call(tiles.children, function (c) { c.classList.remove("on"); });
+    }
+  }
+
+  function maybeOfferMathSpark(enc) {
+    if (!sparkEligible(enc)) return false;
+    openMathSpark();
+    return true;
+  }
+
   async function winFight() {
     state.won = true;
     const enc = state.encounter.def;
@@ -3264,6 +3403,11 @@
     setFeedback("Win!", "good");
     scheduleSave();
     await wait(450);
+    /* Math Spark: only after reading foe clear on W1 — never replaces reading, never boss. */
+    if (!enc.isBoss && maybeOfferMathSpark(enc)) {
+      state.busy = false;
+      return;
+    }
     el.winOverlay.classList.remove("hidden");
     state.busy = false;
   }

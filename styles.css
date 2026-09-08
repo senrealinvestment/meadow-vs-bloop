@@ -353,3 +353,36 @@
   80%{left:50%;bottom:27%;opacity:0.85;transform:scale(1.45);}
   100%{left:55%;bottom:26%;opacity:0;transform:scale(1.55);}
 }
+
+
+/* W1 Math Spark fullscreen (v0.2.3) — distinct from CVC Confirm chrome */
+.spark-overlay{
+  position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;
+  padding:1rem;background:rgba(20,40,60,0.72);
+}
+.spark-overlay.hidden{display:none;}
+.spark-card{
+  width:100%;max-width:400px;background:#fffdf5;border:4px solid #0d1333;border-radius:1.1rem;
+  padding:1rem 1rem 1.15rem;box-shadow:0 10px 32px rgba(0,0,0,0.28);text-align:center;
+}
+.spark-badge{margin:0 0 0.35rem;font-size:0.75rem;font-weight:800;letter-spacing:0.06em;color:#5c6bc0;text-transform:uppercase;}
+.spark-prompt{margin:0 0 0.75rem;font-size:clamp(1.25rem,5.5vw,1.75rem);font-weight:900;color:#1a237e;}
+.spark-dots{display:flex;align-items:center;justify-content:center;gap:0.55rem;min-height:4.5rem;margin:0 0 0.85rem;flex-wrap:wrap;}
+.spark-group{display:flex;gap:0.28rem;flex-wrap:wrap;max-width:42%;justify-content:center;}
+.spark-dot{font-size:1.55rem;line-height:1;color:#f9a825;text-shadow:0 1px 0 #e65100;}
+.spark-plus{font-size:1.6rem;font-weight:900;color:#3949ab;}
+.spark-tiles{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin:0 0 0.65rem;}
+.spark-tile{
+  min-width:3.4rem;min-height:3.4rem;padding:0.35rem 0.7rem;border:3px solid #3949ab;border-radius:0.85rem;
+  background:#e8eaf6;color:#1a237e;font-size:1.45rem;font-weight:900;cursor:pointer;box-shadow:0 3px 0 #283593;
+}
+.spark-tile.on{background:#c5cae9;transform:translateY(1px);box-shadow:0 1px 0 #283593;}
+.spark-feedback{min-height:1.25em;margin:0 0 0.55rem;font-weight:800;color:#546e7a;}
+.spark-feedback.good{color:#2e7d32;}
+.spark-feedback.soft{color:#f9a825;}
+.spark-confirm{
+  width:100%;max-width:260px;min-height:52px;border:none;border-radius:999px;
+  background:linear-gradient(180deg,#7e57c2,#5e35b1);color:#fff;font-size:1.15rem;font-weight:800;
+  cursor:pointer;box-shadow:0 4px 0 #311b92;
+}
+.spark-confirm:active{transform:translateY(2px);box-shadow:0 2px 0 #311b92;}
