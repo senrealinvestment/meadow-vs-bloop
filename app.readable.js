@@ -3230,7 +3230,7 @@
   }
 
 
-  /* --- Math Spark M1 Literacy-compromise — W1 ≥8/~15% cap1; W2 after ice_howl; W3+ ~22% cap1; never boss --- */
+  /* --- Math Spark M1 v0.2.4 denser — W1 ≥5/~25% cap2; W2 mid ~15%; W3+ ~25% cap2; never boss --- */
   const MATH_SPARK_M1_BANK = [{"id":"m1-01","band":"M1","op":"add","a":1,"b":1,"sum":2,"stimulus":"dots","layout":"two_groups","tiles":[2,1,3],"correct":2,"prompt":"How many sparks?"},{"id":"m1-02","band":"M1","op":"add","a":2,"b":1,"sum":3,"stimulus":"dots","layout":"two_groups","tiles":[3,2,4,1],"correct":3,"prompt":"How many sparks?"},{"id":"m1-03","band":"M1","op":"add","a":1,"b":2,"sum":3,"stimulus":"dots","layout":"two_groups","tiles":[3,1,4,2],"correct":3,"prompt":"How many sparks?"},{"id":"m1-04","band":"M1","op":"add","a":3,"b":1,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,3,5,2],"correct":4,"prompt":"How many sparks?"},{"id":"m1-05","band":"M1","op":"add","a":1,"b":3,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,1,5,3],"correct":4,"prompt":"How many sparks?"},{"id":"m1-06","band":"M1","op":"add","a":2,"b":2,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,2,5,3],"correct":4,"prompt":"How many sparks?"},{"id":"m1-07","band":"M1","op":"add","a":4,"b":1,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,4,3,2],"correct":5,"prompt":"How many sparks?"},{"id":"m1-08","band":"M1","op":"add","a":1,"b":4,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,1,4,3],"correct":5,"prompt":"How many sparks?"},{"id":"m1-09","band":"M1","op":"add","a":3,"b":2,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,3,4,2],"correct":5,"prompt":"How many sparks?"},{"id":"m1-10","band":"M1","op":"add","a":2,"b":3,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,2,4,3],"correct":5,"prompt":"How many sparks?"},{"id":"m1-13","band":"M1","op":"add","a":2,"b":1,"sum":3,"stimulus":"dots","layout":"two_groups","tiles":[3,5,2,1],"correct":3,"prompt":"How many sparks?"},{"id":"m1-14","band":"M1","op":"add","a":1,"b":1,"sum":2,"stimulus":"dots","layout":"two_groups","tiles":[2,3,4,1],"correct":2,"prompt":"How many sparks?"},{"id":"m1-15","band":"M1","op":"add","a":4,"b":1,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,4,1,3],"correct":5,"prompt":"How many sparks?"},{"id":"m1-16","band":"M1","op":"add","a":3,"b":2,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,4,2,1],"correct":5,"prompt":"How many sparks?"},{"id":"m1-17","band":"M1","op":"add","a":2,"b":2,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,3,5,1],"correct":4,"prompt":"How many sparks?"},{"id":"m1-18","band":"M1","op":"add","a":1,"b":2,"sum":3,"stimulus":"dots","layout":"two_groups","tiles":[3,4,2,5],"correct":3,"prompt":"How many sparks?"},{"id":"m1-19","band":"M1","op":"add","a":3,"b":1,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,5,2,3],"correct":4,"prompt":"How many sparks?"},{"id":"m1-20","band":"M1","op":"add","a":2,"b":3,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,3,1,4],"correct":5,"prompt":"How many sparks?"},{"id":"m1-21","band":"M1","op":"add","a":1,"b":3,"sum":4,"stimulus":"dots","layout":"two_groups","tiles":[4,3,1,5],"correct":4,"prompt":"How many sparks?"},{"id":"m1-22","band":"M1","op":"add","a":1,"b":4,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,2,4,1],"correct":5,"prompt":"How many sparks?"},{"id":"m1-23","band":"M1","op":"add","a":2,"b":1,"sum":3,"stimulus":"dots","layout":"two_groups","tiles":[3,1,2,4],"correct":3,"prompt":"How many sparks?"},{"id":"m1-24","band":"M1","op":"add","a":3,"b":2,"sum":5,"stimulus":"dots","layout":"two_groups","tiles":[5,2,3,4],"correct":5,"prompt":"How many sparks?"}];
   var sparkSessionUsed = 0;
   var sparkJustClosed = false;
@@ -3246,25 +3246,27 @@
   }
   function meadowFoeClears() { return worldFoeClears(); }
 
-  /* Literacy compromise Spark rates (NOT full v0.2.4):
-     W1 ≥8 or star_bloom, ~15%, cap 1; W2 mid 0% / after ice_howl only; W3+ ~22%, cap 1. */
+  /* Spark v0.2.4 denser (Sergio/CoS SoT — not 0.2.5):
+     W1 ≥5 or star_bloom ~25% cap 2; W2 mid ~15%; W3+ ~25% cap 2; never back-to-back. */
+  function sparkCap() {
+    return 2;
+  }
   function sparkEligible(enc) {
     if (!enc || enc.isBoss) return false;
-    if (sparkSessionUsed >= 1) return false;
+    if (sparkSessionUsed >= sparkCap()) return false;
     if (sparkJustClosed) return false;
     var w = state.world;
     if (w === "meadow") {
       var clears = worldFoeClears();
       var bloom = !!state.powers.star || !!state.cleared["boss:star_bloom"] || !!state.world2Open;
-      if (clears < 8 && !bloom) return false;
-      return Math.random() < 0.15;
+      if (clears < 5 && !bloom) return false;
+      return Math.random() < 0.25;
     }
     if (w === "frost") {
-      /* Mid-map Spark off; post-ice_howl Spark is offered from winFight boss path. */
-      return false;
+      return Math.random() < 0.15; /* mid-world Spark; Forge unlocks after ice_howl */
     }
     /* W3+ */
-    return Math.random() < 0.22;
+    return Math.random() < 0.25;
   }
 
   function ensureSparkDom() {
@@ -3357,7 +3359,7 @@
       return;
     }
     if (sparkPicked === sparkItem.correct || sparkPicked === sparkItem.sum) {
-      sparkSessionUsed = 1;
+      sparkSessionUsed += 1;
       fb.textContent = "Sparkle!";
       fb.className = "spark-feedback good";
       setTimeout(closeMathSpark, 700);
@@ -3393,7 +3395,6 @@
       if (enc.id === "ice_howl") {
         state.world3Open = true;
         state.mathForge = true; /* Forge unlock after ice_howl (UI later) */
-        state._sparkAfterIceHowl = true;
       }
       updatePowerHud();
       el.chest.classList.remove("hidden");
@@ -3416,14 +3417,7 @@
     setFeedback("Win!", "good");
     scheduleSave();
     await wait(450);
-    /* Math Spark Literacy compromise: after reading foe clear; never replaces reading.
-       Boss fights never Spark mid-fight; ice_howl may offer one Spark after clear. */
-    if (enc.isBoss && enc.id === "ice_howl" && state._sparkAfterIceHowl && sparkSessionUsed < 1 && !sparkJustClosed) {
-      state._sparkAfterIceHowl = false;
-      openMathSpark(); /* one Spark after ice_howl clear (never mid-boss) */
-      state.busy = false;
-      return;
-    }
+    /* Math Spark v0.2.4 denser: after reading foe clear only — never mid-boss, never replaces reading. */
     if (!enc.isBoss && maybeOfferMathSpark(enc)) {
       state.busy = false;
       return;
