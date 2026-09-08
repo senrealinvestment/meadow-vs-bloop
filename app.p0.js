@@ -1,1 +1,2 @@
-window.__MVB0=(window.__MVB0A||"")+(window.__MVB0B||"");delete window.__MVB0A;delete window.__MVB0B;
+/* Pixel-only: p-chain procedural renderer is dead. Do not eval. */
+window.__MVB0 = window.__MVB1 = window.__MVB2 = "";

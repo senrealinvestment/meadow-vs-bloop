@@ -1,4 +1,4 @@
-# Meadow vs Bloop — Sparkelody Phase 3 World 1
+# Meadow vs Bloop — Melody Phase 3 World 1
 
 Literacy-first overworld + read-to-hit fights. CVC only.
 
@@ -8,7 +8,7 @@ Literacy-first overworld + read-to-hit fights. CVC only.
 - WORLD1 CVC bank (~79 words), ≤2/10 repeat picker
 - Star unlocks **only** after Star Bloom
 - World 2 Frost Path gate placeholder (locked until boss)
-- Pixel art hot-swap: Sparkelody / foes / boss / tiles / power icons / VFX
+- Pixel art hot-swap: Melody / foes / boss / tiles / power icons / VFX
 
 ## Files
 - `app.readable.js` — source
@@ -17,3 +17,18 @@ Literacy-first overworld + read-to-hit fights. CVC only.
 - `assets/` — Pixel Art Director PNGs
 - `assets-embed.js` — keyed data-URL fallback for jsDelivr CDN shells
 - Deploy: Vercel same-origin `assets/` or CDN shell + embed / jsDelivr
+
+
+## Branch ladder (not GREEN)
+
+`feat/full-ladder-cosmetics` — Worlds 1–9 playable with official banks. Same-origin `index.html` on this branch so a Vercel deploy of the branch **is** the game (no jsDelivr). Optional `?t=<sha>` loads that commit from jsDelivr. **Sergio's Vercel play pin is still `7179fc44` (old dual-renderer).** This branch is the fix. Live vis pin on main stays `3337fad7`. GREEN hold remains `7179fc44`. Do not treat this PR as GREEN.
+
+- W3 Ember Grove `?w3=1` — CVC mastery, Ember Maw, Fire
+- W4 Leaf Hollow `?w4=1` — 4-letter closed, Thorn Crown, Leaf
+- W5 Windy Ridge `?w5=1` — 2 CVC words, Gale Whisk, Wind
+- W6 Tide Pools `?w6=1` — CVC+4-letter pairs, Tide Shell, Water
+- W7 Storm Peak `?w7=1` — 3-word trios, Storm Fang, Electric
+- W8 Harmony Hill `?w8=1` — 20 four-word lines, Shine Bell, Shine
+- W9 Story Gate `?w9=1` — 20 five/six-word lines, Melody Gate, Melody
+- Wear: clear a regular foe to auto-unlock that world's look; giant WEAR cycles
+- Pixel-only foes (CSS slime stays hidden)
