@@ -3313,6 +3313,16 @@
     box.appendChild(group(item.b, "right"));
   }
 
+  function shuffleSparkTiles(arr) {
+    var a = (arr || []).slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
   function openMathSpark() {
     var bank = MATH_SPARK_M1_BANK.slice();
     sparkItem = bank[Math.floor(Math.random() * bank.length)];
@@ -3324,7 +3334,8 @@
     paintSparkDots(sparkItem);
     var tiles = document.getElementById("spark-tiles");
     tiles.innerHTML = "";
-    (sparkItem.tiles || []).forEach(function (n) {
+    /* Sergio FAIL fix: bank tiles list correct first — shuffle each open so L→R is not a tell. */
+    shuffleSparkTiles(sparkItem.tiles || []).forEach(function (n) {
       var b = document.createElement("button");
       b.type = "button";
       b.className = "spark-tile";
