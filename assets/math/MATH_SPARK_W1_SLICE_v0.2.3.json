@@ -1,23 +1,26 @@
 {
-  "plugin_version": "0.2.4",
+  "plugin_version": "0.2.5",
   "slice": "w1_light_math_spark_m1_only",
+  "note": "Literacy compromise — not denser v0.2.4",
   "rules": {
     "w1": {
       "trigger": "after_successful_reading_foe_clear",
-      "prefer_eligibility_after": "5_plus_foe_clears_or_star_bloom_once",
-      "rate": 0.25,
-      "cap_sparks_per_session": 2,
+      "prefer_eligibility_after": "8_plus_foe_clears_or_star_bloom_once",
+      "rate": 0.15,
+      "cap_sparks_per_session": 1,
       "never_back_to_back": true,
       "items_per_spark": 1,
       "bank": "M1"
     },
     "w2": {
-      "mid_world_spark_rate": 0.15,
+      "mid_world_spark_rate": 0,
+      "spark_unlock": "after_ice_howl_boss_clear",
       "forge_unlock": "after_ice_howl_boss_clear"
     },
     "w3_plus": {
-      "rate": 0.25,
-      "cap_sparks_per_session": 2,
+      "rate": 0.22,
+      "rate_range": "0.20-0.25",
+      "cap_sparks_per_session": 1,
       "never_back_to_back": true,
       "bank": "M1"
     },
