@@ -67,9 +67,6 @@
 
   /* W2: short e/i CVC only. Keep fig (i). Drop cub/fog (u/o). */
   const WORLD2_BANK = "beg bet bib big bin bit den dim dip fed fig fin fit gem get hen hid him hip hit jig jet kid kit led leg lid lip lit men met mid mix net nip peg pen pep pet pig pin pit red rib rid rim rip set sip sit ten tin tip vet web wed wet wig win yet zip".split(" ");
-  const ICE_CASTS = ["tip", "nip", "bit"];
-  const STAR_CASTS = ["zap", "pop", "sun", "bat", "jam"];
-  const FIRE_CASTS = ["hug", "cop", "dot"];
   /* W3 CVC mastery: remaining 3-letter CVC not in W1. No silent e / sh-ch-th / vowel teams. */
   const WORLD3_BANK = "bag bam ban bop cob cop cot cut dab dam dot dug gab gap got had ham hug hut job jog jug lab lad lag lob lot mad mob mug nab nag pal pat pod pug ram rob rod rot rub sag sap sub sum tab tad tan tap tug yam yap".split(" ");
 
@@ -349,12 +346,6 @@
     },
   ];
 
-  const LEAF_CASTS = ["belt", "camp", "nest"];
-  const WIND_CASTS = ["fan", "sun", "hop"];
-  const WATER_CASTS = ["wet", "mud", "hop"];
-  const ELEC_CASTS = ["zap", "zip", "run"];
-  const SHINE_CASTS = ["and", "on", "up"];
-  const MELODY_CASTS = ["and", "on", "a"];
   const STRETCH_BANK = ["and", "on", "up", "a", "fast", "well", "him"];
   const WORLD4_BANK = "belt bump camp clap crib desk drip drum flag frog gift grab hand jump lamp land lift list milk nest plan pond rest sand sled slip spot stop swim tent trap vest wind".split(" ");
   const WORLD5_BANK = ["cat hop","sun run","wet mud","big fan","red hen","hot pot","sad pup","log hut","fox cub","pig pen","dog run","kid sip","bug hid","cup lid","hat box","net dip","map pin","bat hit","ten men","wet dog","big cat","red fox","hot sun","dad nap"];
@@ -1841,12 +1832,31 @@
     while (hist.length > 10) hist.shift();
   }
 
-  /** Pick from pool with ≤2 uses in last 10 of hist. */
+  /** Legacy capped pick (distractors / misc). Prefer drawFromWorldBank for fight words. */
   function pickCapped(pool, hist) {
     const ok = pool.filter((w) => countInWindow(hist, w) < 2);
     const use = ok.length ? ok : pool;
     const word = use[Math.floor(Math.random() * use.length)];
     pushHist(hist, word);
+    return word;
+  }
+
+  /* Power never picks words. One shuffled deck per world bank; reshuffle when empty. */
+  var bankDeckByWorld = {};
+  function drawFromWorldBank() {
+    const wid = worldDef().id;
+    const bank = currentBank();
+    if (!bank || !bank.length) return "cat";
+    let deck = bankDeckByWorld[wid];
+    if (!deck || !deck.length) {
+      deck = shuffle(bank);
+      bankDeckByWorld[wid] = deck;
+    }
+    const word = deck.shift();
+    pushHist(state.recentFoe, word);
+    if (state.encounter && state.encounter.def && state.encounter.def.isBoss) {
+      pushHist(state.recentBoss, word);
+    }
     return word;
   }
 
@@ -2634,6 +2644,7 @@
     const d = WORLD_DEFS[id];
     if (!d) return;
     state.world = id;
+    bankDeckByWorld[id] = []; /* reshuffle this world bank on enter */
     const spawn = opts && opts.spawn;
     if (spawn === "east") placeHero(17, 2, "left");
     else placeHero(2, 14, "up");
@@ -3040,33 +3051,8 @@
   }
 
   function pickWordEntry() {
-    const enc = state.encounter.def;
-    let word;
-    if (worldDef().num >= 4) {
-      word = pickCapped(currentBank(), enc.isBoss ? state.recentBoss : state.recentFoe);
-    } else if (state.selectedPower === "star") {
-      word = pickCapped(STAR_CASTS, state.recentStar);
-    } else if (state.selectedPower === "ice") {
-      word = pickCapped(ICE_CASTS, state.recentIce);
-    } else if (state.selectedPower === "fire") {
-      word = pickCapped(FIRE_CASTS, state.recentFire);
-    } else if (state.selectedPower === "leaf") {
-      word = pickCapped(LEAF_CASTS, state.recentLeaf);
-    } else if (state.selectedPower === "wind") {
-      word = pickCapped(WIND_CASTS, state.recentWind);
-    } else if (state.selectedPower === "water") {
-      word = pickCapped(WATER_CASTS, state.recentWater);
-    } else if (state.selectedPower === "electric") {
-      word = pickCapped(ELEC_CASTS, state.recentElec);
-    } else if (state.selectedPower === "shine") {
-      word = pickCapped(SHINE_CASTS, state.recentStar);
-    } else if (state.selectedPower === "melody") {
-      word = pickCapped(MELODY_CASTS, state.recentStar);
-    } else if (enc.isBoss) {
-      word = pickCapped(currentBank(), state.recentBoss);
-    } else {
-      word = pickCapped(currentBank(), state.recentFoe);
-    }
+    /* Reading bank follows world ladder only. Power chip = VFX + matchup, never the word. */
+    const word = drawFromWorldBank();
     return { word: word, distractor: distractorFor(word) };
   }
 
