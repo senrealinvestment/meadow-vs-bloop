@@ -1841,19 +1841,32 @@
     return word;
   }
 
-  /* Power never picks words. One shuffled deck per world bank; reshuffle when empty. */
+  /* Power never picks words. Shuffled world bank; reshuffle when empty.
+     Literacy: ≤2 same token/line in any 10-read window. Miss retries same item (onMiss). */
   var bankDeckByWorld = {};
   function drawFromWorldBank() {
     const wid = worldDef().id;
     const bank = currentBank();
     if (!bank || !bank.length) return "cat";
+    const hist = state.recentFoe;
+    function eligible(w) { return countInWindow(hist, w) < 2; }
     let deck = bankDeckByWorld[wid];
     if (!deck || !deck.length) {
       deck = shuffle(bank);
       bankDeckByWorld[wid] = deck;
     }
-    const word = deck.shift();
-    pushHist(state.recentFoe, word);
+    let idx = -1;
+    for (let i = 0; i < deck.length; i++) {
+      if (eligible(deck[i])) { idx = i; break; }
+    }
+    if (idx < 0) {
+      deck = shuffle(bank.filter(eligible));
+      if (!deck.length) deck = shuffle(bank);
+      bankDeckByWorld[wid] = deck;
+      idx = 0;
+    }
+    const word = deck.splice(idx, 1)[0];
+    pushHist(hist, word);
     if (state.encounter && state.encounter.def && state.encounter.def.isBoss) {
       pushHist(state.recentBoss, word);
     }
