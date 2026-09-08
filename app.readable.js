@@ -2515,6 +2515,7 @@
     if (spawn === "east") placeHero(17, 2, "left");
     else placeHero(2, 14, "up");
     applyWorldChrome();
+    try { bgmSetWorld("frost"); } catch (eBgmF) {}
     closeDialogueQuiet();
     scheduleSave();
     const silent = !!(opts && opts.silent);
@@ -2653,6 +2654,154 @@
     }
     enterWorld("leaf", { spawn: "west" });
   }
+
+  /* --- Per-world BGM (Web Audio procedural; kid-safe; mute+localStorage) --- */
+  var BGM_MUTE_KEY = "meadow-bgm-muted";
+  var bgm = {
+    ctx: null,
+    master: null,
+    timer: null,
+    world: null,
+    muted: false,
+    started: false,
+    step: 0
+  };
+  try { bgm.muted = localStorage.getItem(BGM_MUTE_KEY) === "1"; } catch (eMute) {}
+
+  var BGM_THEMES = {
+    meadow:   { root: 262, scale: [0, 2, 4, 7, 9], tempo: 520, wave: "triangle", gain: 0.045 },
+    frost:    { root: 330, scale: [0, 3, 7, 10, 12], tempo: 640, wave: "sine", gain: 0.038 },
+    ember:    { root: 196, scale: [0, 4, 7, 11, 12], tempo: 560, wave: "triangle", gain: 0.04 },
+    leaf:     { root: 294, scale: [0, 2, 5, 7, 9], tempo: 500, wave: "sine", gain: 0.042 },
+    wind:     { root: 349, scale: [0, 5, 7, 12], tempo: 700, wave: "sine", gain: 0.032 },
+    tide:     { root: 220, scale: [0, 3, 7, 10], tempo: 780, wave: "triangle", gain: 0.036 },
+    storm:    { root: 247, scale: [0, 3, 5, 7, 10], tempo: 480, wave: "triangle", gain: 0.038 },
+    harmony:  { root: 277, scale: [0, 4, 7, 9, 12], tempo: 540, wave: "sine", gain: 0.04 },
+    story:    { root: 247, scale: [0, 2, 4, 7, 9, 12], tempo: 600, wave: "sine", gain: 0.04 }
+  };
+
+  function bgmEnsureCtx() {
+    if (bgm.ctx) return bgm.ctx;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    bgm.ctx = new AC();
+    bgm.master = bgm.ctx.createGain();
+    bgm.master.gain.value = bgm.muted ? 0 : 1;
+    bgm.master.connect(bgm.ctx.destination);
+    return bgm.ctx;
+  }
+
+  function bgmBeep(freq, dur, wave, g) {
+    var ctx = bgm.ctx;
+    if (!ctx || !bgm.master || bgm.muted) return;
+    var o = ctx.createOscillator();
+    var gain = ctx.createGain();
+    o.type = wave || "sine";
+    o.frequency.value = freq;
+    var now = ctx.currentTime;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.001, g || 0.04), now + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+    o.connect(gain);
+    gain.connect(bgm.master);
+    o.start(now);
+    o.stop(now + dur + 0.02);
+  }
+
+  function bgmTick() {
+    if (!bgm.ctx || bgm.muted || !bgm.world) return;
+    var th = BGM_THEMES[bgm.world] || BGM_THEMES.meadow;
+    var deg = th.scale[bgm.step % th.scale.length];
+    var freq = th.root * Math.pow(2, deg / 12);
+    /* Soft arpeggio + occasional gentle fifth underlay */
+    bgmBeep(freq, 0.28, th.wave, th.gain);
+    if (bgm.step % 4 === 0) bgmBeep(freq * 0.5, 0.45, "sine", th.gain * 0.55);
+    bgm.step++;
+  }
+
+  function bgmStopLoop() {
+    if (bgm.timer) {
+      clearInterval(bgm.timer);
+      bgm.timer = null;
+    }
+  }
+
+  function bgmStartLoop(worldId) {
+    bgmStopLoop();
+    bgm.world = worldId || state.world || "meadow";
+    bgm.step = 0;
+    if (bgm.muted) return;
+    var ctx = bgmEnsureCtx();
+    if (!ctx) return;
+    if (ctx.state === "suspended") {
+      ctx.resume().catch(function () {});
+    }
+    var th = BGM_THEMES[bgm.world] || BGM_THEMES.meadow;
+    bgm.timer = setInterval(bgmTick, th.tempo);
+    bgmTick();
+  }
+
+  function bgmSetWorld(id) {
+    if (!id) id = state.world || "meadow";
+    if (bgm.world === id && bgm.timer) return;
+    if (!bgm.started && !bgm.muted) {
+      /* wait for gesture; still remember world */
+      bgm.world = id;
+      return;
+    }
+    bgmStartLoop(id);
+  }
+
+  function bgmUnlock() {
+    if (bgm.started) return;
+    bgm.started = true;
+    var ctx = bgmEnsureCtx();
+    if (ctx && ctx.state === "suspended") ctx.resume().catch(function () {});
+    if (!bgm.muted) bgmStartLoop(state.world || "meadow");
+  }
+
+  function bgmSetMuted(on) {
+    bgm.muted = !!on;
+    try { localStorage.setItem(BGM_MUTE_KEY, bgm.muted ? "1" : "0"); } catch (eS) {}
+    if (bgm.master) bgm.master.gain.value = bgm.muted ? 0 : 1;
+    var btn = document.getElementById("btn-bgm");
+    if (btn) {
+      btn.classList.toggle("muted", bgm.muted);
+      btn.setAttribute("aria-pressed", bgm.muted ? "true" : "false");
+      btn.textContent = bgm.muted ? "🔇" : "🎵";
+      btn.title = bgm.muted ? "Music off" : "Music on";
+    }
+    if (bgm.muted) bgmStopLoop();
+    else if (bgm.started) bgmStartLoop(state.world || bgm.world || "meadow");
+  }
+
+  function bgmToggle() {
+    bgmUnlock();
+    bgmSetMuted(!bgm.muted);
+  }
+
+  function ensureBgmButton() {
+    var btn = document.getElementById("btn-bgm");
+    if (btn) return btn;
+    var hud = document.getElementById("save-hud");
+    if (!hud) return null;
+    btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "btn-bgm";
+    btn.className = "btn-bgm" + (bgm.muted ? " muted" : "");
+    btn.textContent = bgm.muted ? "🔇" : "🎵";
+    btn.title = bgm.muted ? "Music off" : "Music on";
+    btn.setAttribute("aria-label", "Music");
+    btn.setAttribute("aria-pressed", bgm.muted ? "true" : "false");
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      bgmToggle();
+    });
+    hud.insertBefore(btn, hud.firstChild);
+    return btn;
+  }
+
+
   function enterWorld(id, opts) {
     const d = WORLD_DEFS[id];
     if (!d) return;
@@ -2662,6 +2811,7 @@
     if (spawn === "east") placeHero(17, 2, "left");
     else placeHero(2, 14, "up");
     applyWorldChrome();
+    try { bgmSetWorld(id); } catch (eBgm) {}
     closeDialogueQuiet();
     scheduleSave();
     const silent = !!(opts && opts.silent);
@@ -3773,5 +3923,11 @@
       showArtLoader(false);
     }
   }, 8000);
+  ensureBgmButton();
+  bgmSetMuted(bgm.muted);
+  ["pointerdown", "keydown", "touchstart"].forEach(function (ev) {
+    window.addEventListener(ev, bgmUnlock, { once: true, passive: true });
+  });
+  try { bgmSetWorld(state.world || "meadow"); } catch (eBootBgm) {}
   preloadArt();
 })();

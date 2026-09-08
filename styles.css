@@ -386,3 +386,28 @@
   cursor:pointer;box-shadow:0 4px 0 #311b92;
 }
 .spark-confirm:active{transform:translateY(2px);box-shadow:0 2px 0 #311b92;}
+
+
+/* Per-world BGM mute */
+.btn-bgm {
+  border: 2px solid #2d5a3d;
+  background: #fff8e7;
+  border-radius: 999px;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  margin-right: 0.35rem;
+  flex-shrink: 0;
+}
+.btn-bgm.muted {
+  background: #eceff1;
+  border-color: #78909c;
+  opacity: 0.85;
+}
+.save-hud {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
